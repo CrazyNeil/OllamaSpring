@@ -8,12 +8,31 @@
 
 /* Begin PBXBuildFile section */
 		FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC7E42BEF1657007E4EB9 /* OllamaSpringApp.swift */; };
-		FB0FC7E72BEF1657007E4EB9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC7E62BEF1657007E4EB9 /* ContentView.swift */; };
 		FB0FC7E92BEF165A007E4EB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB0FC7E82BEF165A007E4EB9 /* Assets.xcassets */; };
 		FB0FC7EC2BEF165A007E4EB9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB0FC7EB2BEF165A007E4EB9 /* Preview Assets.xcassets */; };
 		FB0FC7F72BEF165A007E4EB9 /* OllamaSpringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC7F62BEF165A007E4EB9 /* OllamaSpringTests.swift */; };
 		FB0FC8012BEF165A007E4EB9 /* OllamaSpringUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8002BEF165A007E4EB9 /* OllamaSpringUITests.swift */; };
 		FB0FC8032BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */; };
+		FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */; };
+		FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */; };
+		FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC62BF19115007E0935 /* ChatModel.swift */; };
+		FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */; };
+		FBA45BCD2BF1AB14007E0935 /* MessagesPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCC2BF1AB14007E0935 /* MessagesPanelView.swift */; };
+		FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */; };
+		FBA45BD12BF1C2B5007E0935 /* MessagesRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BD02BF1C2B5007E0935 /* MessagesRowView.swift */; };
+		FBA45BD32BF20258007E0935 /* ChatListPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BD22BF20258007E0935 /* ChatListPanelView.swift */; };
+		FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BD52BF20B48007E0935 /* OllamaApi.swift */; };
+		FBA45BD92BF21240007E0935 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = FBA45BD82BF21240007E0935 /* SwiftyJSON */; };
+		FBA45BDC2BF23F6D007E0935 /* MessagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BDB2BF23F6D007E0935 /* MessagesViewModel.swift */; };
+		FBA45BDE2BF30103007E0935 /* SendMsgPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BDD2BF30103007E0935 /* SendMsgPanelView.swift */; };
+		FBA45BE12BF3030F007E0935 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = FBA45BE02BF3030F007E0935 /* MarkdownUI */; };
+		FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BE22BF3334D007E0935 /* ChatListViewModel.swift */; };
+		FBA45BEB2BF3614D007E0935 /* RealmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BEA2BF3614D007E0935 /* RealmModel.swift */; };
+		FBA45BEE2BF436C3007E0935 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = FBA45BED2BF436C3007E0935 /* RealmSwift */; };
+		FBA45BEF2BF436C3007E0935 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = FBA45BED2BF436C3007E0935 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */; };
+		FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */; };
+		FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA45BF82BF627D8007E0935 /* Metal.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,10 +52,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		FBA45BF02BF436C3007E0935 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				FBA45BEF2BF436C3007E0935 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		FB0FC7E12BEF1657007E4EB9 /* OllamaSpring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OllamaSpring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB0FC7E42BEF1657007E4EB9 /* OllamaSpringApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringApp.swift; sourceTree = "<group>"; };
-		FB0FC7E62BEF1657007E4EB9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FB0FC7E82BEF165A007E4EB9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB0FC7EB2BEF165A007E4EB9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FB0FC7ED2BEF165A007E4EB9 /* OllamaSpring.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OllamaSpring.entitlements; sourceTree = "<group>"; };
@@ -45,6 +77,22 @@
 		FB0FC7FC2BEF165A007E4EB9 /* OllamaSpringUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OllamaSpringUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB0FC8002BEF165A007E4EB9 /* OllamaSpringUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITests.swift; sourceTree = "<group>"; };
 		FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPanelView.swift; sourceTree = "<group>"; };
+		FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePanelView.swift; sourceTree = "<group>"; };
+		FBA45BC62BF19115007E0935 /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
+		FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListRowView.swift; sourceTree = "<group>"; };
+		FBA45BCC2BF1AB14007E0935 /* MessagesPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesPanelView.swift; sourceTree = "<group>"; };
+		FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
+		FBA45BD02BF1C2B5007E0935 /* MessagesRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesRowView.swift; sourceTree = "<group>"; };
+		FBA45BD22BF20258007E0935 /* ChatListPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListPanelView.swift; sourceTree = "<group>"; };
+		FBA45BD52BF20B48007E0935 /* OllamaApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaApi.swift; sourceTree = "<group>"; };
+		FBA45BDB2BF23F6D007E0935 /* MessagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewModel.swift; sourceTree = "<group>"; };
+		FBA45BDD2BF30103007E0935 /* SendMsgPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMsgPanelView.swift; sourceTree = "<group>"; };
+		FBA45BE22BF3334D007E0935 /* ChatListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListViewModel.swift; sourceTree = "<group>"; };
+		FBA45BEA2BF3614D007E0935 /* RealmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmModel.swift; sourceTree = "<group>"; };
+		FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonViewModel.swift; sourceTree = "<group>"; };
+		FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferredResponseLangModel.swift; sourceTree = "<group>"; };
+		FBA45BF82BF627D8007E0935 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +100,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBA45BEE2BF436C3007E0935 /* RealmSwift in Frameworks */,
+				FBA45BD92BF21240007E0935 /* SwiftyJSON in Frameworks */,
+				FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */,
+				FBA45BE12BF3030F007E0935 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +131,7 @@
 				FB0FC7F52BEF165A007E4EB9 /* OllamaSpringTests */,
 				FB0FC7FF2BEF165A007E4EB9 /* OllamaSpringUITests */,
 				FB0FC7E22BEF1657007E4EB9 /* Products */,
+				FBA45BEC2BF436C3007E0935 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,8 +148,13 @@
 		FB0FC7E32BEF1657007E4EB9 /* OllamaSpring */ = {
 			isa = PBXGroup;
 			children = (
+				FBA45BF12BF51871007E0935 /* Utilities */,
+				FBA45BE92BF36114007E0935 /* Database */,
+				FBA45BDA2BF23E7F007E0935 /* ViewModel */,
+				FBA45BD42BF20AFF007E0935 /* Network */,
+				FBA45BC52BF1906A007E0935 /* Model */,
+				FB0FC80F2BEF4812007E4EB9 /* View */,
 				FB0FC7E42BEF1657007E4EB9 /* OllamaSpringApp.swift */,
-				FB0FC7E62BEF1657007E4EB9 /* ContentView.swift */,
 				FB0FC7E82BEF165A007E4EB9 /* Assets.xcassets */,
 				FB0FC7ED2BEF165A007E4EB9 /* OllamaSpring.entitlements */,
 				FB0FC7EA2BEF165A007E4EB9 /* Preview Content */,
@@ -129,6 +187,87 @@
 			path = OllamaSpringUITests;
 			sourceTree = "<group>";
 		};
+		FB0FC80F2BEF4812007E4EB9 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BC92BF1947A007E0935 /* ScrollViewRow */,
+				FBA45BC82BF19467007E0935 /* Panel */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		FBA45BC52BF1906A007E0935 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BC62BF19115007E0935 /* ChatModel.swift */,
+				FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */,
+				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		FBA45BC82BF19467007E0935 /* Panel */ = {
+			isa = PBXGroup;
+			children = (
+				FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */,
+				FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */,
+				FBA45BCC2BF1AB14007E0935 /* MessagesPanelView.swift */,
+				FBA45BD22BF20258007E0935 /* ChatListPanelView.swift */,
+				FBA45BDD2BF30103007E0935 /* SendMsgPanelView.swift */,
+			);
+			path = Panel;
+			sourceTree = "<group>";
+		};
+		FBA45BC92BF1947A007E0935 /* ScrollViewRow */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */,
+				FBA45BD02BF1C2B5007E0935 /* MessagesRowView.swift */,
+			);
+			path = ScrollViewRow;
+			sourceTree = "<group>";
+		};
+		FBA45BD42BF20AFF007E0935 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BD52BF20B48007E0935 /* OllamaApi.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		FBA45BDA2BF23E7F007E0935 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BDB2BF23F6D007E0935 /* MessagesViewModel.swift */,
+				FBA45BE22BF3334D007E0935 /* ChatListViewModel.swift */,
+				FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		FBA45BE92BF36114007E0935 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BEA2BF3614D007E0935 /* RealmModel.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		FBA45BEC2BF436C3007E0935 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FBA45BF82BF627D8007E0935 /* Metal.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FBA45BF12BF51871007E0935 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -139,12 +278,18 @@
 				FB0FC7DD2BEF1657007E4EB9 /* Sources */,
 				FB0FC7DE2BEF1657007E4EB9 /* Frameworks */,
 				FB0FC7DF2BEF1657007E4EB9 /* Resources */,
+				FBA45BF02BF436C3007E0935 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = OllamaSpring;
+			packageProductDependencies = (
+				FBA45BD82BF21240007E0935 /* SwiftyJSON */,
+				FBA45BE02BF3030F007E0935 /* MarkdownUI */,
+				FBA45BED2BF436C3007E0935 /* RealmSwift */,
+			);
 			productName = OllamaSpring;
 			productReference = FB0FC7E12BEF1657007E4EB9 /* OllamaSpring.app */;
 			productType = "com.apple.product-type.application";
@@ -217,6 +362,11 @@
 				Base,
 			);
 			mainGroup = FB0FC7D82BEF1657007E4EB9;
+			packageReferences = (
+				FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				FBA45BDF2BF3030F007E0935 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				FBA45BE42BF34F67007E0935 /* XCRemoteSwiftPackageReference "realm-swift" */,
+			);
 			productRefGroup = FB0FC7E22BEF1657007E4EB9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -259,8 +409,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB0FC7E72BEF1657007E4EB9 /* ContentView.swift in Sources */,
+				FBA45BDC2BF23F6D007E0935 /* MessagesViewModel.swift in Sources */,
+				FBA45BEB2BF3614D007E0935 /* RealmModel.swift in Sources */,
 				FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */,
+				FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */,
+				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
+				FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */,
+				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
+				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
+				FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */,
+				FBA45BDE2BF30103007E0935 /* SendMsgPanelView.swift in Sources */,
+				FBA45BD32BF20258007E0935 /* ChatListPanelView.swift in Sources */,
+				FBA45BD12BF1C2B5007E0935 /* MessagesRowView.swift in Sources */,
+				FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */,
+				FBA45BCD2BF1AB14007E0935 /* MessagesPanelView.swift in Sources */,
+				FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */,
+				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +584,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -447,6 +612,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -581,6 +747,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		FBA45BDF2BF3030F007E0935 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
+		FBA45BE42BF34F67007E0935 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FBA45BD82BF21240007E0935 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+		FBA45BE02BF3030F007E0935 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FBA45BDF2BF3030F007E0935 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+		FBA45BED2BF436C3007E0935 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FBA45BE42BF34F67007E0935 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FB0FC7D92BEF1657007E4EB9 /* Project object */;
 }
