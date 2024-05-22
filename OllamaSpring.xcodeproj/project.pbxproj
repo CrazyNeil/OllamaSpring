@@ -14,6 +14,12 @@
 		FB0FC8012BEF165A007E4EB9 /* OllamaSpringUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8002BEF165A007E4EB9 /* OllamaSpringUITests.swift */; };
 		FB0FC8032BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */; };
 		FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */; };
+		FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */; };
+		FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE02BF7241000E1EA88 /* Constant.swift */; };
+		FB65CFE32BF7A83F00E1EA88 /* common.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE22BF7A83F00E1EA88 /* common.swift */; };
+		FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */; };
+		FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */; };
+		FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */; };
 		FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */; };
 		FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC62BF19115007E0935 /* ChatModel.swift */; };
 		FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */; };
@@ -78,6 +84,12 @@
 		FB0FC8002BEF165A007E4EB9 /* OllamaSpringUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITests.swift; sourceTree = "<group>"; };
 		FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPanelView.swift; sourceTree = "<group>"; };
+		FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaModel.swift; sourceTree = "<group>"; };
+		FB65CFE02BF7241000E1EA88 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
+		FB65CFE22BF7A83F00E1EA88 /* common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = common.swift; sourceTree = "<group>"; };
+		FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaDownloadViewModel.swift; sourceTree = "<group>"; };
+		FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLocalModelListRowView.swift; sourceTree = "<group>"; };
+		FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmModalView.swift; sourceTree = "<group>"; };
 		FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePanelView.swift; sourceTree = "<group>"; };
 		FBA45BC62BF19115007E0935 /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
 		FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListRowView.swift; sourceTree = "<group>"; };
@@ -158,6 +170,7 @@
 				FB0FC7E82BEF165A007E4EB9 /* Assets.xcassets */,
 				FB0FC7ED2BEF165A007E4EB9 /* OllamaSpring.entitlements */,
 				FB0FC7EA2BEF165A007E4EB9 /* Preview Content */,
+				FB65CFE02BF7241000E1EA88 /* Constant.swift */,
 			);
 			path = OllamaSpring;
 			sourceTree = "<group>";
@@ -190,10 +203,19 @@
 		FB0FC80F2BEF4812007E4EB9 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				FB65CFE82BF984FB00E1EA88 /* Modal */,
 				FBA45BC92BF1947A007E0935 /* ScrollViewRow */,
 				FBA45BC82BF19467007E0935 /* Panel */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		FB65CFE82BF984FB00E1EA88 /* Modal */ = {
+			isa = PBXGroup;
+			children = (
+				FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */,
+			);
+			path = Modal;
 			sourceTree = "<group>";
 		};
 		FBA45BC52BF1906A007E0935 /* Model */ = {
@@ -202,6 +224,7 @@
 				FBA45BC62BF19115007E0935 /* ChatModel.swift */,
 				FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */,
 				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
+				FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -223,6 +246,7 @@
 			children = (
 				FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */,
 				FBA45BD02BF1C2B5007E0935 /* MessagesRowView.swift */,
+				FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */,
 			);
 			path = ScrollViewRow;
 			sourceTree = "<group>";
@@ -241,6 +265,7 @@
 				FBA45BDB2BF23F6D007E0935 /* MessagesViewModel.swift */,
 				FBA45BE22BF3334D007E0935 /* ChatListViewModel.swift */,
 				FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */,
+				FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -264,6 +289,7 @@
 		FBA45BF12BF51871007E0935 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				FB65CFE22BF7A83F00E1EA88 /* common.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -412,17 +438,23 @@
 				FBA45BDC2BF23F6D007E0935 /* MessagesViewModel.swift in Sources */,
 				FBA45BEB2BF3614D007E0935 /* RealmModel.swift in Sources */,
 				FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */,
+				FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */,
 				FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */,
 				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
 				FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */,
+				FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */,
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
 				FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */,
 				FBA45BDE2BF30103007E0935 /* SendMsgPanelView.swift in Sources */,
+				FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */,
+				FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */,
 				FBA45BD32BF20258007E0935 /* ChatListPanelView.swift in Sources */,
+				FB65CFE32BF7A83F00E1EA88 /* common.swift in Sources */,
 				FBA45BD12BF1C2B5007E0935 /* MessagesRowView.swift in Sources */,
 				FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */,
 				FBA45BCD2BF1AB14007E0935 /* MessagesPanelView.swift in Sources */,
+				FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */,
 				FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */,
 				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
 			);

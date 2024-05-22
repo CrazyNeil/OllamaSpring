@@ -47,15 +47,13 @@ class RealmChat: Object {
     @Persisted var chatId: String
     @Persisted var name: String
     @Persisted var image: String
-    @Persisted var modelName: String
     @Persisted var createdAt: String
     
-    convenience init(chatId: String, name: String, image: String, modelName: String, createdAt: String){
+    convenience init(chatId: String, name: String, image: String, createdAt: String){
         self.init()
         self.chatId = chatId
         self.name = name
         self.image = image
-        self.modelName = modelName
         self.createdAt = createdAt
     }
 }
@@ -119,20 +117,15 @@ class PreferenceManager {
     }
     
     func setPreference(preferenceKey: String, preferenceValue: String) {
-        let realm = try! Realm()
-        
-        do {
-            try realm.write {
-                let record = RealmPreference(
-                    preferenceKey: preferenceKey, preferenceValue: preferenceValue
-                )
+            let realm = try! Realm()
+            guard realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) == nil else {
+                return
+            }
+            let record = RealmPreference(preferenceKey: preferenceKey, preferenceValue: preferenceValue)
+            try! realm.write {
                 realm.add(record)
             }
-  
-        } catch {
-            NSLog("Failed to save msg: \(error.localizedDescription)")
         }
-    }
 
     func getPreference(preferenceKey: String) -> Results<RealmPreference> {
         let realm = try! Realm()
@@ -144,6 +137,18 @@ class PreferenceManager {
         
         return item
     }
+    
+    func deletePreference(preferenceKey: String) {
+        let realm = try! Realm()
+        guard let record = realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) else {
+            NSLog("preferenceKey \(preferenceKey) not found.")
+            return
+        }
+        try! realm.write {
+            realm.delete(record)
+        }
+    }
+
 }
 
 class MessageManager {
@@ -215,7 +220,6 @@ class ChatManager {
                     chatId: chat.id.uuidString,  // Convert UUID to String
                     name: chat.name,
                     image: chat.image,
-                    modelName: chat.modelName,
                     createdAt: chat.createdAt
                 )
                 realm.add(record)

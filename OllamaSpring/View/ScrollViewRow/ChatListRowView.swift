@@ -25,7 +25,7 @@ struct ChatListRowView: View {
             Color
                 .clear
                 .contentShape(Rectangle())
-
+            
             
             HStack {
                 VStack {
@@ -37,11 +37,11 @@ struct ChatListRowView: View {
                         .padding(.leading, 10)
                 }
                 
-                VStack {
+                VStack(spacing:0){
                     HStack {
                         // edit chat name
                         if isEditing {
-                            TextField("Chat Name", text: $editedChatName, onCommit: {
+                            TextField(default_conversation_name, text: $editedChatName, onCommit: {
                                 isEditing = false
                                 let chatManager = ChatManager()
                                 if chatManager.updateChatName(withId: chat.id, newName: editedChatName) {
@@ -50,10 +50,10 @@ struct ChatListRowView: View {
                             })
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .onKeyPress(keys: [.escape]) { press in
-                                    isEditing = false
-                                    return .handled
-                                }
-
+                                isEditing = false
+                                return .handled
+                            }
+                            
                         } else {
                             Text(chat.name)
                                 .font(.body)
@@ -64,17 +64,18 @@ struct ChatListRowView: View {
                         }
                         Spacer()
                     }
-
+                    
                     
                     HStack {
-                        Text(chat.modelName)
+                        Text(chat.createdAt)
                             .font(.subheadline)
                             .foregroundColor(.gray)
-                            .opacity(0.5)
+                            .opacity(0.75)
+                            .padding(.top, 2)
                         Spacer()
                     }
                 }
-
+                
                 
                 Spacer()
                 

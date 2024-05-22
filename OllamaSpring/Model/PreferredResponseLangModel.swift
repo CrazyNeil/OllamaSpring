@@ -17,14 +17,4 @@ struct PreferredResponseLanguage: Identifiable {
     }
 }
 
-let PreferredLangList = [
-    PreferredResponseLanguage(lang: "English"),
-    PreferredResponseLanguage(lang: "Korean"),
-    PreferredResponseLanguage(lang: "Japanese"),
-    PreferredResponseLanguage(lang: "Vietnamese"),
-    PreferredResponseLanguage(lang: "Spanish"),
-    PreferredResponseLanguage(lang: "Arabic"),
-    PreferredResponseLanguage(lang: "Indonesian"),
-    PreferredResponseLanguage(lang: "Simplified Chinese"),
-    PreferredResponseLanguage(lang: "Traditional Chinese")
-]
+

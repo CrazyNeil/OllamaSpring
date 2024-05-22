@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Message: Identifiable {
+struct Message: Identifiable, Decodable, Equatable{
     var id = UUID()
     var chatId:UUID
     var model:String
@@ -21,6 +21,7 @@ struct Message: Identifiable {
     var promptEvalCuration:Int = 0
     var evalCount:Int = 0
     var evalDuration:Int = 0
+    
     
     init(
         id: UUID = UUID(),

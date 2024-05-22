@@ -30,7 +30,10 @@ struct SendMsgPanelView: View {
     @ObservedObject var commonViewModel:CommonViewModel
     
     @State private var inputText = ""
+    @State private var placeHolder = ""
     @State var textEditorHeight : CGFloat = 20
+    
+    @State private var disableSendMsg = false
     
     var body: some View {
         ZStack(alignment: .leading) {
@@ -44,31 +47,94 @@ struct SendMsgPanelView: View {
                 })
             
             HStack {
-                TextEditor(text: $inputText)
-                    .font(.system(.body))
-                    .frame(height: max(20,min(300, textEditorHeight)))
-                    .cornerRadius(10.0)
-                    .shadow(radius: 1.0)
-                    .padding(.trailing, 5)
-                    .padding(.bottom, 3)
-                    .padding(.top, 5)
-                    .padding(.leading, 3)
-                    .scrollContentBackground(.hidden)
-                    .onKeyPress(keys: [.return]) { press in
-                        if press.modifiers.contains(.shift) {
-                            // Perform newline operation
-                            inputText += "\n"
-                            return .handled
-                        } else {
-                            DispatchQueue.main.async {
-                                if(messagesViewModel.waitingModelResponse == false) {
-                                    messagesViewModel.sendMsg(chatId: chatListViewModel.selectedChat!, modelName: "llama3", content: inputText, responseLang: commonViewModel.selectedResponseLang, messages: messagesViewModel.messages)
-                                    inputText = ""
-                                }
-                            }
-                            return .handled
+                
+                ZStack(alignment: .topLeading) {
+                    // no model found. disable send msg.
+                    if commonViewModel.ollamaLocalModelList.isEmpty {
+                        HStack {
+                            Image(systemName: "exclamationmark.circle")
+                                .font(.subheadline)
+                                .imageScale(.large)
+                                .foregroundColor(.gray)
+                                .padding(EdgeInsets(top: 5, leading: 11, bottom: 8, trailing: 0))
+                            
+                            Text("You need select a model on top bar first")
+                                .foregroundColor(.gray)
+                                .opacity(0.9)
+                                .padding(EdgeInsets(top: 5, leading: 0, bottom: 8, trailing: 5))
                         }
+                        HStack {}.frame(maxWidth: .infinity)
+                    } else if (chatListViewModel.ChatList.count == 0) {
+                        HStack {
+                            Image(systemName: "exclamationmark.circle")
+                                .font(.subheadline)
+                                .imageScale(.large)
+                                .foregroundColor(.gray)
+                                .padding(EdgeInsets(top: 5, leading: 11, bottom: 8, trailing: 0))
+                            
+                            Text("You need create a new conversation on left top bar first.")
+                                .foregroundColor(.gray)
+                                .opacity(0.9)
+                                .padding(EdgeInsets(top: 5, leading: 0, bottom: 8, trailing: 5))
+                        }
+                        HStack {}.frame(maxWidth: .infinity)
+                    } else {
+                        
+                        if inputText.isEmpty {
+                            Text("send a message (shift + return for new line)")
+                                .foregroundColor(.gray)
+                                .opacity(0.4)
+                                .padding(EdgeInsets(top: 5, leading: 11, bottom: 8, trailing: 5))
+                        }
+                        
+                        TextEditor(text: $inputText)
+                            .font(.system(.body))
+                            .frame(height: max(20,min(300, textEditorHeight)))
+                            .cornerRadius(10.0)
+                            .shadow(radius: 1.0)
+                            .padding(.trailing, 5)
+                            .padding(.bottom, 3)
+                            .padding(.top, 5)
+                            .padding(.leading, 3)
+                            .scrollContentBackground(.hidden)
+                            .onKeyPress(keys: [.return]) { press in
+                                if commonViewModel.ollamaLocalModelList.isEmpty {
+                                    disableSendMsg = true
+                                } else {
+                                    if press.modifiers.contains(.shift) {
+                                        // Perform newline operation
+                                        inputText += "\n"
+                                    } else {
+                                        DispatchQueue.main.async {
+                                            if(messagesViewModel.waitingModelResponse == false) {
+                                                if messagesViewModel.streamingOutput {
+                                                    messagesViewModel.sendMsgWithStreamingOn(
+                                                        chatId: chatListViewModel.selectedChat!,
+                                                        modelName: commonViewModel.selectedOllamaModel,
+                                                        content: inputText,
+                                                        responseLang: commonViewModel.selectedResponseLang,
+                                                        messages: messagesViewModel.messages
+                                                    )
+                                                } else {
+                                                    messagesViewModel.sendMsg(
+                                                        chatId: chatListViewModel.selectedChat!,
+                                                        modelName: commonViewModel.selectedOllamaModel,
+                                                        content: inputText,
+                                                        responseLang: commonViewModel.selectedResponseLang,
+                                                        messages: messagesViewModel.messages
+                                                    )
+                                                }
+                                                
+                                                inputText = ""
+                                            }
+                                        }
+                                    }
+                                }
+                                return .handled
+                            }
                     }
+                    
+                }
                 
                 Image(systemName: "arrowshape.up.circle")
                     .font(.subheadline)
@@ -78,15 +144,19 @@ struct SendMsgPanelView: View {
                     .onTapGesture {
                         DispatchQueue.main.async {
                             if(messagesViewModel.waitingModelResponse == false) {
-                                messagesViewModel.sendMsg(chatId: chatListViewModel.selectedChat!, modelName: "llama3", content: inputText, responseLang: commonViewModel.selectedResponseLang, messages: messagesViewModel.messages)
-                                inputText = ""
                                 
+                                if commonViewModel.ollamaLocalModelList.isEmpty == false {
+                                    messagesViewModel.sendMsg(chatId: chatListViewModel.selectedChat!, modelName: "llama3", content: inputText, responseLang: commonViewModel.selectedResponseLang, messages: messagesViewModel.messages)
+                                    inputText = ""
+                                }
                             }
                         }
                         
                     }
                 
             }
+            
+            
         }
         .onPreferenceChange(TextEditorViewHeightKey.self) { textEditorHeight = $0 }
         .overlay(
@@ -97,6 +167,7 @@ struct SendMsgPanelView: View {
         .padding(.bottom, 10)
         .padding(.trailing,10)
         .padding(.leading,10)
+        
     }
 }
 
