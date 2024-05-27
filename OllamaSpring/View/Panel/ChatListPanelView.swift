@@ -272,7 +272,6 @@ struct ChatListPanelView: View {
                     .onAppear(){
                         commonViewModel.loadAvailableLocalModels()
                     }
-                    
                 }
                 
                 // download process handler
@@ -340,7 +339,7 @@ struct ChatListPanelView: View {
                     .opacity(0.8)
                     .cornerRadius(8)
                     .onAppear(){
-                        downloadViewModel.startDownload(modelName:modelToBeDownloaded ?? "" )
+                        downloadViewModel.startDownload(modelName:modelToBeDownloaded ?? "")
                     }
                 }
                 

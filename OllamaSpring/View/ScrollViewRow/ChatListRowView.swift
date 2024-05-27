@@ -41,7 +41,7 @@ struct ChatListRowView: View {
                     HStack {
                         // edit chat name
                         if isEditing {
-                            TextField(default_conversation_name, text: $editedChatName, onCommit: {
+                            TextField("Chat Name", text: $editedChatName, onCommit: {
                                 isEditing = false
                                 let chatManager = ChatManager()
                                 if chatManager.updateChatName(withId: chat.id, newName: editedChatName) {
@@ -71,7 +71,7 @@ struct ChatListRowView: View {
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .opacity(0.75)
-                            .padding(.top, 2)
+                            .padding(.top, 1)
                         Spacer()
                     }
                 }

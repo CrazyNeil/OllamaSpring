@@ -8,7 +8,7 @@
 import Foundation
 
 class CommonViewModel: ObservableObject {
-    @Published var selectedResponseLang:String = ""
+    @Published var selectedResponseLang:String = defaultResponseLang
     @Published var isOllamaApiServiceAvailable:Bool = false
     @Published var selectedOllamaModel:String = defaultSelectedModel
     @Published var ollamaLocalModelList:[OllamaModel] = []

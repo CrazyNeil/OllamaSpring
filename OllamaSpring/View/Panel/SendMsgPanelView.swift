@@ -87,51 +87,55 @@ struct SendMsgPanelView: View {
                                 .padding(EdgeInsets(top: 5, leading: 11, bottom: 8, trailing: 5))
                         }
                         
-                        TextEditor(text: $inputText)
-                            .font(.system(.body))
-                            .frame(height: max(20,min(300, textEditorHeight)))
-                            .cornerRadius(10.0)
-                            .shadow(radius: 1.0)
-                            .padding(.trailing, 5)
-                            .padding(.bottom, 3)
-                            .padding(.top, 5)
-                            .padding(.leading, 3)
-                            .scrollContentBackground(.hidden)
-                            .onKeyPress(keys: [.return]) { press in
-                                if commonViewModel.ollamaLocalModelList.isEmpty {
-                                    disableSendMsg = true
-                                } else {
-                                    if press.modifiers.contains(.shift) {
-                                        // Perform newline operation
-                                        inputText += "\n"
+                        if #available(macOS 14.0, *) {
+                            TextEditor(text: $inputText)
+                                .font(.system(.body))
+                                .frame(height: max(20,min(300, textEditorHeight)))
+                                .cornerRadius(10.0)
+                                .shadow(radius: 1.0)
+                                .padding(.trailing, 5)
+                                .padding(.bottom, 3)
+                                .padding(.top, 5)
+                                .padding(.leading, 3)
+                                .scrollContentBackground(.hidden)
+                                .onKeyPress(keys: [.return]) { press in
+                                    if commonViewModel.ollamaLocalModelList.isEmpty {
+                                        disableSendMsg = true
                                     } else {
-                                        DispatchQueue.main.async {
-                                            if(messagesViewModel.waitingModelResponse == false) {
-                                                if messagesViewModel.streamingOutput {
-                                                    messagesViewModel.sendMsgWithStreamingOn(
-                                                        chatId: chatListViewModel.selectedChat!,
-                                                        modelName: commonViewModel.selectedOllamaModel,
-                                                        content: inputText,
-                                                        responseLang: commonViewModel.selectedResponseLang,
-                                                        messages: messagesViewModel.messages
-                                                    )
-                                                } else {
-                                                    messagesViewModel.sendMsg(
-                                                        chatId: chatListViewModel.selectedChat!,
-                                                        modelName: commonViewModel.selectedOllamaModel,
-                                                        content: inputText,
-                                                        responseLang: commonViewModel.selectedResponseLang,
-                                                        messages: messagesViewModel.messages
-                                                    )
+                                        if press.modifiers.contains(.shift) {
+                                            // Perform newline operation
+                                            inputText += "\n"
+                                        } else {
+                                            DispatchQueue.main.async {
+                                                if(messagesViewModel.waitingModelResponse == false) {
+                                                    if messagesViewModel.streamingOutput {
+                                                        messagesViewModel.sendMsgWithStreamingOn(
+                                                            chatId: chatListViewModel.selectedChat!,
+                                                            modelName: commonViewModel.selectedOllamaModel,
+                                                            content: inputText,
+                                                            responseLang: commonViewModel.selectedResponseLang,
+                                                            messages: messagesViewModel.messages
+                                                        )
+                                                    } else {
+                                                        messagesViewModel.sendMsg(
+                                                            chatId: chatListViewModel.selectedChat!,
+                                                            modelName: commonViewModel.selectedOllamaModel,
+                                                            content: inputText,
+                                                            responseLang: commonViewModel.selectedResponseLang,
+                                                            messages: messagesViewModel.messages
+                                                        )
+                                                    }
+                                                    
+                                                    inputText = ""
                                                 }
-                                                
-                                                inputText = ""
                                             }
                                         }
                                     }
+                                    return .handled
                                 }
-                                return .handled
-                            }
+                        } else {
+                            // Fallback on earlier versions
+                        }
                     }
                     
                 }

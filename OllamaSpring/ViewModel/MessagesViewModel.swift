@@ -30,7 +30,6 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     
     let msgManager = MessageManager()
     
-    
     func loadMessagesFromDatabase(selectedChat: UUID) {
         self.messages.removeAll()
         let results = msgManager.getMessagesByChatId(chatId: selectedChat.uuidString)
@@ -115,7 +114,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         ]
         let newPrompt = [
             "role": "user",
-            "content": content + "\n attention: Generate response for the above content using \(responseLang) language"
+            "content": content + "\n attention: please generate response for abave content use \(responseLang) language"
         ]
         var context: [[String: String]] = []
         for message in messages.suffix(5) {
@@ -126,6 +125,8 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
         context.append(newPrompt)
         params["messages"] = context
+        
+        print(params)
         
         // send request
         do {

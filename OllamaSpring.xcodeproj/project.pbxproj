@@ -39,6 +39,7 @@
 		FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */; };
 		FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */; };
 		FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA45BF82BF627D8007E0935 /* Metal.framework */; };
+		FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,8 @@
 		FB0FC8002BEF165A007E4EB9 /* OllamaSpringUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITests.swift; sourceTree = "<group>"; };
 		FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPanelView.swift; sourceTree = "<group>"; };
+		FB1642E12BFDDDF800161BB1 /* OllamaSpringRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OllamaSpringRelease.entitlements; sourceTree = "<group>"; };
+		FB340CA02BFDB45800DD5C3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaModel.swift; sourceTree = "<group>"; };
 		FB65CFE02BF7241000E1EA88 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		FB65CFE22BF7A83F00E1EA88 /* common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = common.swift; sourceTree = "<group>"; };
@@ -105,6 +108,7 @@
 		FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonViewModel.swift; sourceTree = "<group>"; };
 		FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferredResponseLangModel.swift; sourceTree = "<group>"; };
 		FBA45BF82BF627D8007E0935 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightTopBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +164,8 @@
 		FB0FC7E32BEF1657007E4EB9 /* OllamaSpring */ = {
 			isa = PBXGroup;
 			children = (
+				FB1642E12BFDDDF800161BB1 /* OllamaSpringRelease.entitlements */,
+				FB340CA02BFDB45800DD5C3C /* Info.plist */,
 				FBA45BF12BF51871007E0935 /* Utilities */,
 				FBA45BE92BF36114007E0935 /* Database */,
 				FBA45BDA2BF23E7F007E0935 /* ViewModel */,
@@ -203,6 +209,7 @@
 		FB0FC80F2BEF4812007E4EB9 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				FBD4948C2BFD927D009AFAC1 /* Menu */,
 				FB65CFE82BF984FB00E1EA88 /* Modal */,
 				FBA45BC92BF1947A007E0935 /* ScrollViewRow */,
 				FBA45BC82BF19467007E0935 /* Panel */,
@@ -292,6 +299,14 @@
 				FB65CFE22BF7A83F00E1EA88 /* common.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		FBD4948C2BFD927D009AFAC1 /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */,
+			);
+			path = Menu;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -443,6 +458,7 @@
 				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
 				FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */,
 				FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */,
+				FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */,
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
 				FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */,
@@ -530,7 +546,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -545,6 +561,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -593,7 +610,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -602,6 +619,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -620,12 +638,17 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OllamaSpring/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OllamaSpring;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -645,15 +668,21 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
+				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpringRelease.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OllamaSpring/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OllamaSpring;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

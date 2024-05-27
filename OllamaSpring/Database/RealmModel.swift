@@ -31,8 +31,7 @@ class RealmConfiguration {
 }
 
 class RealmPreference: Object {
-    @Persisted(primaryKey: true) var _id: ObjectId
-    @Persisted var preferenceKey: String
+    @Persisted(primaryKey: true) var preferenceKey: String
     @Persisted var preferenceValue: String
     
     convenience init(preferenceKey: String, preferenceValue: String) {
@@ -141,7 +140,6 @@ class PreferenceManager {
     func deletePreference(preferenceKey: String) {
         let realm = try! Realm()
         guard let record = realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) else {
-            NSLog("preferenceKey \(preferenceKey) not found.")
             return
         }
         try! realm.write {

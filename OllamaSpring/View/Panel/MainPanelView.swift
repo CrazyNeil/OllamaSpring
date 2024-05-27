@@ -24,91 +24,10 @@ struct MainPanelView: View {
                 )
                 
                 VStack() {
-                    HStack(spacing:0) {
-                        // model list menu
-                        Menu(commonViewModel.selectedOllamaModel) {
-                            ForEach(commonViewModel.ollamaLocalModelList) { model in
-                                Button(role: .destructive, action: {
-                                    commonViewModel.selectedOllamaModel = model.name
-                                    commonViewModel.updateSelectedOllamaLocalModel(modelName: model.name)
-                                }) {
-                                    Text(model.name + " " + model.parameter_size)
-                                        .font(.subheadline)
-                                }
-                            }
-                        }
-                        .font(.subheadline)
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.leading, 30)
-                        
-                        
-                        Image(systemName: "chevron.down")
-                            .font(.subheadline)
-                            .imageScale(.small)
-                            .foregroundColor(.gray)
-                            .padding(.leading, 5)
-                        
-                        Image(systemName: "globe")
-                            .font(.subheadline)
-                            .imageScale(.medium)
-                            .foregroundColor(.gray)
-                            .padding(.leading, 30)
-                        
-                        // response language menu
-                        Menu("Response by \(commonViewModel.selectedResponseLang)") {
-                            
-                            ForEach(PreferredLangList) { lang in
-                                Button(role: .destructive, action: { commonViewModel.updateSelectedResponseLang(lang: lang.lang)  }) {
-                                    Text(lang.lang)
-                                        .font(.subheadline)
-                                }
-                            }
-                        }
-                        .font(.subheadline)
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.leading, 5)
-                        
-                        Image(systemName: "chevron.down")
-                            .font(.subheadline)
-                            .imageScale(.small)
-                            .foregroundColor(.gray)
-                            .padding(.leading, 5)
-                        
-                        
-                        Spacer()
-                        
-                        Text("Streaming")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .padding(.trailing, 5)
-                        
-                        if messagesViewModel.streamingOutput {
-                            Button(action: {
-                                messagesViewModel.streamingOutput.toggle()
-                            }) {
-                                Image(systemName: "stop.circle")
-                                    .font(.headline)
-                                    .foregroundColor(.red)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .padding(.vertical)
-                            .padding(.trailing, 10)
-                        } else {
-                            Button(action: {
-                                messagesViewModel.streamingOutput.toggle()
-                            }) {
-                                Image(systemName: "play.circle")
-                                    .font(.headline)
-                                    .foregroundColor(.green)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .padding(.vertical)
-                            .padding(.trailing, 10)
-                        }
-                        
-                    }
-                    .frame(height: 30)
-                    .background(Color.black)
+                    RightTopBarView(
+                        commonViewModel: commonViewModel,
+                        messagesViewModel: messagesViewModel
+                    )
                     
                     MessagesPanelView(
                         messagesViewModel: messagesViewModel,
@@ -134,7 +53,6 @@ struct MainPanelView: View {
             .frame(maxHeight: .infinity)
             .frame(minHeight: 600)
             .onAppear(){
-                commonViewModel.loadSelectedResponseLangFromDatabase()
                 commonViewModel.loadAvailableLocalModels()
             }
             
@@ -164,6 +82,15 @@ struct MainPanelView: View {
                     .frame(maxWidth: 600)
                     
                     HStack {
+//                        Link("Download & Install Ollama", destination: URL(string: ollamaWebUrl)!)
+//                            .font(.body)
+//                            .foregroundColor(.green)
+//                            .padding(8)
+//                            .overlay(
+//                                RoundedRectangle(cornerRadius: 8)
+//                                    .stroke(Color.green, lineWidth: 1)
+//                            )
+
                         Text("Download & Install Ollama")
                             .font(.body)
                             .foregroundColor(.green)
@@ -175,6 +102,7 @@ struct MainPanelView: View {
                             .onTapGesture {
                                 openURL(ollamaWebUrl)
                             }
+
                         
                         Text("Refresh & Try again")
                             .font(.body)
@@ -189,7 +117,6 @@ struct MainPanelView: View {
                             }
                     }
                     .frame(maxWidth: 600)
-                    
                 }
             }
             
