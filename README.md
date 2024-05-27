@@ -7,7 +7,10 @@ https://www.ollamaspring.com
 
 system requirement
 - Mac OS 14.0+
-- need [https://ollama.com](ollama) installed
+- need [ollama](https://ollama.com) installed
+
+![1-1](https://github.com/CrazyNeil/OllamaSpring/assets/5747549/0f9a1c6d-1124-4bc0-9759-c6426fdf0fd3)
+
 
 You can download latest release package in https://github.com/CrazyNeil/OllamaSpring/releases
 Just unzip and drag it into your Applicaiton folder.
