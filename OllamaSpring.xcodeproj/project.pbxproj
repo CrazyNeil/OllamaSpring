@@ -14,6 +14,9 @@
 		FB0FC8012BEF165A007E4EB9 /* OllamaSpringUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8002BEF165A007E4EB9 /* OllamaSpringUITests.swift */; };
 		FB0FC8032BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */; };
 		FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */; };
+		FB2FB9F92C06197C00621595 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB2FB9F82C06197C00621595 /* Sparkle */; };
+		FB2FB9FB2C0619F900621595 /* CheckForUpdatesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2FB9FA2C0619F900621595 /* CheckForUpdatesViewModel.swift */; };
+		FB2FB9FD2C061B1300621595 /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2FB9FC2C061B1300621595 /* CheckForUpdatesView.swift */; };
 		FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */; };
 		FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE02BF7241000E1EA88 /* Constant.swift */; };
 		FB65CFE32BF7A83F00E1EA88 /* common.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE22BF7A83F00E1EA88 /* common.swift */; };
@@ -86,6 +89,8 @@
 		FB0FC8022BEF165A007E4EB9 /* OllamaSpringUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FB0FC8112BEF487F007E4EB9 /* MainPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPanelView.swift; sourceTree = "<group>"; };
 		FB1642E12BFDDDF800161BB1 /* OllamaSpringRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OllamaSpringRelease.entitlements; sourceTree = "<group>"; };
+		FB2FB9FA2C0619F900621595 /* CheckForUpdatesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckForUpdatesViewModel.swift; sourceTree = "<group>"; };
+		FB2FB9FC2C061B1300621595 /* CheckForUpdatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckForUpdatesView.swift; sourceTree = "<group>"; };
 		FB340CA02BFDB45800DD5C3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaModel.swift; sourceTree = "<group>"; };
 		FB65CFE02BF7241000E1EA88 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
@@ -116,6 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB2FB9F92C06197C00621595 /* Sparkle in Frameworks */,
 				FBA45BEE2BF436C3007E0935 /* RealmSwift in Frameworks */,
 				FBA45BD92BF21240007E0935 /* SwiftyJSON in Frameworks */,
 				FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */,
@@ -273,6 +279,7 @@
 				FBA45BE22BF3334D007E0935 /* ChatListViewModel.swift */,
 				FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */,
 				FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */,
+				FB2FB9FA2C0619F900621595 /* CheckForUpdatesViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -305,6 +312,7 @@
 			isa = PBXGroup;
 			children = (
 				FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */,
+				FB2FB9FC2C061B1300621595 /* CheckForUpdatesView.swift */,
 			);
 			path = Menu;
 			sourceTree = "<group>";
@@ -330,6 +338,7 @@
 				FBA45BD82BF21240007E0935 /* SwiftyJSON */,
 				FBA45BE02BF3030F007E0935 /* MarkdownUI */,
 				FBA45BED2BF436C3007E0935 /* RealmSwift */,
+				FB2FB9F82C06197C00621595 /* Sparkle */,
 			);
 			productName = OllamaSpring;
 			productReference = FB0FC7E12BEF1657007E4EB9 /* OllamaSpring.app */;
@@ -407,6 +416,7 @@
 				FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				FBA45BDF2BF3030F007E0935 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				FBA45BE42BF34F67007E0935 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				FB2FB9F72C06197C00621595 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = FB0FC7E22BEF1657007E4EB9 /* Products */;
 			projectDirPath = "";
@@ -466,12 +476,14 @@
 				FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */,
 				FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */,
 				FBA45BD32BF20258007E0935 /* ChatListPanelView.swift in Sources */,
+				FB2FB9FB2C0619F900621595 /* CheckForUpdatesViewModel.swift in Sources */,
 				FB65CFE32BF7A83F00E1EA88 /* common.swift in Sources */,
 				FBA45BD12BF1C2B5007E0935 /* MessagesRowView.swift in Sources */,
 				FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */,
 				FBA45BCD2BF1AB14007E0935 /* MessagesPanelView.swift in Sources */,
 				FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */,
 				FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */,
+				FB2FB9FD2C061B1300621595 /* CheckForUpdatesView.swift in Sources */,
 				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -638,13 +650,13 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OllamaSpring/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OllamaSpring;
@@ -654,7 +666,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -672,13 +684,13 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OllamaSpring/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OllamaSpring;
@@ -688,7 +700,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -810,6 +822,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		FB2FB9F72C06197C00621595 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.2;
+			};
+		};
 		FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
@@ -837,6 +857,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		FB2FB9F82C06197C00621595 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB2FB9F72C06197C00621595 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		FBA45BD82BF21240007E0935 /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;

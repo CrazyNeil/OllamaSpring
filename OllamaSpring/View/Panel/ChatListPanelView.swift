@@ -11,7 +11,9 @@ struct ChatListPanelView: View {
     @ObservedObject var chatListViewModel: ChatListViewModel
     @ObservedObject var messagesViewModel: MessagesViewModel
     @ObservedObject var commonViewModel: CommonViewModel
+    @StateObject private var downloadViewModel = OllamaDownloadViewModel()
     
+
     @State private var modelName: String = "llama3"
     
     @State private var lockDownloadPanel = false
@@ -27,10 +29,7 @@ struct ChatListPanelView: View {
     @State private var modelToBeDownloaded:String?
     
     @State private var showNewChatAlert = false
-    
-    
-    
-    @StateObject private var downloadViewModel = OllamaDownloadViewModel()
+
     
     var body: some View {
         
@@ -122,7 +121,9 @@ struct ChatListPanelView: View {
                 
                 // bottom toolbar
                 HStack(spacing:0) {
+                    
                     Spacer()
+                    
                     Text("Downloads")
                         .font(.subheadline)
                         .foregroundColor(.gray)

@@ -7,21 +7,28 @@
 
 import SwiftUI
 import RealmSwift
+import Sparkle
 
 @main
 struct OllamaSpringApp: SwiftUI.App {
-    
+    private let updaterController: SPUStandardUpdaterController
     init() {
         // deleteRealmDatabase()
         // Initialize Realm
         _ = try! Realm(configuration: RealmConfiguration.shared.config)
+        // Create our view model for our CheckForUpdatesView
+        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     }
     
     var body: some Scene {
         
         WindowGroup {
-            
             MainPanelView().preferredColorScheme(.dark)
+        }
+        .commands {
+            CommandGroup(after: .appInfo) {
+                CheckForUpdatesView(updater: updaterController.updater)
+            }
         }
     }
     
