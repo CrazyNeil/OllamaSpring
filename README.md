@@ -6,6 +6,7 @@ OllamaSpring is a comprehensive Mac OS client for managing the various models of
 - Models download and delete
 - Conversations and History Context
 - Customize preferred response language
+- Automatically checks for and installs OllamaSpring's updates
 
 https://www.ollamaspring.com
 
