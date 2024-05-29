@@ -22,7 +22,7 @@ System Requirements:
 You can download the latest release package from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 Simply unzip the package and drag it into your Application folder.
 
-# Run and Build
+# Run & Build
 
 You can clone this project and build it using Xcode 14 or later.
 
