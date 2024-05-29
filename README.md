@@ -35,10 +35,10 @@ OllamaSpring uses [Sparkle](https://sparkle-project.org) as a built-in update fr
 ./bin/generate_keys
 ```
 
-### 2. Update Info.plist
+### 2. Setup Info.plist
 
-- SUFeedURL: Your Update Server appcast.xml
-- SUPublicEDKey: Your EdDSA public key
+- SUFeedURL: https://yourcompany.example.com/appcast.xml (Your Update Server appcast.xml)
+- SUPublicEDKey: (Your EdDSA public key)
 
 ### 3. Sandbox
 OllamaSpring disables Sandbox in .entitlements. If you want to use it, you should follow the [Sparkle sandboxing guide](https://sparkle-project.org/documentation/sandboxing/).
