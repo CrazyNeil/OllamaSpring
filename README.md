@@ -28,30 +28,3 @@ Simply unzip the package and drag it into your Application folder.
 
 You can clone this project and build it using Xcode 14 or later.
 
-## Setup Update Server
-OllamaSpring uses [Sparkle](https://sparkle-project.org) as a built-in update framework. You need to make a few changes to set up your own update service.
-
-### 1. Generate EdDSA Key
-
-```bash
-./bin/generate_keys
-```
-
-### 2. Setup Info.plist
-
-- SUFeedURL: https://yourcompany.example.com/appcast.xml (Your Update Server appcast.xml)
-- SUPublicEDKey: (Your EdDSA public key)
-
-### 3. Sandbox
-OllamaSpring disables Sandbox in .entitlements. If you want to use it, you should follow the [Sparkle sandboxing guide](https://sparkle-project.org/documentation/sandboxing/).
-
-### 4. Publish your appcast
-
-Build your app and compress it (e.g. in a ZIP/tar.xz/DMG archive), and put the archive in a new folder. This folder will be used to store all your future updates.
-
-```bash
-./bin/generate_appcast /path/to/your/updates_folder/
-```
-Upload your archives and the appcast to your server.
-
-
