@@ -43,6 +43,7 @@
 		FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */; };
 		FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA45BF82BF627D8007E0935 /* Metal.framework */; };
 		FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */; };
+		FBDF8C532C0775DC00BED237 /* OllamaLibraryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,6 +115,7 @@
 		FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferredResponseLangModel.swift; sourceTree = "<group>"; };
 		FBA45BF82BF627D8007E0935 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightTopBarView.swift; sourceTree = "<group>"; };
+		FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLibraryModalView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */,
+				FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */,
 			);
 			path = Modal;
 			sourceTree = "<group>";
@@ -478,6 +481,7 @@
 				FBA45BD32BF20258007E0935 /* ChatListPanelView.swift in Sources */,
 				FB2FB9FB2C0619F900621595 /* CheckForUpdatesViewModel.swift in Sources */,
 				FB65CFE32BF7A83F00E1EA88 /* common.swift in Sources */,
+				FBDF8C532C0775DC00BED237 /* OllamaLibraryModalView.swift in Sources */,
 				FBA45BD12BF1C2B5007E0935 /* MessagesRowView.swift in Sources */,
 				FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */,
 				FBA45BCD2BF1AB14007E0935 /* MessagesPanelView.swift in Sources */,

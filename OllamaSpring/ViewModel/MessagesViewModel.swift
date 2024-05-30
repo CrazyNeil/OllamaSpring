@@ -62,6 +62,9 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 // answer
                 let response = try await ollama.chat(modelName: modelName, role: "user", content: content, responseLang: responseLang, messages: messages)
                 if let contentDict = response["message"] as? [String: Any], let content = contentDict["content"] as? String {
+                    if content == "" || content == "\n" {
+                        let content = "No Response from \(modelName)"
+                    }
                     let msg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "assistant", messageContent: content)
                     DispatchQueue.main.async {
                         if(self.msgManager.saveMessage(message: msg)) {
@@ -125,8 +128,6 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
         context.append(newPrompt)
         params["messages"] = context
-        
-        print(params)
         
         // send request
         do {

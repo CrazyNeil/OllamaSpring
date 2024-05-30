@@ -4,12 +4,16 @@ struct RightTopBarView: View {
     @ObservedObject var commonViewModel: CommonViewModel
     @ObservedObject var messagesViewModel: MessagesViewModel
     
+    @Binding var openOllamaLibraryModal:Bool
+    
     var body: some View {
         HStack(spacing: 0) {
             modelListMenu
             chevronDownImage
             globeImage
             responseLanguageMenu
+            chevronDownImage
+            market
             chevronDownImage
             Spacer()
             streamingText
@@ -22,13 +26,22 @@ struct RightTopBarView: View {
         }
     }
     
+    private var market: some View {
+        Text("Library")
+            .font(.subheadline)
+            .padding(.leading, 30)
+            .onTapGesture {
+                self.openOllamaLibraryModal.toggle()
+            }
+    }
+    
     private var modelListMenu: some View {
         Menu(commonViewModel.selectedOllamaModel) {
             ForEach(commonViewModel.ollamaLocalModelList) { model in
                 Button(role: .destructive, action: {
                     commonViewModel.selectedOllamaModel = model.name
                 }) {
-                    Text(model.name + " " + model.parameter_size)
+                    Text(model.name)
                         .font(.subheadline)
                 }
             }

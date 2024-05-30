@@ -6,6 +6,8 @@ struct MainPanelView: View {
     @ObservedObject var messagesViewModel:MessagesViewModel
     @ObservedObject var chatListViewModel:ChatListViewModel
     
+    @State private var openOllamaLibraryModal = false
+    
     init() {
         let commonViewModel = CommonViewModel()
         self.commonViewModel = commonViewModel
@@ -20,13 +22,15 @@ struct MainPanelView: View {
                 ChatListPanelView(
                     chatListViewModel: chatListViewModel,
                     messagesViewModel: messagesViewModel,
-                    commonViewModel: commonViewModel
+                    commonViewModel: commonViewModel,
+                    openOllamaLibraryModal: $openOllamaLibraryModal
                 )
                 
                 VStack() {
                     RightTopBarView(
                         commonViewModel: commonViewModel,
-                        messagesViewModel: messagesViewModel
+                        messagesViewModel: messagesViewModel,
+                        openOllamaLibraryModal: $openOllamaLibraryModal
                     )
                     
                     MessagesPanelView(

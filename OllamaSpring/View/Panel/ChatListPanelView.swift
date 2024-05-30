@@ -29,6 +29,8 @@ struct ChatListPanelView: View {
     @State private var modelToBeDownloaded:String?
     
     @State private var showNewChatAlert = false
+    
+    @Binding var openOllamaLibraryModal:Bool
 
     
     var body: some View {
@@ -136,6 +138,16 @@ struct ChatListPanelView: View {
                 .background(Color(red: 34/255, green: 35/255, blue: 41/255))
                 .opacity(1)
                 .padding(.bottom, 0)
+                .sheet(isPresented:$openOllamaLibraryModal) {
+                    OllamaLibraryModalView(
+                        commonViewModel: commonViewModel,
+                        downloadViewModel: downloadViewModel,
+                        openOllamaLibraryModal: $openOllamaLibraryModal,
+                        downloadModelConfirm: $downloadModelConfirm,
+                        openDownloadPanel: $openDownloadPanel,
+                        modelToBeDownloaded: $modelToBeDownloaded
+                    )
+                }
             }
             .frame(maxHeight: .infinity)
             .frame(width: 280)
@@ -300,6 +312,21 @@ struct ChatListPanelView: View {
                             Spacer()
                         }
                         
+                        if downloadViewModel.downloadFailed {
+                            HStack{
+                                Spacer()
+                                
+                                Text("Close")
+                                    .font(.subheadline)
+                                    .foregroundColor(.red)
+                                    .padding(.horizontal, 20)
+                                    .padding(.top, 10)
+                                    .onTapGesture {
+                                        downloadProcessPanel.toggle()
+                                    }
+                            }
+                        }
+                        
                         if downloadViewModel.downloadCompleted {
                             HStack {
                                 Text("Close")
@@ -375,7 +402,7 @@ struct ChatListPanelView: View {
                 // modal
                 ConfirmModalView(
                     isPresented: $downloadModelConfirm,
-                    title: "Download",
+                    title: "Download: \(modelToBeDownloaded ?? "No Model")",
                     content: "This will take a few minutes, continue?",
                     confirmAction: {
                         downloadProcessPanel.toggle()  // start download process

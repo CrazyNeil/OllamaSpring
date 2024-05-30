@@ -10,6 +10,13 @@ import MarkdownUI
 
 struct MessagesRowView: View {
     let message:Message
+    @State private var isCopied: Bool = false
+    
+    func copyToClipboard(text: String) {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(text, forType: .string)
+    }
     
     var body: some View {
         let avatar = Image("ollama-1")
@@ -31,6 +38,25 @@ struct MessagesRowView: View {
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .opacity(0.5)
+                    Image(systemName: "doc.on.doc")
+                        .font(.subheadline)
+                        .imageScale(.medium)
+                        .foregroundColor(.gray)
+                        .onTapGesture {
+                            copyToClipboard(text: message.messageContent)
+                            isCopied = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                isCopied = false
+                            }
+                        }
+                    
+                    if isCopied {
+                        Text("COPIED")
+                            .font(.subheadline)
+                            .foregroundColor(Color.green)
+                    }
+                    
+                    
                     Spacer()
                 }
                 .padding(.top, 20)

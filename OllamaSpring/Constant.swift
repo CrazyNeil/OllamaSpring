@@ -31,9 +31,11 @@ let defaultResponseLang = "English"
 
 // ollama website url
 let ollamaWebUrl = "https://ollama.com"
+// ollama search page
+let ollamaLibraryUrl = "https://ollama.com/library"
 
 // ollama models
-let OllamaLocalModelList = [
+var OllamaLocalModelList = [
     OllamaModel(modelName: "Llama3 8B", name: "llama3:latest", size: "4.7GB", parameter_size: "8B", isDefault: true),
     OllamaModel(modelName: "Llama3 70B", name: "llama3:70b", size: "40GB", parameter_size: "70B", isDefault: false),
     OllamaModel(modelName: "Phi-3 3.8B", name: "phi3:latest", size: "2.3GB", parameter_size: "3.8B", isDefault: false),

@@ -44,6 +44,10 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    func findLocalModel(byName name: String, in models: [OllamaModel]) -> OllamaModel? {
+        return models.first(where: { $0.name == name })
+    }
+    
     func loadAvailableLocalModels() {
         
         Task {
@@ -60,15 +64,36 @@ class CommonViewModel: ObservableObject {
                     let details = model["details"] as? [String: Any]
                     let parameterSize = details?["parameter_size"] as? String ?? ""
                     
+                    let sizeInGB: Double
+                    if let sizeInBytes = model["size"] as? Int {
+                        sizeInGB = Double(sizeInBytes) / (1024.0 * 1024.0 * 1024.0)
+                    } else {
+                        sizeInGB = 0.0
+                    }
+                    
+                    
                     // init available local model list
                     DispatchQueue.main.async {
                         self.ollamaLocalModelList.append(OllamaModel(
                             modelName: (model["name"] as? String ?? "Not Available"),
                             name: (model["name"] as? String ?? "Not Available"),
-                            size: (model["size"] as? String ?? "0.0 GB"),
+                            size: String(format: "%.2fGB", sizeInGB),
                             parameter_size: parameterSize,
                             isDefault: false
                         ))
+                        
+                        // append model installed by library
+                        if self.findLocalModel(byName: model["name"] as! String, in: OllamaLocalModelList) == nil {
+                            OllamaLocalModelList.append(OllamaModel(
+                                modelName: (model["name"] as? String ?? "Not Available"),
+                                name: (model["name"] as? String ?? "Not Available"),
+                                size: String(format: "%.2fGB", sizeInGB),
+                                parameter_size: parameterSize,
+                                isDefault: false
+                            ))
+                        }
+                        
+
                     }
                 }
                 

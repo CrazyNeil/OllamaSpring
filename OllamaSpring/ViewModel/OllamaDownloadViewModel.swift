@@ -12,6 +12,7 @@ class OllamaDownloadViewModel: NSObject, ObservableObject, URLSessionDataDelegat
     @Published var status: String = ""
     @Published var progress: Double = 0.0
     @Published var downloadCompleted:Bool = false
+    @Published var downloadFailed:Bool = false
     @Published var downloadOnProcessing:Bool = false
     
     private var receivedData = Data()
@@ -45,7 +46,8 @@ class OllamaDownloadViewModel: NSObject, ObservableObject, URLSessionDataDelegat
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.status = "Error decoding JSON: \(error)"
+                    self.status = "Download failed. Please confirm if the model name is correct."
+                    self.downloadFailed.toggle()
                 }
             }
         }
