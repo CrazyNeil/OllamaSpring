@@ -11,8 +11,8 @@ OllamaSpring is a comprehensive Mac OS client for managing the various models of
 
 https://www.ollamaspring.com
 
-<img width="987" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/092573d1-ce83-4104-b61e-b63fd9b204f3">
-<img width="987" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/710495d7-6045-47cb-8a15-24d4083e0add">
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/092573d1-ce83-4104-b61e-b63fd9b204f3">
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/710495d7-6045-47cb-8a15-24d4083e0add">
 
 
 
