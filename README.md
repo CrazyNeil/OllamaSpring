@@ -22,7 +22,7 @@ System Requirements:
 - [Ollama](https://ollama.com) installed
 
 Download the latest release package from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
-Simply unzip the package and drag it into your Application folder.
+Simply unzip the package and drag it into your Application folder. Or install sandbox version from app store.
 
 <a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
   <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="Description" width="150"/>
