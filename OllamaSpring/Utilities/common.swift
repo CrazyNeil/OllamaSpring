@@ -31,3 +31,31 @@ func strDatetime() -> String {
     
     return createdAt
 }
+
+func convertToBase64(image: NSImage) -> String {
+    guard let tiffData = image.tiffRepresentation,
+          let bitmap = NSBitmapImageRep(data: tiffData),
+          let data = bitmap.representation(using: .jpeg, properties: [:]) ?? bitmap.representation(using: .png, properties: [:]) else {
+        return ""
+    }
+    return data.base64EncodedString(options: .lineLength64Characters)
+}
+
+func convertFromBase64(base64String: String) -> NSImage? {
+    guard let imageData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
+        print("Error decoding base64 string")
+        return nil
+    }
+
+    if let image = NSImage(data: imageData) {
+        return image
+    }
+
+    if let pngData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) {
+        if let image = NSImage(data: pngData) {
+            return image
+        }
+    }
+
+    return nil
+}

@@ -27,13 +27,6 @@ struct OllamaLibraryModalView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
-                Text("Search Model")
-                    .font(.subheadline)
-                    .foregroundColor(.orange)
-                    .padding(.leading, 20)
-                    .onTapGesture {
-                        openURL(ollamaLibraryUrl)
-                    }
                 Spacer()
             }
             .padding(.leading, 45)
@@ -62,6 +55,14 @@ struct OllamaLibraryModalView: View {
                     .foregroundColor(.gray)
                     .opacity(0.6)
                     .padding(.leading, 5)
+                
+                Text("click here")
+                    .font(.subheadline)
+                    .foregroundColor(.orange)
+                    .padding(.leading, 15)
+                    .onTapGesture {
+                        openURL(ollamaLibraryUrl)
+                    }
 
                 Spacer()
             }

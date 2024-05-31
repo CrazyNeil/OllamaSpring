@@ -40,18 +40,19 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 model: record.model,
                 createdAt: record.createdAt,
                 messageRole: record.messageRole,
-                messageContent: record.messageContent
+                messageContent: record.messageContent, 
+                image: Array(record.image)
             )
         }
     }
     
-    func sendMsg(chatId:UUID, modelName:String, content:String, responseLang:String, messages:[Message]) {
+    func sendMsg(chatId:UUID, modelName:String, content:String, responseLang:String, messages:[Message], image:[String] = []) {
         let ollama = OllamaApi()
         Task {
             do {
                 // question
-                let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content)
-                
+                let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image)
+
                 DispatchQueue.main.async {
                     if(self.msgManager.saveMessage(message: userMsg)) {
                         self.messages.append(userMsg)
@@ -60,12 +61,20 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 }
                 
                 // answer
-                let response = try await ollama.chat(modelName: modelName, role: "user", content: content, responseLang: responseLang, messages: messages)
+                var historyMsg: [Message]
+                
+                if image.count > 0 {
+                     historyMsg = []
+                } else {
+                     historyMsg = messages
+                }
+                
+                let response = try await ollama.chat(modelName: modelName, role: "user", content: content, responseLang: responseLang, messages: historyMsg, image: image)
                 if let contentDict = response["message"] as? [String: Any], var content = contentDict["content"] as? String {
                     if content == "" || content == "\n" {
                         content = "No Response from \(modelName)"
                     }
-                    let msg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "assistant", messageContent: content)
+                    let msg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "assistant", messageContent: content, image: image)
                     DispatchQueue.main.async {
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
@@ -85,12 +94,12 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         
     }
     
-    func sendMsgWithStreamingOn(chatId: UUID, modelName: String, content: String, responseLang: String, messages: [Message]){
+    func sendMsgWithStreamingOn(chatId: UUID, modelName: String, content: String, responseLang: String, messages: [Message], image:[String] = []){
         self.tmpChatId = chatId
         self.tmpModelName = modelName
         
         // question handler
-        let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content)
+        let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image)
         
         DispatchQueue.main.async {
             if(self.msgManager.saveMessage(message: userMsg)) {
@@ -101,7 +110,6 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         
         // answer handler
         guard let url = URL(string: "http://localhost:11434/api/chat") else {
-            print("Invalid URL")
             return
         }
         
@@ -117,15 +125,21 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         ]
         let newPrompt = [
             "role": "user",
-            "content": content + "\n attention: please generate response for abave content use \(responseLang) language"
-        ]
-        var context: [[String: String]] = []
-        for message in messages.suffix(5) {
-            context.append([
-                "role": message.messageRole,
-                "content": message.messageContent
-            ])
+            "content": content + "\n attention: please generate response for abave content use \(responseLang) language",
+            "images": image
+        ] as [String : Any]
+        var context: [[String: Any?]] = []
+        
+        if image.count == 0 {
+            // add history context if no image
+            for message in messages.suffix(5) {
+                context.append([
+                    "role": message.messageRole,
+                    "content": message.messageContent
+                ])
+            }
         }
+
         context.append(newPrompt)
         params["messages"] = context
         
@@ -171,7 +185,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     // after streaming done
                     if jsonObject["done"] as! Int == 1 {
                         self.waitingModelResponse = false
-                        let msg = Message(chatId: self.tmpChatId!, model: self.tmpModelName!, createdAt: strDatetime(), messageRole: "assistant", messageContent: self.tmpResponse ?? "")
+                        let msg = Message(chatId: self.tmpChatId!, model: self.tmpModelName!, createdAt: strDatetime(), messageRole: "assistant", messageContent: self.tmpResponse ?? "", image: [])
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
                         }

@@ -71,6 +71,7 @@ class RealmMessage: Object {
     @Persisted var promptEvalCuration: Int = 0
     @Persisted var evalCount: Int = 0
     @Persisted var evalDuration: Int = 0
+    @Persisted var image = List<String>()
 
     
     convenience init(
@@ -85,7 +86,8 @@ class RealmMessage: Object {
         promptEvalCount: Int,
         promptEvalCuration: Int,
         evalCount: Int,
-        evalDuration: Int
+        evalDuration: Int,
+        image:List<String>
     ){
         self.init()
         self.chatId = chatId
@@ -100,6 +102,7 @@ class RealmMessage: Object {
         self.promptEvalCuration = promptEvalCuration
         self.evalCount = evalCount
         self.evalDuration = evalDuration
+        self.image = image
     }
 }
 
@@ -181,6 +184,9 @@ class MessageManager {
         
         do {
             try realm.write {
+                let imageList = List<String>()
+                imageList.append(objectsIn: message.image)
+                
                 let record = RealmMessage(
                     chatId: message.chatId.uuidString,  // Convert UUID to String
                     model: message.model,
@@ -193,7 +199,8 @@ class MessageManager {
                     promptEvalCount: message.promptEvalCount,
                     promptEvalCuration: message.promptEvalCuration,
                     evalCount: message.evalCount,
-                    evalDuration: message.evalDuration
+                    evalDuration: message.evalDuration, 
+                    image: imageList
                 )
                 realm.add(record)
             }

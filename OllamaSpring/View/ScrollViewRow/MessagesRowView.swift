@@ -88,27 +88,46 @@ struct MessagesRowView: View {
             
             if(message.messageRole == "user")
             {
-                
-                HStack {
-                    Spacer()
+                VStack {
                     HStack {
-                        Markdown{message.messageContent}
-                            .padding(10)
-                            .font(.body)
-                            .textSelection(.enabled)
-                            .markdownTextStyle(\.code) {
-                                FontFamilyVariant(.monospaced)
-                                FontSize(.em(0.65))
-                                ForegroundColor(.purple)
-                                BackgroundColor(.purple.opacity(0.25))
-                            }
-                            .background(Color.teal.opacity(0.5))
+                        Spacer()
+                        HStack {
+                            Markdown{message.messageContent}
+                                .padding(10)
+                                .font(.body)
+                                .textSelection(.enabled)
+                                .markdownTextStyle(\.code) {
+                                    FontFamilyVariant(.monospaced)
+                                    FontSize(.em(0.65))
+                                    ForegroundColor(.purple)
+                                    BackgroundColor(.purple.opacity(0.25))
+                                }
+                                .background(Color.teal.opacity(0.5))
+                        }
+                        .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+                        .cornerRadius(8)
                     }
-                    .background(Color(red: 24/255, green: 25/255, blue: 29/255))
-                    .cornerRadius(8)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
+                    
+                    if message.image.count > 0 {
+                        if let image = convertFromBase64(base64String: message.image[0]) {
+                            HStack {
+                                Spacer()
+                                Image(nsImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .padding(.trailing, 20)
+                                    .padding(.top, 10)
+                            }
+
+                        }
+                    }
+                    
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
+                
             }
         }
     }

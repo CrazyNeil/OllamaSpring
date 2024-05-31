@@ -66,7 +66,7 @@ class OllamaApi {
         }
     }
     
-    public func chat(modelName:String, role:String, content:String, stream:Bool = false, responseLang:String = "English", messages:[Message] = []) async throws -> AnyObject {
+    public func chat(modelName:String, role:String, content:String, stream:Bool = false, responseLang:String = "English", messages:[Message] = [], image:[String] = []) async throws -> AnyObject {
         
         var params: [String: Any] = [
             "model": modelName,
@@ -74,9 +74,10 @@ class OllamaApi {
         ]
         let newPrompt = [
             "role": role,
-            "content": content + "\n attention: please generate response for abave content use \(responseLang) language"
-        ]
-        var context: [[String: String]] = []
+            "content": content + "\n attention: please generate response for abave content use \(responseLang) language",
+            "images": image
+        ] as [String : Any]
+        var context: [[String: Any?]] = []
         for message in messages.suffix(5) {
             context.append([
                 "role": message.messageRole,
@@ -85,7 +86,6 @@ class OllamaApi {
         }
         context.append(newPrompt)
         params["messages"] = context
-        
         return try await makeRequest(method: "POST", endpoint: "chat", params: params)
     }
     

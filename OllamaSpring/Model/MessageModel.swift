@@ -21,6 +21,7 @@ struct Message: Identifiable, Decodable, Equatable{
     var promptEvalCuration:Int = 0
     var evalCount:Int = 0
     var evalDuration:Int = 0
+    var image:[String] = []
     
     
     init(
@@ -29,7 +30,8 @@ struct Message: Identifiable, Decodable, Equatable{
         model: String,
         createdAt: String,
         messageRole: String,
-        messageContent: String
+        messageContent: String,
+        image:[String]
     ) {
         self.id = id
         self.chatId = chatId
@@ -44,5 +46,6 @@ struct Message: Identifiable, Decodable, Equatable{
         self.promptEvalCuration = 0
         self.evalCount = 0
         self.evalDuration = 0
+        self.image = image
     }
 }
