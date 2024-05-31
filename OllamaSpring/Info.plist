@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict/>
+<dict>
+	<key>SUFeedURL</key>
+	<string>https://www.ollamaspring.com/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>TKgrecsfy8MlA3y+s0q3udqJ89XYFx0iC680721X9fs=</string>
+</dict>
 </plist>
