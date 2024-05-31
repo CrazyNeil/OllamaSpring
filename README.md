@@ -26,10 +26,9 @@ Simply unzip the package and drag it into your Application folder.
 
 You can also download sandbox version from app store
 
-[![](https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe)](https://apps.apple.com/us/app/ollamaspring/id6502970995)
-
-<img width="150" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe">
-
+<a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
+  <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="Description" width="150"/>
+</a>
 
 # Run & Build
 
