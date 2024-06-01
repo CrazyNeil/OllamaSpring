@@ -248,9 +248,23 @@ struct SendMsgPanelView: View {
         switch result {
         case .success(let urls):
             if let url = urls.first {
-                if let image = NSImage(contentsOf: url) {
-                    selectedImage = image
-                    base64EncodedImage = convertToBase64(image: image)
+                do {
+                    guard url.startAccessingSecurityScopedResource() else {
+                        print("Unable to access security scoped resource")
+                        return
+                    }
+                    
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    
+                    let data = try Data(contentsOf: url)
+                    if let image = NSImage(data: data) {
+                        DispatchQueue.main.async {
+                            self.selectedImage = image
+                            self.base64EncodedImage = convertToBase64(image: image)
+                        }
+                    }
+                } catch {
+                    print("Error reading image data: \(error.localizedDescription)")
                 }
             }
         case .failure(let error):
