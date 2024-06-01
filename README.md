@@ -8,6 +8,7 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 - Customize preferred response language
 - Automatically checks for and installs OllamaSpring's updates
 - Quick installation by entering the model name
+- Image input
 
 https://www.ollamaspring.com
 
