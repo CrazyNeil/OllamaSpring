@@ -23,6 +23,110 @@ struct TextEditorViewHeightKey: PreferenceKey {
     }
 }
 
+struct CustomTextView: NSViewRepresentable {
+    @Binding var text: String
+    var onCommit: () -> Void
+    var onShiftReturn: () -> Void
+    var backgroundColor: NSColor
+    var isEditable: Bool
+
+    class Coordinator: NSObject, NSTextViewDelegate {
+        var parent: CustomTextView
+
+        init(_ parent: CustomTextView) {
+            self.parent = parent
+        }
+
+        func textDidChange(_ notification: Notification) {
+            if let textView = notification.object as? NSTextView {
+                DispatchQueue.main.async {
+                    self.parent.text = textView.string
+                }
+            }
+        }
+
+        func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+            if commandSelector == #selector(NSResponder.insertNewline(_:)) {
+                if NSEvent.modifierFlags.contains(.shift) {
+                    parent.onShiftReturn()
+                } else if textView.hasMarkedText() {
+                    return false
+                } else {
+                    parent.onCommit()
+                }
+                return true
+            }
+            return false
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    func makeNSView(context: Context) -> NSScrollView {
+        let scrollView = NSScrollView()
+        scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .noBorder
+        scrollView.drawsBackground = false
+
+        let textView = NSTextView()
+        textView.delegate = context.coordinator
+        textView.isRichText = false
+        textView.font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        textView.backgroundColor = backgroundColor
+        textView.isEditable = isEditable
+        textView.isSelectable = isEditable
+        textView.textContainerInset = NSSize(width: 0, height: 0)
+        textView.drawsBackground = true
+        textView.autoresizingMask = [.width]
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 0
+        paragraphStyle.paragraphSpacing = 0
+        paragraphStyle.paragraphSpacingBefore = 0
+        paragraphStyle.alignment = .left
+
+        textView.defaultParagraphStyle = paragraphStyle
+        textView.usesFontPanel = false
+        textView.autoresizingMask = [.width]
+        textView.typingAttributes = [
+            .paragraphStyle: paragraphStyle,
+            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+            .foregroundColor: NSColor.textColor
+        ]
+
+        scrollView.documentView = textView
+        return scrollView
+    }
+
+    func updateNSView(_ nsView: NSScrollView, context: Context) {
+        if let textView = nsView.documentView as? NSTextView {
+            if textView.string != text {
+                textView.string = text
+            }
+            textView.backgroundColor = backgroundColor
+            textView.isEditable = isEditable
+            textView.isSelectable = isEditable
+            
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = 0
+            paragraphStyle.paragraphSpacing = 0
+            paragraphStyle.paragraphSpacingBefore = 0
+            paragraphStyle.alignment = .left
+            
+            textView.defaultParagraphStyle = paragraphStyle
+            textView.typingAttributes = [
+                .paragraphStyle: paragraphStyle,
+                .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+                .foregroundColor: NSColor.textColor
+            ]
+        }
+    }
+}
+
 
 struct SendMsgPanelView: View {
     @ObservedObject var messagesViewModel:MessagesViewModel
@@ -113,10 +217,61 @@ struct SendMsgPanelView: View {
                     .foregroundColor(.gray)
                     .padding(.leading, 10)
                     .onTapGesture {
-                        showImagePicker.toggle()
+                        if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 {
+                            showImagePicker.toggle()
+                        }
                     }
                 
                 ZStack(alignment: .topLeading) {
+                    
+                    CustomTextView(
+                        text: $inputText,
+                        onCommit: {
+                            DispatchQueue.main.async {
+                                if messagesViewModel.waitingModelResponse == false {
+                                    var imageToSend: [String]? = nil
+                                    if self.selectedImage != nil {
+                                        imageToSend = [base64EncodedImage]
+                                        self.selectedImage = nil
+                                    }
+                                    
+                                    if messagesViewModel.streamingOutput {
+                                        messagesViewModel.sendMsgWithStreamingOn(
+                                            chatId: chatListViewModel.selectedChat!,
+                                            modelName: commonViewModel.selectedOllamaModel,
+                                            content: inputText,
+                                            responseLang: commonViewModel.selectedResponseLang,
+                                            messages: messagesViewModel.messages,
+                                            image: imageToSend ?? []
+                                        )
+                                    } else {
+                                        messagesViewModel.sendMsg(
+                                            chatId: chatListViewModel.selectedChat!,
+                                            modelName: commonViewModel.selectedOllamaModel,
+                                            content: inputText,
+                                            responseLang: commonViewModel.selectedResponseLang,
+                                            messages: messagesViewModel.messages,
+                                            image: imageToSend ?? []
+                                        )
+                                    }
+                                    
+                                    inputText = ""
+                                }
+                            }
+                        },
+                        onShiftReturn: {
+                            inputText += "\n"
+                        },
+                        backgroundColor:NSColor.clear,
+                        isEditable: !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0
+                    )
+                    .font(.system(.subheadline))
+                    .frame(height: max(20, min(300, textEditorHeight)))
+                    .padding(.trailing, 5)
+                    .padding(.bottom, 0)
+                    .padding(.top, 5)
+                    .padding(.leading, 0)
+                    
                     // no model found. disable send msg.
                     if commonViewModel.ollamaLocalModelList.isEmpty {
                         HStack {
@@ -124,7 +279,7 @@ struct SendMsgPanelView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
-                                .padding(EdgeInsets(top: 7, leading: 0, bottom: 8, trailing: 5))
+                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
                         }
                         HStack {}.frame(maxWidth: .infinity)
                     } else if (chatListViewModel.ChatList.count == 0) {
@@ -133,7 +288,7 @@ struct SendMsgPanelView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
-                                .padding(EdgeInsets(top: 7, leading: 0, bottom: 8, trailing: 5))
+                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
                         }
                         HStack {}.frame(maxWidth: .infinity)
                     } else {
@@ -143,65 +298,7 @@ struct SendMsgPanelView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .opacity(0.4)
-                                .padding(EdgeInsets(top: 7, leading: 7, bottom: 8, trailing: 5))
-                        }
-                        
-                        if #available(macOS 14.0, *) {
-                            TextEditor(text: $inputText)
-                                .font(.system(.body))
-                                .frame(height: max(20,min(300, textEditorHeight)))
-                                .cornerRadius(10.0)
-                                .shadow(radius: 1.0)
-                                .padding(.trailing, 5)
-                                .padding(.bottom, 3)
-                                .padding(.top, 5)
-                                .padding(.leading, 0)
-                                .scrollContentBackground(.hidden)
-                                .onKeyPress(keys: [.return]) { press in
-                                    if commonViewModel.ollamaLocalModelList.isEmpty {
-                                        disableSendMsg = true
-                                    } else {
-                                        if press.modifiers.contains(.shift) {
-                                            // Perform newline operation
-                                            inputText += "\n"
-                                        } else {
-                                            DispatchQueue.main.async {
-                                                if(messagesViewModel.waitingModelResponse == false) {
-                                                    var imageToSend: [String]? = nil
-                                                    if self.selectedImage != nil {
-                                                        imageToSend = [base64EncodedImage]
-                                                        self.selectedImage = nil
-                                                    }
-                                                    
-                                                    if messagesViewModel.streamingOutput {
-                                                        messagesViewModel.sendMsgWithStreamingOn(
-                                                            chatId: chatListViewModel.selectedChat!,
-                                                            modelName: commonViewModel.selectedOllamaModel,
-                                                            content: inputText,
-                                                            responseLang: commonViewModel.selectedResponseLang,
-                                                            messages: messagesViewModel.messages,
-                                                            image: imageToSend ?? []
-                                                        )
-                                                    } else {
-                                                        messagesViewModel.sendMsg(
-                                                            chatId: chatListViewModel.selectedChat!,
-                                                            modelName: commonViewModel.selectedOllamaModel,
-                                                            content: inputText,
-                                                            responseLang: commonViewModel.selectedResponseLang,
-                                                            messages: messagesViewModel.messages,
-                                                            image: imageToSend ?? []
-                                                        )
-                                                    }
-                                                    
-                                                    inputText = ""
-                                                }
-                                            }
-                                        }
-                                    }
-                                    return .handled
-                                }
-                        } else {
-                            // Fallback on earlier versions
+                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
                         }
                     }
                     
@@ -216,7 +313,7 @@ struct SendMsgPanelView: View {
                         DispatchQueue.main.async {
                             if(messagesViewModel.waitingModelResponse == false) {
                                 
-                                if commonViewModel.ollamaLocalModelList.isEmpty == false {
+                                if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 && !isInputEmpty(inputText){
                                     messagesViewModel.sendMsg(chatId: chatListViewModel.selectedChat!, modelName: "llama3", content: inputText, responseLang: commonViewModel.selectedResponseLang, messages: messagesViewModel.messages)
                                     inputText = ""
                                 }

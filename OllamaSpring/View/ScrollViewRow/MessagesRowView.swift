@@ -10,6 +10,7 @@ import MarkdownUI
 
 struct MessagesRowView: View {
     let message:Message
+    
     @State private var isCopied: Bool = false
     
     func copyToClipboard(text: String) {
@@ -75,7 +76,6 @@ struct MessagesRowView: View {
                                 BackgroundColor(.purple.opacity(0.25))
                             }
                             .markdownTheme(.gitHub)
-                        
                     }
                     .background(Color(red: 24/255, green: 25/255, blue: 29/255))
                     .cornerRadius(8)
@@ -122,7 +122,7 @@ struct MessagesRowView: View {
                                     .padding(.trailing, 20)
                                     .padding(.top, 10)
                             }
-
+                            
                         }
                     }
                     
