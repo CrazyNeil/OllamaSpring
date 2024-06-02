@@ -22,8 +22,8 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package (v1.1.3) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
-Simply unzip the package and drag it into your Application folder. Or install sandbox version (v1.1.1 not recommend) from app store.
+Download the latest release package ( latest v1.1.3 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
+Simply unzip the package and drag it into your Application folder. Or install sandbox version ( v1.1.1 not recommend ) from app store.
 
 <a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
   <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="Description" width="150"/>
