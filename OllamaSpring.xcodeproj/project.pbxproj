@@ -654,7 +654,7 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				ENABLE_APP_SANDBOX = NO;
@@ -688,7 +688,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				ENABLE_APP_SANDBOX = NO;

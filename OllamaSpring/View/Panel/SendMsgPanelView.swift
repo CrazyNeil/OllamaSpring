@@ -197,6 +197,7 @@ struct SendMsgPanelView: View {
             }
             .padding(.top, 25)
             .cornerRadius(8)
+            .frame(maxHeight: 200)
         }
         
         ZStack(alignment: .leading) {
@@ -280,6 +281,9 @@ struct SendMsgPanelView: View {
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
                                 .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
+                                .onAppear(){
+                                    inputText = ""
+                                }
                         }
                         HStack {}.frame(maxWidth: .infinity)
                     } else if (chatListViewModel.ChatList.count == 0) {
@@ -289,6 +293,9 @@ struct SendMsgPanelView: View {
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
                                 .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
+                                .onAppear(){
+                                    inputText = ""
+                                }
                         }
                         HStack {}.frame(maxWidth: .infinity)
                     } else {
