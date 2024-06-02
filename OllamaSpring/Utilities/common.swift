@@ -59,3 +59,8 @@ func convertFromBase64(base64String: String) -> NSImage? {
 
     return nil
 }
+
+func isInputEmpty(_ inputText: String) -> Bool {
+    let trimmedText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmedText.isEmpty
+}
