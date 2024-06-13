@@ -13,14 +13,19 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 
 https://www.ollamaspring.com
 
+
 Quick download for popular models
+
 <img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/cd9e01e7-70d4-47c0-a879-55d02f5f1dc2">
 
 Update model options
+
 <img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/ea77ba4e-034b-4193-ae94-d93e0c184ad7">
 
 Install model by name
+
 <img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/411c23a7-efb0-4988-861d-43efce8f964c">
+
 
 # Download & Install
 
