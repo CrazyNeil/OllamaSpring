@@ -64,3 +64,11 @@ func isInputEmpty(_ inputText: String) -> Bool {
     let trimmedText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
     return trimmedText.isEmpty
 }
+
+func formattedNumber(_ value: Double) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    formatter.groupingSeparator = ""
+    formatter.maximumFractionDigits = 0
+    return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+}

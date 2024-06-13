@@ -20,6 +20,7 @@
 		FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */; };
 		FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */; };
 		FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */; };
+		FB98716B2C1AF630000A4808 /* OptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB98716A2C1AF630000A4808 /* OptionsModel.swift */; };
 		FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */; };
 		FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC62BF19115007E0935 /* ChatModel.swift */; };
 		FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */; };
@@ -94,6 +95,7 @@
 		FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaDownloadViewModel.swift; sourceTree = "<group>"; };
 		FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLocalModelListRowView.swift; sourceTree = "<group>"; };
 		FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmModalView.swift; sourceTree = "<group>"; };
+		FB98716A2C1AF630000A4808 /* OptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsModel.swift; sourceTree = "<group>"; };
 		FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePanelView.swift; sourceTree = "<group>"; };
 		FBA45BC62BF19115007E0935 /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
 		FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListRowView.swift; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 				FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */,
 				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
 				FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */,
+				FB98716A2C1AF630000A4808 /* OptionsModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -453,6 +456,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB98716B2C1AF630000A4808 /* OptionsModel.swift in Sources */,
 				FBA45BDC2BF23F6D007E0935 /* MessagesViewModel.swift in Sources */,
 				FBA45BEB2BF3614D007E0935 /* RealmModel.swift in Sources */,
 				FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */,

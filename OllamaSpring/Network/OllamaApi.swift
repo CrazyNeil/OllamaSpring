@@ -66,11 +66,39 @@ class OllamaApi {
         }
     }
     
-    public func chat(modelName:String, role:String, content:String, stream:Bool = false, responseLang:String = "English", messages:[Message] = [], image:[String] = []) async throws -> AnyObject {
+    public func chat(
+        modelName:String,
+        role:String,
+        content:String,
+        stream:Bool = false,
+        responseLang:String = "English",
+        messages:[Message] = [],
+        image:[String] = [],
+        temperature: Double = 0.8,
+        seed: Int = 0,
+        num_ctx: Int = 2048,
+        top_k: Int = 40,
+        top_p: Double = 0.9
+    ) async throws -> AnyObject {
+        
+        // options init
+        let options:[String: Any] = [
+            /// The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)
+            "temperature": temperature,
+            /// Sets the random number seed to use for generation. Setting this to a specific number will make the model generate the same text for the same prompt. (Default: 0)
+            "seed": seed,
+            /// Sets the size of the context window used to generate the next token. (Default: 2048)
+            "num_ctx": num_ctx,
+            /// Reduces the probability of generating nonsense. A higher value (e.g. 100) will give more diverse answers, while a lower value (e.g. 10) will be more conservative. (Default: 40)
+            "top_k": top_k,
+            /// Works together with top-k. A higher value (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. (Default: 0.9)
+            "top_p": top_p,
+        ]
         
         var params: [String: Any] = [
             "model": modelName,
-            "stream": stream
+            "stream": stream,
+            "options":options
         ]
         let newPrompt = [
             "role": role,

@@ -228,37 +228,7 @@ struct SendMsgPanelView: View {
                     CustomTextView(
                         text: $inputText,
                         onCommit: {
-                            DispatchQueue.main.async {
-                                if messagesViewModel.waitingModelResponse == false {
-                                    var imageToSend: [String]? = nil
-                                    if self.selectedImage != nil {
-                                        imageToSend = [base64EncodedImage]
-                                        self.selectedImage = nil
-                                    }
-                                    
-                                    if messagesViewModel.streamingOutput {
-                                        messagesViewModel.sendMsgWithStreamingOn(
-                                            chatId: chatListViewModel.selectedChat!,
-                                            modelName: commonViewModel.selectedOllamaModel,
-                                            content: inputText,
-                                            responseLang: commonViewModel.selectedResponseLang,
-                                            messages: messagesViewModel.messages,
-                                            image: imageToSend ?? []
-                                        )
-                                    } else {
-                                        messagesViewModel.sendMsg(
-                                            chatId: chatListViewModel.selectedChat!,
-                                            modelName: commonViewModel.selectedOllamaModel,
-                                            content: inputText,
-                                            responseLang: commonViewModel.selectedResponseLang,
-                                            messages: messagesViewModel.messages,
-                                            image: imageToSend ?? []
-                                        )
-                                    }
-                                    
-                                    inputText = ""
-                                }
-                            }
+                            DispatchQueue.main.async {fire()}
                         },
                         onShiftReturn: {
                             inputText += "\n"
@@ -316,15 +286,7 @@ struct SendMsgPanelView: View {
                     .foregroundColor(.gray)
                     .padding(.trailing, 10)
                     .onTapGesture {
-                        DispatchQueue.main.async {
-                            if(messagesViewModel.waitingModelResponse == false) {
-                                
-                                if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 && !isInputEmpty(inputText){
-                                    messagesViewModel.sendMsg(chatId: chatListViewModel.selectedChat!, modelName: "llama3", content: inputText, responseLang: commonViewModel.selectedResponseLang, messages: messagesViewModel.messages)
-                                    inputText = ""
-                                }
-                            }
-                        }
+                        DispatchQueue.main.async {fire()}
                     }
             }
             .fileImporter(
@@ -345,6 +307,38 @@ struct SendMsgPanelView: View {
         .padding(.trailing,10)
         .padding(.leading,10)
         
+    }
+    
+    private func fire() {
+        if messagesViewModel.waitingModelResponse == false {
+            var imageToSend: [String]? = nil
+            if self.selectedImage != nil {
+                imageToSend = [base64EncodedImage]
+                self.selectedImage = nil
+            }
+            
+            if messagesViewModel.streamingOutput {
+                messagesViewModel.sendMsgWithStreamingOn(
+                    chatId: chatListViewModel.selectedChat!,
+                    modelName: commonViewModel.selectedOllamaModel,
+                    content: inputText,
+                    responseLang: commonViewModel.selectedResponseLang,
+                    messages: messagesViewModel.messages,
+                    image: imageToSend ?? []
+                )
+            } else {
+                messagesViewModel.sendMsg(
+                    chatId: chatListViewModel.selectedChat!,
+                    modelName: commonViewModel.selectedOllamaModel,
+                    content: inputText,
+                    responseLang: commonViewModel.selectedResponseLang,
+                    messages: messagesViewModel.messages,
+                    image: imageToSend ?? []
+                )
+            }
+            
+            inputText = ""
+        }
     }
     
     private func handleFileSelection(result: Result<[URL], Error>) {
