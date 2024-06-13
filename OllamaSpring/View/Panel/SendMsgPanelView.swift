@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// disable TextEditor's smart quote
+/// disable TextEditor's smart quote
 extension NSTextView {
     open override var frame: CGRect {
         didSet {
@@ -29,14 +29,14 @@ struct CustomTextView: NSViewRepresentable {
     var onShiftReturn: () -> Void
     var backgroundColor: NSColor
     var isEditable: Bool
-
+    
     class Coordinator: NSObject, NSTextViewDelegate {
         var parent: CustomTextView
-
+        
         init(_ parent: CustomTextView) {
             self.parent = parent
         }
-
+        
         func textDidChange(_ notification: Notification) {
             if let textView = notification.object as? NSTextView {
                 DispatchQueue.main.async {
@@ -44,7 +44,7 @@ struct CustomTextView: NSViewRepresentable {
                 }
             }
         }
-
+        
         func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
             if commandSelector == #selector(NSResponder.insertNewline(_:)) {
                 if NSEvent.modifierFlags.contains(.shift) {
@@ -59,11 +59,11 @@ struct CustomTextView: NSViewRepresentable {
             return false
         }
     }
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-
+    
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
         scrollView.hasVerticalScroller = true
@@ -71,7 +71,7 @@ struct CustomTextView: NSViewRepresentable {
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
         scrollView.drawsBackground = false
-
+        
         let textView = NSTextView()
         textView.delegate = context.coordinator
         textView.isRichText = false
@@ -82,13 +82,13 @@ struct CustomTextView: NSViewRepresentable {
         textView.textContainerInset = NSSize(width: 0, height: 0)
         textView.drawsBackground = true
         textView.autoresizingMask = [.width]
-
+        
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 0
         paragraphStyle.paragraphSpacing = 0
         paragraphStyle.paragraphSpacingBefore = 0
         paragraphStyle.alignment = .left
-
+        
         textView.defaultParagraphStyle = paragraphStyle
         textView.usesFontPanel = false
         textView.autoresizingMask = [.width]
@@ -97,11 +97,11 @@ struct CustomTextView: NSViewRepresentable {
             .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
             .foregroundColor: NSColor.textColor
         ]
-
+        
         scrollView.documentView = textView
         return scrollView
     }
-
+    
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         if let textView = nsView.documentView as? NSTextView {
             if textView.string != text {
@@ -143,7 +143,7 @@ struct SendMsgPanelView: View {
     @State private var showImagePicker: Bool = false
     @State private var selectedImage: NSImage? = nil
     @State private var base64EncodedImage: String = ""
-
+    
     var body: some View {
         // Display selected image preview
         if let image = selectedImage {
@@ -158,7 +158,7 @@ struct SendMsgPanelView: View {
                             .padding(8)
                             .overlay {
                                 RoundedRectangle(cornerRadius: 8)
-                                      .stroke(Color.orange, lineWidth: 1)
+                                    .stroke(Color.orange, lineWidth: 1)
                             }
                     }
                     .frame(width: 240)
@@ -228,37 +228,7 @@ struct SendMsgPanelView: View {
                     CustomTextView(
                         text: $inputText,
                         onCommit: {
-                            DispatchQueue.main.async {
-                                if messagesViewModel.waitingModelResponse == false {
-                                    var imageToSend: [String]? = nil
-                                    if self.selectedImage != nil {
-                                        imageToSend = [base64EncodedImage]
-                                        self.selectedImage = nil
-                                    }
-                                    
-                                    if messagesViewModel.streamingOutput {
-                                        messagesViewModel.sendMsgWithStreamingOn(
-                                            chatId: chatListViewModel.selectedChat!,
-                                            modelName: commonViewModel.selectedOllamaModel,
-                                            content: inputText,
-                                            responseLang: commonViewModel.selectedResponseLang,
-                                            messages: messagesViewModel.messages,
-                                            image: imageToSend ?? []
-                                        )
-                                    } else {
-                                        messagesViewModel.sendMsg(
-                                            chatId: chatListViewModel.selectedChat!,
-                                            modelName: commonViewModel.selectedOllamaModel,
-                                            content: inputText,
-                                            responseLang: commonViewModel.selectedResponseLang,
-                                            messages: messagesViewModel.messages,
-                                            image: imageToSend ?? []
-                                        )
-                                    }
-                                    
-                                    inputText = ""
-                                }
-                            }
+                            DispatchQueue.main.async {fire()}
                         },
                         onShiftReturn: {
                             inputText += "\n"
@@ -317,15 +287,7 @@ struct SendMsgPanelView: View {
                     .foregroundColor(.gray)
                     .padding(.trailing, 10)
                     .onTapGesture {
-                        DispatchQueue.main.async {
-                            if(messagesViewModel.waitingModelResponse == false) {
-                                
-                                if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 && !isInputEmpty(inputText){
-                                    messagesViewModel.sendMsg(chatId: chatListViewModel.selectedChat!, modelName: "llama3", content: inputText, responseLang: commonViewModel.selectedResponseLang, messages: messagesViewModel.messages)
-                                    inputText = ""
-                                }
-                            }
-                        }
+                        DispatchQueue.main.async {fire()}
                     }
             }
             .fileImporter(
@@ -346,6 +308,38 @@ struct SendMsgPanelView: View {
         .padding(.trailing,10)
         .padding(.leading,10)
         
+    }
+    
+    private func fire() {
+        if messagesViewModel.waitingModelResponse == false {
+            var imageToSend: [String]? = nil
+            if self.selectedImage != nil {
+                imageToSend = [base64EncodedImage]
+                self.selectedImage = nil
+            }
+            
+            if messagesViewModel.streamingOutput {
+                messagesViewModel.sendMsgWithStreamingOn(
+                    chatId: chatListViewModel.selectedChat!,
+                    modelName: commonViewModel.selectedOllamaModel,
+                    content: inputText,
+                    responseLang: commonViewModel.selectedResponseLang,
+                    messages: messagesViewModel.messages,
+                    image: imageToSend ?? []
+                )
+            } else {
+                messagesViewModel.sendMsg(
+                    chatId: chatListViewModel.selectedChat!,
+                    modelName: commonViewModel.selectedOllamaModel,
+                    content: inputText,
+                    responseLang: commonViewModel.selectedResponseLang,
+                    messages: messagesViewModel.messages,
+                    image: imageToSend ?? []
+                )
+            }
+            
+            inputText = ""
+        }
     }
     
     private func handleFileSelection(result: Result<[URL], Error>) {

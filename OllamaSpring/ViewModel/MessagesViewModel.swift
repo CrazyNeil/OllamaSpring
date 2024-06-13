@@ -18,14 +18,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     @Published var tmpResponse:String?
     
     @Published var commonViewModel: CommonViewModel
+    @Published var modelOptions: OptionsModel
     
     private var receivedData = Data()
     
     private var tmpChatId:UUID?
     private var tmpModelName:String?
     
-    init(commonViewModel: CommonViewModel) {
+    init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel()) {
         self.commonViewModel = commonViewModel
+        self.modelOptions = modelOptions
     }
     
     let msgManager = MessageManager()
@@ -46,7 +48,14 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
     }
     
-    func sendMsg(chatId:UUID, modelName:String, content:String, responseLang:String, messages:[Message], image:[String] = []) {
+    func sendMsg(
+        chatId:UUID,
+        modelName:String,
+        content:String,
+        responseLang:String,
+        messages:[Message],
+        image:[String] = []
+    ) {
         let ollama = OllamaApi()
         Task {
             do {
@@ -69,7 +78,19 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                      historyMsg = messages
                 }
                 
-                let response = try await ollama.chat(modelName: modelName, role: "user", content: content, responseLang: responseLang, messages: historyMsg, image: image)
+                let response = try await ollama.chat(
+                    modelName: modelName,
+                    role: "user",
+                    content: content,
+                    responseLang: responseLang,
+                    messages: historyMsg,
+                    image: image,
+                    temperature: self.modelOptions.temperature,
+                    seed: Int(self.modelOptions.seed),
+                    num_ctx: Int(self.modelOptions.numContext),
+                    top_k: Int(self.modelOptions.topK),
+                    top_p: self.modelOptions.topP
+                )
                 if let contentDict = response["message"] as? [String: Any], var content = contentDict["content"] as? String {
                     if content == "" || content == "\n" {
                         content = "No Response from \(modelName)"
@@ -119,9 +140,24 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         
+        // options
+        let options:[String: Any] = [
+            /// The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)
+            "temperature": self.modelOptions.temperature,
+            /// Sets the random number seed to use for generation. Setting this to a specific number will make the model generate the same text for the same prompt. (Default: 0)
+            "seed": self.modelOptions.seed,
+            /// Sets the size of the context window used to generate the next token. (Default: 2048)
+            "num_ctx": self.modelOptions.numContext,
+            /// Reduces the probability of generating nonsense. A higher value (e.g. 100) will give more diverse answers, while a lower value (e.g. 10) will be more conservative. (Default: 40)
+            "top_k": self.modelOptions.topK,
+            /// Works together with top-k. A higher value (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. (Default: 0.9)
+            "top_p": self.modelOptions.topP,
+        ]
+        
         // params
         var params: [String: Any] = [
             "model": modelName,
+            "options":options
         ]
         let newPrompt = [
             "role": "user",

@@ -18,6 +18,7 @@ struct ChatListPanelView: View {
     
     @State private var lockDownloadPanel = false
     @State private var openDownloadPanel = false
+    @State private var openOptionsConfigPanel = false
     @State private var modelNotExistAlert = false
     
     @State private var modelToBeDeleted:String?
@@ -31,8 +32,21 @@ struct ChatListPanelView: View {
     @State private var showNewChatAlert = false
     
     @Binding var openOllamaLibraryModal:Bool
-
     
+    @State private var isShowingTemperatureDesc = false
+    @State private var isShowingSeedDesc = false
+    @State private var isShowingNumContextDesc = false
+    @State private var isShowingTopKDesc = false
+    @State private var isShowingTopPDesc = false
+    
+    /// this seems like Slider's bug in macOS
+    /// Slider not change when published modelOptions updated
+    /// update Slider by this func
+    private func refreshOptionsConfigPanel() {
+        openOptionsConfigPanel = false
+        openOptionsConfigPanel.toggle()
+    }
+
     var body: some View {
         
         ZStack(alignment: .bottom) {
@@ -124,13 +138,26 @@ struct ChatListPanelView: View {
                 // bottom toolbar
                 HStack(spacing:0) {
                     
+                    // options config
+                    Image(systemName: "gearshape")
+                        .font(.subheadline)
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                        .onTapGesture {
+                            openDownloadPanel = false
+                            openOptionsConfigPanel.toggle()
+                        }
+                    
                     Spacer()
                     
+                    // download
                     Text("Downloads")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .padding(.trailing, 10)
                         .onTapGesture {
+                            openOptionsConfigPanel = false
                             openDownloadPanel.toggle()
                         }
                 }
@@ -238,6 +265,200 @@ struct ChatListPanelView: View {
                     .background(Color(red: 34/255, green: 35/255, blue: 41/255))
                     .cornerRadius(8)
                     
+                }
+                
+                if openOptionsConfigPanel {
+                    VStack(spacing:0) {
+                        HStack(spacing:0) {
+                            Spacer()
+                            Text("Reset All")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    messagesViewModel.modelOptions.resetToDefaults()
+                                    refreshOptionsConfigPanel()
+                                }
+                        }
+
+                        
+                        // temperature
+                        HStack(spacing:0) {
+                            Text("Temperature")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 20)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    isShowingTemperatureDesc.toggle()
+                                }
+                                .popover(isPresented: $isShowingTemperatureDesc, arrowEdge: .trailing) {
+                                    VStack {
+                                        Text("The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)")
+                                            .padding()
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: 300, maxHeight: 70, alignment: .leading)
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text("\(messagesViewModel.modelOptions.temperature, specifier: "%.2f")")
+                                .font(.system(size: 10, weight: .light))
+                                .foregroundColor(.green)
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                        }
+                        
+                        HStack {
+                            Slider(value: $messagesViewModel.modelOptions.temperature, in: 0.1...1.0, step: 0.05)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 0)
+                        }
+                        
+                        // seed
+                        HStack(spacing:0) {
+                            Text("Seed")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 20)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    isShowingSeedDesc.toggle()
+                                }
+                                .popover(isPresented: $isShowingSeedDesc, arrowEdge: .trailing) {
+                                    VStack {
+                                        Text("Sets the random number seed to use for generation. Setting this to a specific number will make the model generate the same text for the same prompt. (Default: 0)")
+                                            .padding()
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: 300, maxHeight: 85, alignment: .leading)
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text("\(messagesViewModel.modelOptions.seed, specifier: "%.0f")")
+                                .font(.system(size: 10, weight: .light))
+                                .foregroundColor(.green)
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                            
+                            
+                        }
+                        
+                        HStack {
+                            Slider(value: $messagesViewModel.modelOptions.seed, in: 1...100, step: 5)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 5)
+                        }
+                        
+                        // context
+                        HStack(spacing:0) {
+                            Text("Context Tokens")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 20)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    isShowingNumContextDesc.toggle()
+                                }
+                                .popover(isPresented: $isShowingNumContextDesc, arrowEdge: .trailing) {
+                                    VStack {
+                                        Text("Sets the size of the context window used to generate the next token. (Default: 2048)")
+                                            .padding()
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: 300, maxHeight: 50, alignment: .leading)
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text(formattedNumber(messagesViewModel.modelOptions.numContext))
+                                .font(.system(size: 10, weight: .light))
+                                .foregroundColor(.green)
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                        }
+                        
+                        HStack {
+                            Slider(value: $messagesViewModel.modelOptions.numContext, in: 1024...10240, step: 512)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 5)
+                        }
+                        
+                        // top k
+                        HStack(spacing:0) {
+                            Text("Top K")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 20)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    isShowingTopKDesc.toggle()
+                                }
+                                .popover(isPresented: $isShowingTopKDesc, arrowEdge: .trailing) {
+                                    VStack {
+                                        Text("Reduces the probability of generating nonsense. A higher value (e.g. 100) will give more diverse answers, while a lower value (e.g. 10) will be more conservative. (Default: 40)")
+                                            .padding()
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: 300, maxHeight: 100, alignment: .leading)
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text("\(messagesViewModel.modelOptions.topK, specifier: "%.0f")")
+                                .font(.system(size: 10, weight: .light))
+                                .foregroundColor(.green)
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                        }
+                        
+                        HStack {
+                            Slider(value: $messagesViewModel.modelOptions.topK, in: 1...300, step: 10)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 5)
+                        }
+                        
+                        // top p
+                        HStack(spacing:0) {
+                            Text("Top P")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 20)
+                                .padding(.top, 10)
+                                .onTapGesture {
+                                    isShowingTopPDesc.toggle()
+                                }
+                                .popover(isPresented: $isShowingTopPDesc, arrowEdge: .trailing) {
+                                    VStack {
+                                        Text("Works together with top-k. A higher value (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. (Default: 0.9)")
+                                            .padding()
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: 300, maxHeight: 100, alignment: .leading)
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text("\(messagesViewModel.modelOptions.topP, specifier: "%.2f")")
+                                .font(.system(size: 10, weight: .light))
+                                .foregroundColor(.green)
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                        }
+                        
+                        HStack {
+                            Slider(value: $messagesViewModel.modelOptions.topP, in: 0.1...1.0, step: 0.05)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 5)
+                        }
+                        
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(Color(red: 34/255, green: 35/255, blue: 41/255))
                 }
                 
                 // delete model success handler
@@ -371,7 +592,7 @@ struct ChatListPanelView: View {
                     }
                 }
                 
-                // modal
+                // delete model confirm modal
                 ConfirmModalView(
                     isPresented: $deleteModelConfirm,
                     title: "Warning",
@@ -399,7 +620,7 @@ struct ChatListPanelView: View {
                 .frame(maxHeight: 150)
                 .cornerRadius(8)
                 
-                // modal
+                // download confirm modal
                 ConfirmModalView(
                     isPresented: $downloadModelConfirm,
                     title: "Download: \(modelToBeDownloaded ?? "No Model")",

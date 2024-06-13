@@ -23,6 +23,7 @@
 		FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */; };
 		FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */; };
 		FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */; };
+		FB9871692C198F3F000A4808 /* OptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9871682C198F3F000A4808 /* OptionsModel.swift */; };
 		FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */; };
 		FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC62BF19115007E0935 /* ChatModel.swift */; };
 		FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */; };
@@ -99,6 +100,7 @@
 		FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaDownloadViewModel.swift; sourceTree = "<group>"; };
 		FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLocalModelListRowView.swift; sourceTree = "<group>"; };
 		FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmModalView.swift; sourceTree = "<group>"; };
+		FB9871682C198F3F000A4808 /* OptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsModel.swift; sourceTree = "<group>"; };
 		FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePanelView.swift; sourceTree = "<group>"; };
 		FBA45BC62BF19115007E0935 /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
 		FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListRowView.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */,
 				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
 				FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */,
+				FB9871682C198F3F000A4808 /* OptionsModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -391,7 +394,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					FB0FC7E02BEF1657007E4EB9 = {
 						CreatedOnToolsVersion = 15.3;
@@ -486,6 +489,7 @@
 				FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */,
 				FBA45BCD2BF1AB14007E0935 /* MessagesPanelView.swift in Sources */,
 				FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */,
+				FB9871692C198F3F000A4808 /* OptionsModel.swift in Sources */,
 				FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */,
 				FB2FB9FD2C061B1300621595 /* CheckForUpdatesView.swift in Sources */,
 				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
@@ -559,6 +563,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -623,6 +628,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -654,7 +660,8 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				ENABLE_APP_SANDBOX = NO;
@@ -670,7 +677,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -688,7 +695,8 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				ENABLE_APP_SANDBOX = NO;
@@ -704,7 +712,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -719,6 +727,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -738,6 +747,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -756,6 +766,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
@@ -773,6 +784,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
