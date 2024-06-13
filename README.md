@@ -36,6 +36,8 @@ Simply unzip the package and drag it into your Application folder. Or install sa
   <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="Description" width="150"/>
 </a>
 
+_Notice: The sandbox version needs to undergo Apple App Store review, so we recommend you use the binary installation package to get the latest updates_
+
 # Run & Build
 
 You can clone this project and build it using Xcode 14 or later.
