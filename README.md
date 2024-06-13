@@ -21,7 +21,7 @@ https://www.ollamaspring.com
 <img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/ea77ba4e-034b-4193-ae94-d93e0c184ad7">
 
 ### Install model by name
-<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/411c23a7-efb0-4988-861d-43efce8f964c">
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/1ea2b015-8b30-41d5-b01b-b8b14331837b">
 
 # Download & Install
 
