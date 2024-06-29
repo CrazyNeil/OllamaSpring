@@ -115,7 +115,14 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         
     }
     
-    func sendMsgWithStreamingOn(chatId: UUID, modelName: String, content: String, responseLang: String, messages: [Message], image:[String] = []){
+    func sendMsgWithStreamingOn(
+        chatId: UUID,
+        modelName: String,
+        content: String,
+        responseLang: String,
+        messages: [Message],
+        image:[String] = []
+    ){
         self.tmpChatId = chatId
         self.tmpModelName = modelName
         

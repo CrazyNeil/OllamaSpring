@@ -11,7 +11,10 @@ import Sparkle
 
 @main
 struct OllamaSpringApp: SwiftUI.App {
+    
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     private let updaterController: SPUStandardUpdaterController
+    
     init() {
         // deleteRealmDatabase()
         // Initialize Realm

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Carbon
 
 func openURL(_ urlString: String) {
     if let url = URL(string: urlString) {
@@ -71,4 +72,21 @@ func formattedNumber(_ value: Double) -> String {
     formatter.groupingSeparator = ""
     formatter.maximumFractionDigits = 0
     return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+}
+
+/// hot key handler
+/// for quick completion etc
+func hotKeyEventHandler(nextHandler: EventHandlerCallRef?, theEvent: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
+    let appDelegate = Unmanaged<AppDelegate>.fromOpaque(userData!).takeUnretainedValue()
+    var hotKeyID = EventHotKeyID()
+    GetEventParameter(theEvent, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &hotKeyID)
+    
+    if hotKeyID.signature == OSType(0x4A4B4C4D) {
+        DispatchQueue.main.async {
+            appDelegate.showQuickCompletion()
+        }
+        return noErr
+    }
+    
+    return CallNextEventHandler(nextHandler, theEvent)
 }
