@@ -13,11 +13,7 @@ struct MessagesRowView: View {
     
     @State private var isCopied: Bool = false
     
-    func copyToClipboard(text: String) {
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
-    }
+
     
     var body: some View {
         let avatar = Image("ollama-1")

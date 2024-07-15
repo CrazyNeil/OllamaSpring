@@ -86,15 +86,6 @@ struct MainPanelView: View {
                     .frame(maxWidth: 600)
                     
                     HStack {
-//                        Link("Download & Install Ollama", destination: URL(string: ollamaWebUrl)!)
-//                            .font(.body)
-//                            .foregroundColor(.green)
-//                            .padding(8)
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 8)
-//                                    .stroke(Color.green, lineWidth: 1)
-//                            )
-
                         Text("Download & Install Ollama")
                             .font(.body)
                             .foregroundColor(.green)

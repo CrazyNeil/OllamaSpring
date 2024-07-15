@@ -72,7 +72,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let window = quickCompletionWindow, !window.frame.contains(event.locationInWindow) {
             quickCompletionWindowController.close()
             stopQuickCompletionMonitoring()
-            //showApp()
         }
     }
     
@@ -90,7 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let quickCompletionPanelView = QuickCompletionPanelView()
         
         quickCompletionWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 800, height: 100), // Adjust height to accommodate the TextField
+            contentRect: NSRect(x: 0, y: 0, width: 800, height: 65), // Adjust height to accommodate the TextField
             styleMask: [.titled, .closable, .resizable], // Allow the window to be the key window
             backing: .buffered,
             defer: false

@@ -16,7 +16,10 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
     @Published var modelOptions: OptionsModel
     
     @Published var waitingModelResponse = false
-    @Published var tmpResponse:String?
+    @Published var tmpResponse:String = ""
+    @Published var responseErrorMsg:String = ""
+    @Published var showResponsePanel = false
+    @Published var showMsgPanel = false
     
     init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel(), tmpModelName: String) {
         self.commonViewModel = commonViewModel
@@ -29,9 +32,10 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         content: String,
         responseLang: String
     ){
+        
         self.tmpModelName = modelName
         
-        // answer handler
+        // Generate a completion
         guard let url = URL(string: "http://localhost:11434/api/chat") else {
             return
         }
@@ -106,14 +110,20 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                 DispatchQueue.main.async {
                     if let messageDict = jsonObject["message"] as? [String: Any],
                        let content = messageDict["content"] as? String {
-                        self.tmpResponse = (self.tmpResponse ?? "") + content
+                        self.tmpResponse = (self.tmpResponse) + content
                     } else {
                         NSLog("Error: Missing message content")
                     }
                     
                     // after streaming done
-                    if jsonObject["done"] as! Int == 1 {
+                    if let doneValue = jsonObject["done"] as? Int {
+                        if doneValue == 1 {
+                            self.waitingModelResponse = false
+                        }
+                    } else {
                         self.waitingModelResponse = false
+                        self.showResponsePanel = false
+                        self.responseErrorMsg = "Response error, please make sure the model exists or restart OllamaSpring."
                     }
                 }
             } catch {

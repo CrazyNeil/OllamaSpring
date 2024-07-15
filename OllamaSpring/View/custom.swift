@@ -8,22 +8,6 @@
 import Foundation
 import SwiftUI
 
-
-struct QuickCompletionTextFieldStyle: TextFieldStyle {
-    var backgroundColor: Color
-    var cornerRadius: CGFloat
-    var textSize: CGFloat
-    
-    func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
-            .padding(0) // Adjust padding to change the text area height
-            .background(backgroundColor)
-            .cornerRadius(cornerRadius)
-            .font(.system(size: textSize)) // Adjust font size
-            .padding(.horizontal)
-    }
-}
-
 struct CustomTextView: NSViewRepresentable {
     @Binding var text: String
     var onCommit: () -> Void
