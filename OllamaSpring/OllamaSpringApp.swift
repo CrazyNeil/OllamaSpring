@@ -10,6 +10,7 @@ import RealmSwift
 
 @main
 struct OllamaSpringApp: SwiftUI.App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     init() {
         // deleteRealmDatabase()
         // Initialize Realm

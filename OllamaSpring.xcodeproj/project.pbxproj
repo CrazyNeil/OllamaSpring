@@ -42,6 +42,9 @@
 		FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA45BF82BF627D8007E0935 /* Metal.framework */; };
 		FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */; };
 		FBDF8C532C0775DC00BED237 /* OllamaLibraryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */; };
+		FBFF5EE22C460AC500D8DB91 /* QuickCompletionPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFF5EE12C460AC500D8DB91 /* QuickCompletionPanelView.swift */; };
+		FBFF5EE42C460AF700D8DB91 /* QuickCompletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFF5EE32C460AF700D8DB91 /* QuickCompletionViewModel.swift */; };
+		FBFF5EE62C460B3F00D8DB91 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFF5EE52C460B3F00D8DB91 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +116,9 @@
 		FBA45BF82BF627D8007E0935 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightTopBarView.swift; sourceTree = "<group>"; };
 		FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLibraryModalView.swift; sourceTree = "<group>"; };
+		FBFF5EE12C460AC500D8DB91 /* QuickCompletionPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCompletionPanelView.swift; sourceTree = "<group>"; };
+		FBFF5EE32C460AF700D8DB91 /* QuickCompletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCompletionViewModel.swift; sourceTree = "<group>"; };
+		FBFF5EE52C460B3F00D8DB91 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +187,7 @@
 				FB0FC7ED2BEF165A007E4EB9 /* OllamaSpring.entitlements */,
 				FB0FC7EA2BEF165A007E4EB9 /* Preview Content */,
 				FB65CFE02BF7241000E1EA88 /* Constant.swift */,
+				FBFF5EE52C460B3F00D8DB91 /* AppDelegate.swift */,
 			);
 			path = OllamaSpring;
 			sourceTree = "<group>";
@@ -250,6 +257,7 @@
 				FBA45BCC2BF1AB14007E0935 /* MessagesPanelView.swift */,
 				FBA45BD22BF20258007E0935 /* ChatListPanelView.swift */,
 				FBA45BDD2BF30103007E0935 /* SendMsgPanelView.swift */,
+				FBFF5EE12C460AC500D8DB91 /* QuickCompletionPanelView.swift */,
 			);
 			path = Panel;
 			sourceTree = "<group>";
@@ -279,6 +287,7 @@
 				FBA45BE22BF3334D007E0935 /* ChatListViewModel.swift */,
 				FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */,
 				FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */,
+				FBFF5EE32C460AF700D8DB91 /* QuickCompletionViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -460,6 +469,7 @@
 				FBA45BDC2BF23F6D007E0935 /* MessagesViewModel.swift in Sources */,
 				FBA45BEB2BF3614D007E0935 /* RealmModel.swift in Sources */,
 				FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */,
+				FBFF5EE62C460B3F00D8DB91 /* AppDelegate.swift in Sources */,
 				FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */,
 				FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */,
 				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
@@ -469,6 +479,8 @@
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
 				FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */,
+				FBFF5EE22C460AC500D8DB91 /* QuickCompletionPanelView.swift in Sources */,
+				FBFF5EE42C460AF700D8DB91 /* QuickCompletionViewModel.swift in Sources */,
 				FBA45BDE2BF30103007E0935 /* SendMsgPanelView.swift in Sources */,
 				FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */,
 				FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */,
@@ -648,7 +660,7 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -666,7 +678,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -684,7 +696,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -702,7 +714,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
