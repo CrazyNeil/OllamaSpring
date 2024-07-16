@@ -6,6 +6,7 @@ struct QuickCompletionPanelView: View {
     @ObservedObject var quickCompletionViewModel: QuickCompletionViewModel
     @State private var inputText = ""
     @State private var isCopied: Bool = false
+    @State private var showShortcuts: Bool = false
     
     init() {
         let commonVM = CommonViewModel()
@@ -75,6 +76,25 @@ struct QuickCompletionPanelView: View {
                 }
                 .disableAutocorrection(true)
                 .frame(width: 780, height: 65)
+                .overlay(
+                    HStack {
+                        Spacer()
+                        Image(systemName: "questionmark.circle")
+                            .font(.title)
+                            .foregroundColor(.gray)
+                            .padding(.trailing, 10)
+                            .onTapGesture {
+                                showShortcuts.toggle()
+                            }
+                            .popover(isPresented: $showShortcuts, arrowEdge: .leading) {
+                                VStack {
+                                    Text("You can open quick completion by shortcut cmd + shift + h")
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                    }
+                )
         }
         .frame(width: 800, height: 65)
         // .background(Color(red: 34/255, green: 35/255, blue: 41/255))
@@ -133,6 +153,7 @@ struct QuickCompletionPanelView: View {
                                 Text(commonViewModel.selectedOllamaModel)
                                     .font(.body)
                                     .foregroundColor(.orange)
+                                
                                 Spacer()
                                 /// copy response
                                 if quickCompletionViewModel.tmpResponse != "" {
