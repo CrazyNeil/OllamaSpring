@@ -10,6 +10,7 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 - Quick installation by entering the model name
 - Image input
 - Model Options modification
+- Quick Completion
 
 https://www.ollamaspring.com
 
@@ -17,7 +18,7 @@ https://www.ollamaspring.com
 
 # New Features
 
-Quick Completion allow you send prompt in a fast way and just active it by cmd + shift + h, update OllamaSpring to v1.1.5 or just install it from [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
+Quick Completion allow you send prompt in a fast way and active it by cmd + shift + h, update OllamaSpring to v1.1.5 or just install it from [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 
 ![quickCompletion](https://github.com/user-attachments/assets/0a6109b8-ab0a-454b-b9c8-627a27a43c3d)
 
