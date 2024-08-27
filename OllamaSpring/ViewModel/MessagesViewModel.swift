@@ -11,19 +11,19 @@ import SwiftyJSON
 
 class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     
-    @Published var messages:[Message] = []
+    @Published var messages: [Message] = []
     @Published var waitingModelResponse = false
     @Published var streamingOutput = true
-    @Published var chatId:String?
-    @Published var tmpResponse:String?
+    @Published var chatId: String?
+    @Published var tmpResponse: String?
     
     @Published var commonViewModel: CommonViewModel
     @Published var modelOptions: OptionsModel
     
     private var receivedData = Data()
     
-    private var tmpChatId:UUID?
-    private var tmpModelName:String?
+    private var tmpChatId: UUID?
+    private var tmpModelName: String?
     
     init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel()) {
         self.commonViewModel = commonViewModel
@@ -43,24 +43,30 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 createdAt: record.createdAt,
                 messageRole: record.messageRole,
                 messageContent: record.messageContent, 
-                image: Array(record.image)
+                image: Array(record.image),
+                messageFileName: record.messageFileName,
+                messageFileType: record.messageFileType,
+                messageFileText: record.messageFileText
             )
         }
     }
     
     func sendMsg(
-        chatId:UUID,
-        modelName:String,
-        content:String,
-        responseLang:String,
-        messages:[Message],
-        image:[String] = []
+        chatId: UUID,
+        modelName: String,
+        content: String,
+        responseLang: String,
+        messages: [Message],
+        image: [String] = [],
+        messageFileName: String = "",
+        messageFileType: String = "",
+        messageFileText: String = ""
     ) {
         let ollama = OllamaApi()
         Task {
             do {
-                // question
-                let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image)
+                /// question
+                let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
 
                 DispatchQueue.main.async {
                     if(self.msgManager.saveMessage(message: userMsg)) {
@@ -69,7 +75,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     }
                 }
                 
-                // answer
+                /// answer
                 var historyMsg: [Message]
                 
                 if image.count > 0 {
@@ -78,10 +84,20 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                      historyMsg = messages
                 }
                 
+                /// transfer user input text into a context prompt
+                /// textFileContent will  save to local database
+                var userPrompt = ""
+                if messageFileName != "" {
+                    userPrompt = content + "\n" + messageFileText
+                } else {
+                    userPrompt = content
+                }
+                
+                
                 let response = try await ollama.chat(
                     modelName: modelName,
                     role: "user",
-                    content: content,
+                    content: userPrompt,
                     responseLang: responseLang,
                     messages: historyMsg,
                     image: image,
@@ -95,7 +111,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     if content == "" || content == "\n" {
                         content = "No Response from \(modelName)"
                     }
-                    let msg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "assistant", messageContent: content, image: image)
+                    let msg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "assistant", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
                     DispatchQueue.main.async {
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
@@ -121,13 +137,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         content: String,
         responseLang: String,
         messages: [Message],
-        image:[String] = []
+        image: [String] = [],
+        messageFileName: String = "",
+        messageFileType: String = "",
+        messageFileText: String = ""
     ){
         self.tmpChatId = chatId
         self.tmpModelName = modelName
         
         // question handler
-        let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image)
+        let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
         
         DispatchQueue.main.async {
             if(self.msgManager.saveMessage(message: userMsg)) {
@@ -228,7 +247,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     // after streaming done
                     if jsonObject["done"] as! Int == 1 {
                         self.waitingModelResponse = false
-                        let msg = Message(chatId: self.tmpChatId!, model: self.tmpModelName!, createdAt: strDatetime(), messageRole: "assistant", messageContent: self.tmpResponse ?? "", image: [])
+                        let msg = Message(chatId: self.tmpChatId!, model: self.tmpModelName!, createdAt: strDatetime(), messageRole: "assistant", messageContent: self.tmpResponse ?? "", image: [], messageFileName: "", messageFileType: "", messageFileText: "")
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
                         }

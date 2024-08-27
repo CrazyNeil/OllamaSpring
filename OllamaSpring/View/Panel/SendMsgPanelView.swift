@@ -26,15 +26,19 @@ struct SendMsgPanelView: View {
     
     @State private var disableSendMsg = false
     
-    //image
-    @State private var showImagePicker: Bool = false
+    //file
+    @State private var showFilePicker: Bool = false
+    @State private var isTextFileSelected: Bool = false
+    @State private var textFileContent: String = ""
+    @State private var selectedFileURL: URL?
     @State private var selectedImage: NSImage? = nil
     @State private var base64EncodedImage: String = ""
     
     var body: some View {
-        // Display selected image preview
+        /// Display selected file preview
         if let image = selectedImage {
-            HStack(spacing:0) {
+            // 处理图像文件
+            HStack(spacing: 0) {
                 Spacer()
                 VStack {
                     HStack {
@@ -51,7 +55,7 @@ struct SendMsgPanelView: View {
                     .frame(width: 240)
                     Spacer()
                 }
-                VStack(spacing:0) {
+                VStack(spacing: 0) {
                     Image(nsImage: image)
                         .resizable()
                         .scaledToFit()
@@ -60,7 +64,7 @@ struct SendMsgPanelView: View {
                         .padding(.trailing, 20)
                         .padding(.leading, 10)
                     
-                    HStack(spacing:0){
+                    HStack(spacing: 0) {
                         Text("Revoke")
                             .font(.subheadline)
                             .foregroundColor(.gray)
@@ -85,6 +89,57 @@ struct SendMsgPanelView: View {
             .padding(.top, 25)
             .cornerRadius(8)
             .frame(maxHeight: 200)
+        } else if let fileURL = selectedFileURL { // 假设你有一个 selectedFileURL 属性
+            // 处理 PDF 或 TXT 文件
+            let fileExtension = fileURL.pathExtension.lowercased()
+            let fileIcon = NSWorkspace.shared.icon(forFile: fileURL.path)
+
+            HStack(spacing: 0) {
+                Spacer()
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text(fileURL.lastPathComponent)
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .padding(8)
+                    }
+                    .frame(width: 240)
+                    Spacer()
+                }
+                VStack(spacing: 0) {
+                    Image(nsImage: fileIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200)
+                        .padding(.trailing, 20)
+                        .padding(.leading, 10)
+                    
+                    HStack(spacing: 0) {
+                        Text("Revoke")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .padding(.top, 10)
+                            .onTapGesture {
+                                self.selectedFileURL = nil // 清除文件选择
+                            }
+                        
+                        Image(systemName: "x.circle")
+                            .font(.subheadline)
+                            .imageScale(.large)
+                            .foregroundColor(.gray)
+                            .padding(.leading, 5)
+                            .padding(.top, 10)
+                            .onTapGesture {
+                                self.selectedFileURL = nil // 清除文件选择
+                            }
+                    }
+                    Spacer()
+                }
+            }
+            .padding(.top, 25)
+            .cornerRadius(8)
+            .frame(maxHeight: 200)
         }
         
         ZStack(alignment: .leading) {
@@ -99,14 +154,14 @@ struct SendMsgPanelView: View {
             
             HStack {
                 
-                Image(systemName: "photo.circle")
+                Image(systemName: "doc")
                     .font(.subheadline)
                     .imageScale(.large)
                     .foregroundColor(.gray)
                     .padding(.leading, 10)
                     .onTapGesture {
                         if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 {
-                            showImagePicker.toggle()
+                            showFilePicker.toggle()
                         }
                     }
                 
@@ -178,8 +233,8 @@ struct SendMsgPanelView: View {
                     }
             }
             .fileImporter(
-                isPresented: $showImagePicker,
-                allowedContentTypes: [.jpeg, .png],
+                isPresented: $showFilePicker,
+                allowedContentTypes: [.jpeg, .png, .pdf, .plainText],
                 allowsMultipleSelection: false
             ) { result in
                 handleFileSelection(result: result)
@@ -212,7 +267,8 @@ struct SendMsgPanelView: View {
                     content: inputText,
                     responseLang: commonViewModel.selectedResponseLang,
                     messages: messagesViewModel.messages,
-                    image: imageToSend ?? []
+                    image: imageToSend ?? [],
+                    textFileContent: textFileContent
                 )
             } else {
                 messagesViewModel.sendMsg(
@@ -221,21 +277,41 @@ struct SendMsgPanelView: View {
                     content: inputText,
                     responseLang: commonViewModel.selectedResponseLang,
                     messages: messagesViewModel.messages,
-                    image: imageToSend ?? []
+                    image: imageToSend ?? [],
+                    textFileContent: textFileContent
                 )
+                
+                print(self.textFileContent)
             }
             
             inputText = ""
+            isTextFileSelected = false
+            textFileContent = ""
         }
     }
     
     private func handleFileSelection(result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            if let url = urls.first {
-                if let image = NSImage(contentsOf: url) {
-                    selectedImage = image
-                    base64EncodedImage = convertToBase64(image: image)
+            for url in urls {
+                let fileExtension = url.pathExtension.lowercased()
+                if ["png", "jpg", "jpeg"].contains(fileExtension) {
+                    if let image = NSImage(contentsOf: url) {
+                        selectedImage = image
+                        base64EncodedImage = convertToBase64(image: image)
+                    }
+                } else if fileExtension == "pdf" {
+                    if let text = extractTextFromPDF(url: url) {
+                        self.isTextFileSelected = true
+                        self.textFileContent = text
+                        self.selectedFileURL = url
+                    }
+                } else if fileExtension == "txt" {
+                    if let text = extractTextFromPlainText(url: url) {
+                        self.isTextFileSelected = true
+                        self.textFileContent = text
+                        self.selectedFileURL = url
+                    }
                 }
             }
         case .failure(let error):

@@ -22,6 +22,9 @@ struct Message: Identifiable, Decodable, Equatable{
     var evalCount:Int = 0
     var evalDuration:Int = 0
     var image:[String] = []
+    var messageFileName: String = ""
+    var messageFileType: String = ""
+    var messageFileText: String = ""
     
     
     init(
@@ -31,7 +34,10 @@ struct Message: Identifiable, Decodable, Equatable{
         createdAt: String,
         messageRole: String,
         messageContent: String,
-        image:[String]
+        image:[String],
+        messageFileName: String,
+        messageFileType: String,
+        messageFileText: String
     ) {
         self.id = id
         self.chatId = chatId
@@ -47,5 +53,8 @@ struct Message: Identifiable, Decodable, Equatable{
         self.evalCount = 0
         self.evalDuration = 0
         self.image = image
+        self.messageFileName = ""
+        self.messageFileType = ""
+        self.messageFileText = ""
     }
 }

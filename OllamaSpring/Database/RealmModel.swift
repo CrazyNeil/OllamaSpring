@@ -72,6 +72,9 @@ class RealmMessage: Object {
     @Persisted var evalCount: Int = 0
     @Persisted var evalDuration: Int = 0
     @Persisted var image = List<String>()
+    @Persisted var messageFileName: String = ""
+    @Persisted var messageFileType: String = ""
+    @Persisted var messageFileText: String = ""
 
     
     convenience init(
@@ -87,7 +90,10 @@ class RealmMessage: Object {
         promptEvalCuration: Int,
         evalCount: Int,
         evalDuration: Int,
-        image:List<String>
+        image: List<String>,
+        messageFileName: String,
+        messageFileType: String,
+        messageFileText: String
     ){
         self.init()
         self.chatId = chatId
@@ -103,6 +109,9 @@ class RealmMessage: Object {
         self.evalCount = evalCount
         self.evalDuration = evalDuration
         self.image = image
+        self.messageFileName = messageFileName
+        self.messageFileType = messageFileType
+        self.messageFileText = messageFileText
     }
 }
 
@@ -200,7 +209,10 @@ class MessageManager {
                     promptEvalCuration: message.promptEvalCuration,
                     evalCount: message.evalCount,
                     evalDuration: message.evalDuration, 
-                    image: imageList
+                    image: imageList,
+                    messageFileName: message.messageFileName,
+                    messageFileType: message.messageFileType,
+                    messageFileText: message.messageFileText
                 )
                 realm.add(record)
             }

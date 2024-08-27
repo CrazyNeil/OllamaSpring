@@ -8,6 +8,37 @@
 import Foundation
 import SwiftUI
 import Carbon
+import PDFKit
+
+
+func extractTextFromPDF(url: URL) -> String? {
+    guard let pdfDocument = PDFDocument(url: url) else {
+        return nil
+    }
+
+    let pageCount = pdfDocument.pageCount
+    var documentContent = ""
+
+    for i in 0..<pageCount {
+        guard let page = pdfDocument.page(at: i) else {
+            continue
+        }
+        if let pageContent = page.string {
+            documentContent += pageContent
+        }
+    }
+
+    return documentContent
+}
+
+func extractTextFromPlainText(url: URL) -> String? {
+    do {
+        let content = try String(contentsOf: url, encoding: .utf8)
+        return content
+    } catch {
+        return ""
+    }
+}
 
 func copyToClipboard(text: String) {
     let pasteboard = NSPasteboard.general
@@ -53,17 +84,17 @@ func convertFromBase64(base64String: String) -> NSImage? {
         print("Error decoding base64 string")
         return nil
     }
-
+    
     if let image = NSImage(data: imageData) {
         return image
     }
-
+    
     if let pngData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) {
         if let image = NSImage(data: pngData) {
             return image
         }
     }
-
+    
     return nil
 }
 
