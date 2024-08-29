@@ -29,7 +29,11 @@ struct SendMsgPanelView: View {
     //file
     @State private var showFilePicker: Bool = false
     @State private var isTextFileSelected: Bool = false
-    @State private var textFileContent: String = ""
+    
+    @State private var msgFileName: String = ""
+    @State private var msgFileType: String = ""
+    @State private var msgFileText: String = ""
+    
     @State private var selectedFileURL: URL?
     @State private var selectedImage: NSImage? = nil
     @State private var base64EncodedImage: String = ""
@@ -89,11 +93,9 @@ struct SendMsgPanelView: View {
             .padding(.top, 25)
             .cornerRadius(8)
             .frame(maxHeight: 200)
-        } else if let fileURL = selectedFileURL { // 假设你有一个 selectedFileURL 属性
-            // 处理 PDF 或 TXT 文件
-            let fileExtension = fileURL.pathExtension.lowercased()
+        } else if let fileURL = selectedFileURL {
             let fileIcon = NSWorkspace.shared.icon(forFile: fileURL.path)
-
+            
             HStack(spacing: 0) {
                 Spacer()
                 VStack {
@@ -211,7 +213,6 @@ struct SendMsgPanelView: View {
                         }
                         HStack {}.frame(maxWidth: .infinity)
                     } else {
-                        
                         if inputText.isEmpty {
                             Text("send a message (shift + return for new line)")
                                 .font(.subheadline)
@@ -257,7 +258,6 @@ struct SendMsgPanelView: View {
             var imageToSend: [String]? = nil
             if self.selectedImage != nil {
                 imageToSend = [base64EncodedImage]
-                self.selectedImage = nil
             }
             
             if messagesViewModel.streamingOutput {
@@ -268,7 +268,9 @@ struct SendMsgPanelView: View {
                     responseLang: commonViewModel.selectedResponseLang,
                     messages: messagesViewModel.messages,
                     image: imageToSend ?? [],
-                    textFileContent: textFileContent
+                    messageFileName: msgFileName,
+                    messageFileType: msgFileType,
+                    messageFileText: msgFileText
                 )
             } else {
                 messagesViewModel.sendMsg(
@@ -278,16 +280,18 @@ struct SendMsgPanelView: View {
                     responseLang: commonViewModel.selectedResponseLang,
                     messages: messagesViewModel.messages,
                     image: imageToSend ?? [],
-                    textFileContent: textFileContent
+                    messageFileName: msgFileName,
+                    messageFileType: msgFileType,
+                    messageFileText: msgFileText
                 )
-                
-                print(self.textFileContent)
             }
             
-            inputText = ""
-            isTextFileSelected = false
-            textFileContent = ""
+            self.resetUserInput()
         }
+    }
+    
+    private func resetUserInput() {
+        (inputText, isTextFileSelected, msgFileText, msgFileName, msgFileType, selectedImage, selectedFileURL) = ("", false, "", "", "", nil, nil)
     }
     
     private func handleFileSelection(result: Result<[URL], Error>) {
@@ -295,6 +299,8 @@ struct SendMsgPanelView: View {
         case .success(let urls):
             for url in urls {
                 let fileExtension = url.pathExtension.lowercased()
+                let fileName = url.lastPathComponent
+                
                 if ["png", "jpg", "jpeg"].contains(fileExtension) {
                     if let image = NSImage(contentsOf: url) {
                         selectedImage = image
@@ -303,13 +309,17 @@ struct SendMsgPanelView: View {
                 } else if fileExtension == "pdf" {
                     if let text = extractTextFromPDF(url: url) {
                         self.isTextFileSelected = true
-                        self.textFileContent = text
+                        self.msgFileText = text
+                        self.msgFileType = fileExtension
+                        self.msgFileName = fileName
                         self.selectedFileURL = url
                     }
                 } else if fileExtension == "txt" {
                     if let text = extractTextFromPlainText(url: url) {
                         self.isTextFileSelected = true
-                        self.textFileContent = text
+                        self.msgFileText = text
+                        self.msgFileType = fileExtension
+                        self.msgFileName = fileName
                         self.selectedFileURL = url
                     }
                 }

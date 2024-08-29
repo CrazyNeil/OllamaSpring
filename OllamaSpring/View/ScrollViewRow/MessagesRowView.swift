@@ -1,19 +1,9 @@
-//
-//  MessagesRowView.swift
-//  OllamaSpring
-//
-//  Created by NeilStudio on 2024/5/13.
-//
-
 import SwiftUI
 import MarkdownUI
 
 struct MessagesRowView: View {
-    let message:Message
-    
+    let message: Message
     @State private var isCopied: Bool = false
-    
-
     
     var body: some View {
         let avatar = Image("ollama-1")
@@ -23,9 +13,7 @@ struct MessagesRowView: View {
             .cornerRadius(8)
         
         VStack {
-            
-            if(message.messageRole == "assistant")
-            {
+            if message.messageRole == "assistant" {
                 HStack {
                     avatar
                     Text("assistant")
@@ -53,42 +41,38 @@ struct MessagesRowView: View {
                             .foregroundColor(Color.green)
                     }
                     
-                    
                     Spacer()
                 }
                 .padding(.top, 20)
                 .padding(.leading, 20)
                 
                 HStack {
-                    HStack {
-                        Markdown{message.messageContent}
-                            .padding(10)
-                            .font(.body)
-                            .textSelection(.enabled)
-                            .markdownTextStyle(\.code) {
-                                FontFamilyVariant(.monospaced)
-                                FontSize(.em(0.65))
-                                ForegroundColor(.purple)
-                                BackgroundColor(.purple.opacity(0.25))
-                            }
-                            .markdownTheme(.gitHub)
-                    }
-                    .background(Color(red: 24/255, green: 25/255, blue: 29/255))
-                    .cornerRadius(8)
-                    .padding(.trailing,65)
+                    Markdown(message.messageContent)
+                        .padding(10)
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .markdownTextStyle(\.code) {
+                            FontFamilyVariant(.monospaced)
+                            FontSize(.em(0.65))
+                            ForegroundColor(.purple)
+                            BackgroundColor(.purple.opacity(0.25))
+                        }
+                        .markdownTheme(.gitHub)
+                        .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+                        .cornerRadius(8)
+                        .padding(.trailing, 65)
                     
                     Spacer()
                 }
                 .padding(.horizontal, 20)
             }
             
-            if(message.messageRole == "user")
-            {
+            if message.messageRole == "user" {
                 VStack {
-                    HStack {
-                        Spacer()
+                    if !message.messageContent.isEmpty {
                         HStack {
-                            Markdown{message.messageContent}
+                            Spacer()
+                            Markdown(message.messageContent)
                                 .padding(10)
                                 .font(.body)
                                 .textSelection(.enabled)
@@ -99,31 +83,46 @@ struct MessagesRowView: View {
                                     BackgroundColor(.purple.opacity(0.25))
                                 }
                                 .background(Color.teal.opacity(0.5))
+                                .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+                                .cornerRadius(8)
                         }
-                        .background(Color(red: 24/255, green: 25/255, blue: 29/255))
-                        .cornerRadius(8)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 10)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
                     
-                    if message.image.count > 0 {
-                        if let image = convertFromBase64(base64String: message.image[0]) {
-                            HStack {
-                                Spacer()
-                                Image(nsImage: image)
+                    if !message.image.isEmpty, let image = convertFromBase64(base64String: message.image[0]) {
+                        HStack {
+                            Spacer()
+                            Image(nsImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 200)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .padding(.trailing, 20)
+                                .padding(.top, 10)
+                        }
+                    }
+                    
+                    if !message.messageFileText.isEmpty {
+                        let fileIcon: String = message.messageFileType == "pdf" ? "file-icon-pdf" : "file-icon-txt"
+                        
+                        HStack {
+                            Spacer()
+                            VStack(alignment: .trailing) {
+                                Image(fileIcon)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 200)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .padding(.trailing, 20)
-                                    .padding(.top, 10)
+                                    .frame(height: 75)
+                                
+                                Text(message.messageFileName)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.trailing, 10)
                             }
-                            
+                            .padding(.trailing, 20)
                         }
+                        .padding(.top, 15)
                     }
-                    
                 }
-                
             }
         }
     }

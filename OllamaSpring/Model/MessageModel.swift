@@ -53,8 +53,8 @@ struct Message: Identifiable, Decodable, Equatable{
         self.evalCount = 0
         self.evalDuration = 0
         self.image = image
-        self.messageFileName = ""
-        self.messageFileType = ""
-        self.messageFileText = ""
+        self.messageFileName = messageFileName
+        self.messageFileType = messageFileType
+        self.messageFileText = messageFileText
     }
 }

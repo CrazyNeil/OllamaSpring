@@ -42,7 +42,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 model: record.model,
                 createdAt: record.createdAt,
                 messageRole: record.messageRole,
-                messageContent: record.messageContent, 
+                messageContent: record.messageContent,
                 image: Array(record.image),
                 messageFileName: record.messageFileName,
                 messageFileType: record.messageFileType,
@@ -58,16 +58,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         responseLang: String,
         messages: [Message],
         image: [String] = [],
-        messageFileName: String = "",
-        messageFileType: String = "",
-        messageFileText: String = ""
+        messageFileName: String,
+        messageFileType: String,
+        messageFileText: String
     ) {
         let ollama = OllamaApi()
         Task {
             do {
                 /// question
                 let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
-
+                
                 DispatchQueue.main.async {
                     if(self.msgManager.saveMessage(message: userMsg)) {
                         self.messages.append(userMsg)
@@ -79,20 +79,21 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 var historyMsg: [Message]
                 
                 if image.count > 0 {
-                     historyMsg = []
+                    historyMsg = []
                 } else {
-                     historyMsg = messages
+                    historyMsg = messages
                 }
                 
                 /// transfer user input text into a context prompt
-                /// textFileContent will  save to local database
-                var userPrompt = ""
-                if messageFileName != "" {
-                    userPrompt = content + "\n" + messageFileText
-                } else {
-                    userPrompt = content
+                var userPrompt = content
+                if !messageFileText.isEmpty {
+                    let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+                    userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
                 }
                 
+                if image.count > 0 {
+                    userPrompt = content.isEmpty ? "tell me something about this pic" : "give response for the following prompt:\n\(content)\n"
+                }
                 
                 let response = try await ollama.chat(
                     modelName: modelName,
@@ -138,9 +139,9 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         responseLang: String,
         messages: [Message],
         image: [String] = [],
-        messageFileName: String = "",
-        messageFileType: String = "",
-        messageFileText: String = ""
+        messageFileName: String,
+        messageFileType: String,
+        messageFileText: String
     ){
         self.tmpChatId = chatId
         self.tmpModelName = modelName
@@ -156,8 +157,22 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
         
         // answer handler
-        guard let url = URL(string: "http://localhost:11434/api/chat") else {
+        let endpoint = "/api/chat"
+
+        // Construct the full URL
+        guard let url = URL(string: "\(ollamaApiBaseUrl):\(ollamaApiDefaultPort)\(endpoint)") else {
             return
+        }
+        
+        /// transfer user input text into a context prompt
+        var userPrompt = content
+        if !messageFileText.isEmpty {
+            let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+            userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+        }
+        
+        if image.count > 0 {
+            userPrompt = content.isEmpty ? "tell me something about this pic" : "give response for the following prompt:\n\(content)\n"
         }
         
         // init request
@@ -187,9 +202,15 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         ]
         let newPrompt = [
             "role": "user",
-            "content": content + "\n attention: please generate response for abave content use \(responseLang) language",
+            "content": userPrompt,
             "images": image
         ] as [String : Any]
+        
+        let sysRolePrompt = [
+            "role": "system",
+            "content": "you are a help assistant and answer the question in \(responseLang)",
+        ] as [String : Any]
+        
         var context: [[String: Any?]] = []
         
         if image.count == 0 {
@@ -201,8 +222,10 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 ])
             }
         }
-
+        
         context.append(newPrompt)
+        context.append(sysRolePrompt)
+        
         params["messages"] = context
         
         // send request

@@ -102,9 +102,15 @@ class OllamaApi {
         ]
         let newPrompt = [
             "role": role,
-            "content": content + "\n attention: please generate response for abave content use \(responseLang) language",
+            "content": content,
             "images": image
         ] as [String : Any]
+        
+        let sysRolePrompt = [
+            "role": "system",
+            "content": "you are a help assistant and answer the question in \(responseLang)",
+        ] as [String : Any]
+        
         var context: [[String: Any?]] = []
         for message in messages.suffix(5) {
             context.append([
@@ -113,6 +119,7 @@ class OllamaApi {
             ])
         }
         context.append(newPrompt)
+        context.append(sysRolePrompt)
         params["messages"] = context
         return try await makeRequest(method: "POST", endpoint: "chat", params: params)
     }
