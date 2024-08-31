@@ -119,7 +119,7 @@ class OllamaApi {
             ])
         }
         context.append(newPrompt)
-        context.append(sysRolePrompt)
+        context.insert(sysRolePrompt, at: 0)
         params["messages"] = context
         return try await makeRequest(method: "POST", endpoint: "chat", params: params)
     }

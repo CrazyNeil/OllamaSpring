@@ -224,7 +224,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
         
         context.append(newPrompt)
-        context.append(sysRolePrompt)
+        context.insert(sysRolePrompt, at: 0)
         
         params["messages"] = context
         

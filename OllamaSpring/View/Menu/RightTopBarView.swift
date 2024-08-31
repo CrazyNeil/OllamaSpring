@@ -68,7 +68,7 @@ struct RightTopBarView: View {
     }
     
     private var responseLanguageMenu: some View {
-        Menu("Response by \(commonViewModel.selectedResponseLang)") {
+        Menu("\(commonViewModel.selectedResponseLang)") {
             ForEach(PreferredLangList) { lang in
                 Button(role: .destructive, action: {
                     commonViewModel.updateSelectedResponseLang(lang: lang.lang)
