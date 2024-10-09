@@ -29,7 +29,7 @@ If your Mac computer is not powerful enough to run the Ollama open-source models
 
 ## Http Proxy 
 
-If your network accesses the internet through an HTTP proxy, now you can configure it using the Http Proxy feature in OllamaSpring().
+If your network accesses the internet through an HTTP proxy, now you can configure it using the Http Proxy feature in OllamaSpring (Tool Bar).
 
 ## Quick Completion
 
