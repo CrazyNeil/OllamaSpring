@@ -24,7 +24,7 @@ https://www.ollamaspring.com
 
 If your Mac computer is not powerful enough to run the Ollama open-source models locally, you can now choose to use the Groq Fast API service. All you need is to obtain the [Groq API key](https://groq.com) to experience fast access to large open-source models.
 
-![groq-1](https://github.com/user-attachments/assets/1c8f16da-3209-4567-bd3a-b26642c9e1a4)
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/user-attachments/assets/1c8f16da-3209-4567-bd3a-b26642c9e1a4">
 
 
 ## Http Proxy 
