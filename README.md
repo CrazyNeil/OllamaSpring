@@ -11,6 +11,8 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 - Image, PDF and txt file input
 - Model Options modification
 - Quick Completion
+- Groq Fast API support
+- Http Proxy
 
 https://www.ollamaspring.com
 
@@ -27,9 +29,7 @@ If your Mac computer is not powerful enough to run the Ollama open-source models
 
 ## Http Proxy 
 
-If your network accesses the internet through an HTTP proxy, now you can configure it using the Http Proxy feature in OllamaSpring.
-
-![http-1](https://github.com/user-attachments/assets/3d650224-04c2-49cc-8d06-69fc939fb7d1)
+If your network accesses the internet through an HTTP proxy, now you can configure it using the Http Proxy feature in OllamaSpring().
 
 ## Quick Completion
 
@@ -45,7 +45,7 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package ( latest v1.1.7 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
+Download the latest release package ( latest v1.1.8 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 Simply unzip the package and drag it into your Application folder. Or install sandbox version ( v1.1.4 ) from app store. _Notice: The sandbox version needs to undergo Apple App Store review. For the latest updates and versions as soon as possible, we recommend using the binary installation package._
 
 <a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
