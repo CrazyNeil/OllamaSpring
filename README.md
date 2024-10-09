@@ -18,6 +18,20 @@ https://www.ollamaspring.com
 
 # New Features
 
+## Groq Fast API
+
+If your Mac computer is not powerful enough to run the Ollama open-source models locally, you can now choose to use the Groq Fast API service. All you need is to obtain the [Groq API key](https://groq.com) to experience fast access to large open-source models.
+
+![groq-1](https://github.com/user-attachments/assets/1c8f16da-3209-4567-bd3a-b26642c9e1a4)
+
+
+## Http Proxy 
+
+If your network accesses the internet through an HTTP proxy, now you can configure it using the Http Proxy feature in OllamaSpring.
+
+![http-1](https://github.com/user-attachments/assets/3d650224-04c2-49cc-8d06-69fc939fb7d1)
+
+##
 Quick Completion allow you send prompt in a fast way and active it by cmd + shift + h, update OllamaSpring to v1.1.5+ or just install it from [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 
 ![quickCompletion](https://github.com/user-attachments/assets/0a6109b8-ab0a-454b-b9c8-627a27a43c3d)
