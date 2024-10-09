@@ -123,7 +123,7 @@ struct SendMsgPanelView: View {
                             .foregroundColor(.gray)
                             .padding(.top, 10)
                             .onTapGesture {
-                                self.selectedFileURL = nil // 清除文件选择
+                                self.selectedFileURL = nil
                             }
                         
                         Image(systemName: "x.circle")
@@ -133,7 +133,7 @@ struct SendMsgPanelView: View {
                             .padding(.leading, 5)
                             .padding(.top, 10)
                             .onTapGesture {
-                                self.selectedFileURL = nil // 清除文件选择
+                                self.selectedFileURL = nil
                             }
                     }
                     Spacer()
@@ -178,7 +178,7 @@ struct SendMsgPanelView: View {
                             inputText += "\n"
                         },
                         backgroundColor:NSColor.clear,
-                        isEditable: !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0
+                        isEditable: self.allowEditable()
                     )
                     .font(.system(.subheadline))
                     .frame(height: max(20, min(300, textEditorHeight)))
@@ -187,8 +187,8 @@ struct SendMsgPanelView: View {
                     .padding(.top, 5)
                     .padding(.leading, 0)
                     
-                    // no model found. disable send msg.
-                    if commonViewModel.ollamaLocalModelList.isEmpty {
+                    // no ollama model found. disable send msg.
+                    if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == "Ollama" {
                         HStack {
                             Text("You need select a model on top bar first")
                                 .font(.subheadline)
@@ -260,30 +260,57 @@ struct SendMsgPanelView: View {
                 imageToSend = [base64EncodedImage]
             }
             
+            /// api host
+            let selectedApiHost = commonViewModel.selectedApiHost
+            let isGroqFastAI = (selectedApiHost == ApiHostList[1].name)
+
+            // msg params
+            let chatId = chatListViewModel.selectedChat!
+            let responseLang = commonViewModel.selectedResponseLang
+            let content = inputText
+
             if messagesViewModel.streamingOutput {
-                messagesViewModel.sendMsgWithStreamingOn(
-                    chatId: chatListViewModel.selectedChat!,
-                    modelName: commonViewModel.selectedOllamaModel,
-                    content: inputText,
-                    responseLang: commonViewModel.selectedResponseLang,
-                    messages: messagesViewModel.messages,
-                    image: imageToSend ?? [],
-                    messageFileName: msgFileName,
-                    messageFileType: msgFileType,
-                    messageFileText: msgFileText
-                )
+                if isGroqFastAI {
+                    messagesViewModel.groqSendMsg(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedGroqModel,
+                        responseLang: responseLang,
+                        content: content
+                    )
+                } else {
+                    messagesViewModel.sendMsgWithStreamingOn(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedOllamaModel,
+                        content: content,
+                        responseLang: responseLang,
+                        messages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
+                    )
+                }
             } else {
-                messagesViewModel.sendMsg(
-                    chatId: chatListViewModel.selectedChat!,
-                    modelName: commonViewModel.selectedOllamaModel,
-                    content: inputText,
-                    responseLang: commonViewModel.selectedResponseLang,
-                    messages: messagesViewModel.messages,
-                    image: imageToSend ?? [],
-                    messageFileName: msgFileName,
-                    messageFileType: msgFileType,
-                    messageFileText: msgFileText
-                )
+                if isGroqFastAI {
+                    messagesViewModel.groqSendMsg(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedGroqModel,
+                        responseLang: responseLang,
+                        content: content
+                    )
+                } else {
+                    messagesViewModel.sendMsg(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedOllamaModel,
+                        content: content,
+                        responseLang: responseLang,
+                        messages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
+                    )
+                }
             }
             
             self.resetUserInput()
@@ -327,6 +354,19 @@ struct SendMsgPanelView: View {
         case .failure(let error):
             print("Error selecting file: \(error.localizedDescription)")
         }
+    }
+    
+    private func allowEditable() -> Bool {
+        /// ollama api not available
+        if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == ApiHostList[0].name {
+            return false
+        }
+        
+        if chatListViewModel.ChatList.count == 0 {
+            return false
+        }
+        
+        return true
     }
 }
 

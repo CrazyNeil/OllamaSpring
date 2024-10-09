@@ -106,11 +106,6 @@ class OllamaApi {
             "images": image
         ] as [String : Any]
         
-        let sysRolePrompt = [
-            "role": "system",
-            "content": "you are a help assistant and answer the question in \(responseLang)",
-        ] as [String : Any]
-        
         var context: [[String: Any?]] = []
         for message in messages.suffix(5) {
             context.append([
@@ -119,7 +114,17 @@ class OllamaApi {
             ])
         }
         context.append(newPrompt)
-        context.insert(sysRolePrompt, at: 0)
+        
+        /// system role config
+        if responseLang != "Auto" {
+            let sysRolePrompt = [
+                "role": "system",
+                "content": "you are a help assistant and answer the question in \(responseLang)",
+            ] as [String : Any]
+            
+            context.insert(sysRolePrompt, at: 0)
+        }
+        
         params["messages"] = context
         return try await makeRequest(method: "POST", endpoint: "chat", params: params)
     }

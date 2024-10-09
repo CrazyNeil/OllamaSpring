@@ -127,3 +127,11 @@ func hotKeyEventHandler(nextHandler: EventHandlerCallRef?, theEvent: EventRef?, 
     
     return CallNextEventHandler(nextHandler, theEvent)
 }
+
+func removeProtocolPrefix(from urlString: String) -> String {
+    let trimmedUrl = urlString.replacingOccurrences(of: "https://", with: "")
+                              .replacingOccurrences(of: "http://", with: "")
+                              .replacingOccurrences(of: "wss://", with: "")
+                              .replacingOccurrences(of: "ws://", with: "")
+    return trimmedUrl
+}

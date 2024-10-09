@@ -119,10 +119,20 @@ class PreferenceManager {
 
     func updatePreference(preferenceKey: String, preferenceValue: String) {
         let realm = try! Realm()
-        
+
         if let record = realm.objects(RealmPreference.self).filter("preferenceKey == %@", preferenceKey).first {
+            // update if exists
             try! realm.write {
                 record.preferenceValue = preferenceValue
+            }
+        } else {
+            // create if not exists
+            let newRecord = RealmPreference()
+            newRecord.preferenceKey = preferenceKey
+            newRecord.preferenceValue = preferenceValue
+            
+            try! realm.write {
+                realm.add(newRecord)
             }
         }
     }

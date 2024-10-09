@@ -51,6 +51,92 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
     }
     
+    func groqSendMsg(
+        chatId: UUID,
+        modelName: String,
+        responseLang: String,
+        content: String,
+        image: [String] = [],
+        messageFileName: String = "",
+        messageFileType: String = "",
+        messageFileText: String = ""
+    ){
+        let groqAuthKey = commonViewModel.loadGroqApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let groq = GroqApi(
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: groqAuthKey,
+            isHttpProxyEnabled: commonViewModel.loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: commonViewModel.loadHttpProxyAuthStatusFromDatabase(),
+            login: httpProxyAuth.login,
+            password: httpProxyAuth.password
+        )
+        
+        Task {
+            do {
+                /// question
+                let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
+                
+                /// save question
+                DispatchQueue.main.async {
+                    if(self.msgManager.saveMessage(message: userMsg)) {
+                        self.messages.append(userMsg)
+                        self.waitingModelResponse = true
+                    }
+                }
+                /// user prompt
+                let messages = [
+                    ["role": "user", "content": content]
+                ]
+                
+                /// groq response
+                let response = try await groq.chat(
+                    modelName: modelName,
+                    responseLang: responseLang,
+                    messages: messages
+                )
+                
+                let jsonResponse = JSON(response)
+                
+                /// parse groq message content
+                let errorMessage = jsonResponse["msg"].string
+                
+                let content: String
+                if let errorMessage = errorMessage {
+                    content = errorMessage
+                } else {
+                    content = jsonResponse["choices"].array?.first?["message"]["content"].string ?? ""
+                }
+                
+                let finalContent = (content.isEmpty || content == "\n") ? "No Response from \(modelName)" : content
+                
+                let msg = Message(
+                    chatId: chatId,
+                    model: modelName,
+                    createdAt: strDatetime(),
+                    messageRole: "assistant",
+                    messageContent: finalContent,
+                    image: image,
+                    messageFileName: messageFileName,
+                    messageFileType: messageFileType,
+                    messageFileText: messageFileText
+                )
+                
+                /// save groq response msg
+                DispatchQueue.main.async {
+                    if self.msgManager.saveMessage(message: msg) {
+                        self.messages.append(msg)
+                        self.waitingModelResponse = false
+                    }
+                }
+            } catch {
+                print("Error: \(error)")
+            }
+        }
+    }
+    
     func sendMsg(
         chatId: UUID,
         modelName: String,
@@ -158,7 +244,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         
         // answer handler
         let endpoint = "/api/chat"
-
+        
         // Construct the full URL
         guard let url = URL(string: "\(ollamaApiBaseUrl):\(ollamaApiDefaultPort)\(endpoint)") else {
             return
@@ -206,11 +292,6 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             "images": image
         ] as [String : Any]
         
-        let sysRolePrompt = [
-            "role": "system",
-            "content": "you are a help assistant and answer the question in \(responseLang)",
-        ] as [String : Any]
-        
         var context: [[String: Any?]] = []
         
         if image.count == 0 {
@@ -224,8 +305,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
         
         context.append(newPrompt)
-        context.insert(sysRolePrompt, at: 0)
         
+        /// system role config
+        if responseLang != "Auto" {
+            let sysRolePrompt = [
+                "role": "system",
+                "content": "you are a help assistant and answer the question in \(responseLang)",
+            ] as [String : Any]
+            context.insert(sysRolePrompt, at: 0)
+        }
+
         params["messages"] = context
         
         // send request
@@ -233,7 +322,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
         } catch {
-            print("Error serializing JSON: \(error)")
+            NSLog("Error serializing JSON: \(error)")
             return
         }
         // start a session data task
@@ -278,7 +367,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    print(error)
+                    NSLog("Error: Ollama API service not available.")
                 }
             }
         }

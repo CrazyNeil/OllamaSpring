@@ -32,6 +32,7 @@ struct ChatListPanelView: View {
     @State private var showNewChatAlert = false
     
     @Binding var openOllamaLibraryModal:Bool
+    @Binding var openGroqApiKeyConfigModal:Bool
     
     @State private var isShowingTemperatureDesc = false
     @State private var isShowingSeedDesc = false
@@ -173,6 +174,12 @@ struct ChatListPanelView: View {
                         downloadModelConfirm: $downloadModelConfirm,
                         openDownloadPanel: $openDownloadPanel,
                         modelToBeDownloaded: $modelToBeDownloaded
+                    )
+                }
+                .sheet(isPresented:$openGroqApiKeyConfigModal) {
+                    GroqApiKeyConfigModalView(
+                        commonViewModel: commonViewModel,
+                        openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal
                     )
                 }
             }

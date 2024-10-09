@@ -49,8 +49,13 @@
 		FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */; };
 		FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */; };
 		FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA45BF82BF627D8007E0935 /* Metal.framework */; };
+		FBD459452C855FBD000BE5C1 /* ApiHostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD459442C855FBD000BE5C1 /* ApiHostModel.swift */; };
+		FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD459462C86B680000BE5C1 /* GroqApi.swift */; };
 		FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */; };
 		FBDF8C532C0775DC00BED237 /* OllamaLibraryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */; };
+		FBEFBE512C9D077600B93648 /* HttpProxyConfigPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */; };
+		FBF304822C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */; };
+		FBF304842C8EAB9A00C91CB4 /* GroqModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,8 +133,13 @@
 		FBA45BF42BF58D05007E0935 /* CommonViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonViewModel.swift; sourceTree = "<group>"; };
 		FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferredResponseLangModel.swift; sourceTree = "<group>"; };
 		FBA45BF82BF627D8007E0935 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		FBD459442C855FBD000BE5C1 /* ApiHostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiHostModel.swift; sourceTree = "<group>"; };
+		FBD459462C86B680000BE5C1 /* GroqApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqApi.swift; sourceTree = "<group>"; };
 		FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightTopBarView.swift; sourceTree = "<group>"; };
 		FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLibraryModalView.swift; sourceTree = "<group>"; };
+		FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpProxyConfigPanelView.swift; sourceTree = "<group>"; };
+		FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqApiKeyConfigModalView.swift; sourceTree = "<group>"; };
+		FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,6 +257,7 @@
 			children = (
 				FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */,
 				FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */,
+				FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */,
 			);
 			path = Modal;
 			sourceTree = "<group>";
@@ -259,6 +270,8 @@
 				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
 				FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */,
 				FB9871682C198F3F000A4808 /* OptionsModel.swift */,
+				FBD459442C855FBD000BE5C1 /* ApiHostModel.swift */,
+				FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -272,6 +285,7 @@
 				FBA45BD22BF20258007E0935 /* ChatListPanelView.swift */,
 				FBA45BDD2BF30103007E0935 /* SendMsgPanelView.swift */,
 				FB9871702C280CD0000A4808 /* QuickCompletionPanelView.swift */,
+				FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */,
 			);
 			path = Panel;
 			sourceTree = "<group>";
@@ -290,6 +304,7 @@
 			isa = PBXGroup;
 			children = (
 				FBA45BD52BF20B48007E0935 /* OllamaApi.swift */,
+				FBD459462C86B680000BE5C1 /* GroqApi.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -488,14 +503,19 @@
 				FBA45BEB2BF3614D007E0935 /* RealmModel.swift in Sources */,
 				FB9871762C281881000A4808 /* custom.swift in Sources */,
 				FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */,
+				FBEFBE512C9D077600B93648 /* HttpProxyConfigPanelView.swift in Sources */,
 				FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */,
 				FB98716D2C1C47BF000A4808 /* AppDelegate.swift in Sources */,
+				FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */,
 				FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */,
+				FBF304822C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift in Sources */,
 				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
 				FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */,
 				FB98716F2C1C4A8F000A4808 /* StatusBarView.swift in Sources */,
 				FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */,
+				FBF304842C8EAB9A00C91CB4 /* GroqModel.swift in Sources */,
 				FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */,
+				FBD459452C855FBD000BE5C1 /* ApiHostModel.swift in Sources */,
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
 				FB9871782C293877000A4808 /* QuickCompletionViewModel.swift in Sources */,

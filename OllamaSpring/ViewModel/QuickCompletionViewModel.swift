@@ -65,14 +65,23 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             "model": modelName,
             "options":options
         ]
+
         let newPrompt = [
             "role": "user",
-            "content": content + "\n attention: please generate response for abave content use \(responseLang) language"
+            "content": content
         ] as [String : Any]
+        
+        let sysRolePrompt = [
+            "role": "system",
+            "content": "you are a help assistant and answer the question in \(responseLang)",
+        ] as [String : Any]
+        
         var context: [[String: Any?]] = []
         
 
         context.append(newPrompt)
+        context.insert(sysRolePrompt, at: 0)
+        
         params["messages"] = context
         
         // send request
@@ -80,7 +89,6 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
         } catch {
-            print("Error serializing JSON: \(error)")
             return
         }
         // start a session data task

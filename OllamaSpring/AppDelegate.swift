@@ -16,12 +16,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var mainWindowController: NSWindowController!
     
     var quickCompletionWindow: NSWindow!
+    var httpProxyConfigWindow: NSWindow!
     var quickCompletionWindowController: NSWindowController!
+    var httpProxyConfigWindowController: NSWindowController!
     
     var monitor: Any?
     
     var eventHandler: EventHandlerRef?
     var hotKeyId: EventHotKeyID?
+    
+    @ObservedObject var commonViewModel: CommonViewModel = CommonViewModel()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         
@@ -36,6 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         constructMenu()
         setupQuickCompletionWindow()
+        setupHttpProxyConfigWindow()
         registerGlobalHotkey()
     }
     
@@ -78,11 +83,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func constructMenu() {
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Show", action: #selector(showApp), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Quick Completion", action: #selector(showQuickCompletion), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Quick Completion", action: #selector(showQuickCompletion), keyEquivalent: ""))        
+        menu.addItem(NSMenuItem(title: "Http Proxy", action: #selector(showHttpProxy), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitAction), keyEquivalent: "q"))
         
         statusItem?.menu = menu
+    }
+    
+    func setupHttpProxyConfigWindow() {
+        let httpProxyPanelView = HttpProxyConfigPanelView(commonViewModel: commonViewModel)
+        
+        httpProxyConfigWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: 300), // Adjust height to accommodate the TextField
+            styleMask: [.titled, .closable, .resizable], // Allow the window to be the key window
+            backing: .buffered,
+            defer: false
+        )
+        
+        httpProxyConfigWindow.isReleasedWhenClosed = false
+        httpProxyConfigWindow.center()
+        httpProxyConfigWindow.isOpaque = false
+        httpProxyConfigWindow.level = .floating
+        httpProxyConfigWindow.contentView = NSHostingView(rootView: httpProxyPanelView)
+        
+        httpProxyConfigWindow.title = "Http Proxy"
+        
+        httpProxyConfigWindowController = NSWindowController(window: httpProxyConfigWindow)
     }
     
     func setupQuickCompletionWindow() {
@@ -154,6 +181,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         quickCompletionWindow.makeKeyAndOrderFront(nil)
         quickCompletionWindow.makeFirstResponder(quickCompletionWindow.contentView)
         startQuickCompletionMonitoring()
+    }
+    
+    @objc func showHttpProxy() {
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        
+        httpProxyConfigWindowController.showWindow(self)
+        httpProxyConfigWindow.makeKeyAndOrderFront(nil)
+        httpProxyConfigWindow.makeFirstResponder(httpProxyConfigWindow.contentView)
     }
     
 }

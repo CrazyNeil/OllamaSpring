@@ -16,11 +16,12 @@ struct OllamaSpringApp: SwiftUI.App {
     private let updaterController: SPUStandardUpdaterController
     
     init() {
+        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+        
         // deleteRealmDatabase()
+        
         // Initialize Realm
         _ = try! Realm(configuration: RealmConfiguration.shared.config)
-        // Create our view model for our CheckForUpdatesView
-        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     }
     
     var body: some Scene {

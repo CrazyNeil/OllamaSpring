@@ -20,8 +20,8 @@ struct WelcomePanelView: View {
                 .font(.largeTitle)
                 .foregroundColor(.white)
             
-            // no model installed
-            if commonViewModel.ollamaLocalModelList.isEmpty {
+            // ollama no model installed
+            if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == ApiHostList[0].name {
                 HStack {
                     Text("Oops, you need to download a Ollama model first. You can find a 'Downloads' button at the bottom left. Enjoy!")
                         .font(.body)

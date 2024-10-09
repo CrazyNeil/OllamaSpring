@@ -7,6 +7,7 @@ struct MainPanelView: View {
     @ObservedObject var chatListViewModel:ChatListViewModel
     
     @State private var openOllamaLibraryModal = false
+    @State private var openGroqApiKeyConfigModal = false
     
     init() {
         let commonViewModel = CommonViewModel()
@@ -23,14 +24,16 @@ struct MainPanelView: View {
                     chatListViewModel: chatListViewModel,
                     messagesViewModel: messagesViewModel,
                     commonViewModel: commonViewModel,
-                    openOllamaLibraryModal: $openOllamaLibraryModal
+                    openOllamaLibraryModal: $openOllamaLibraryModal, 
+                    openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal
                 )
                 
                 VStack() {
                     RightTopBarView(
                         commonViewModel: commonViewModel,
                         messagesViewModel: messagesViewModel,
-                        openOllamaLibraryModal: $openOllamaLibraryModal
+                        openOllamaLibraryModal: $openOllamaLibraryModal, 
+                        openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal
                     )
                     
                     MessagesPanelView(
@@ -53,7 +56,7 @@ struct MainPanelView: View {
                 
             }
             .frame(maxWidth: .infinity)
-            .frame(minWidth: 800)
+            .frame(minWidth: 900)
             .frame(maxHeight: .infinity)
             .frame(minHeight: 600)
             .onAppear(){
@@ -61,8 +64,8 @@ struct MainPanelView: View {
             }
             
             
-            // api service not available
-            if commonViewModel.isOllamaApiServiceAvailable == false {
+            // ollama api service not available
+            if commonViewModel.isOllamaApiServiceAvailable == false && commonViewModel.selectedApiHost == ApiHostList[0].name {
                 Color.clear
                     .background(
                         Color.black
@@ -78,7 +81,7 @@ struct MainPanelView: View {
                             .frame(width: 40, height: 40)
                             .cornerRadius(8)
                         
-                        Text("Opps! Ollama API service not available on your Mac. Please ensure that you have installed and are running Ollama.")
+                        Text("Opps! Ollama API service not available on your Mac. Please ensure that you have installed and are running Ollama. Or you can use Groq Fast API service instead of running model locally.")
                             .font(.title2)
                             .padding()
                             .foregroundColor(.white)
@@ -97,6 +100,20 @@ struct MainPanelView: View {
                             .onTapGesture {
                                 openURL(ollamaWebUrl)
                             }
+                        
+                        Text("Groq Fast API")
+                            .font(.body)
+                            .foregroundColor(.green)
+                            .padding(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.green, lineWidth: 1)
+                            )
+                            .onTapGesture {
+                                commonViewModel.isOllamaApiServiceAvailable = true
+                                commonViewModel.updateSelectedApiHost(name: "Groq Fast AI")
+                                messagesViewModel.streamingOutput = false
+                            }
 
                         
                         Text("Refresh & Try again")
@@ -105,11 +122,13 @@ struct MainPanelView: View {
                             .padding(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.blue, lineWidth: 1) // 边框颜色和宽度
+                                    .stroke(Color.blue, lineWidth: 1)
                             )
                             .onTapGesture {
                                 commonViewModel.ollamaApiServiceStatusCheck()
                             }
+                        
+
                     }
                     .frame(maxWidth: 600)
                 }
