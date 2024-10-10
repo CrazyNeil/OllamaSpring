@@ -20,6 +20,12 @@ class OllamaDownloadViewModel: NSObject, ObservableObject, URLSessionDataDelegat
     
     func startDownload(modelName: String) {
         guard let url = URL(string: "http://localhost:11434/api/pull") else { return }
+        
+        // 创建一个配置，设置超时时间
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 10 // 30 秒没有响应则超时
+        configuration.timeoutIntervalForResource = 20 // 总体资源加载超时为 60 秒
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let body = ["name": modelName]
@@ -47,13 +53,34 @@ class OllamaDownloadViewModel: NSObject, ObservableObject, URLSessionDataDelegat
             } catch {
                 DispatchQueue.main.async {
                     self.status = "Download failed. Please confirm if the model name is correct."
-                    self.downloadFailed.toggle()
+                    self.downloadFailed = true
                 }
             }
         }
         
         // Clear processed data
         receivedData = Data()
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let error = error {
+            DispatchQueue.main.async {
+                if (error as NSError).code == NSURLErrorTimedOut {
+                    self.status = "Download failed due to timeout."
+                } else {
+                    self.status = "Download failed: \(error.localizedDescription)"
+                }
+                self.downloadFailed = true
+                self.downloadOnProcessing = false
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.downloadFailed = false
+                self.status = "Download completed successfully."
+                self.downloadCompleted = true
+                self.downloadOnProcessing = false
+            }
+        }
     }
     
     private func updateProgress(with response: DownloadResponse) {

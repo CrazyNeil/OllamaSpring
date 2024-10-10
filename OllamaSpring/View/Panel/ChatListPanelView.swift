@@ -67,7 +67,7 @@ struct ChatListPanelView: View {
                         .padding(.trailing, 10)
                         .onTapGesture {
                             // alert: no allama model found
-                            if commonViewModel.ollamaLocalModelList.isEmpty {
+                            if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == ApiHostList[0].name{
                                 showNewChatAlert.toggle()
                             } else {
                                 // create a new conversation
@@ -159,6 +159,7 @@ struct ChatListPanelView: View {
                         .padding(.trailing, 10)
                         .onTapGesture {
                             openOptionsConfigPanel = false
+                            downloadViewModel.downloadFailed = false
                             openDownloadPanel.toggle()
                         }
                 }
@@ -204,7 +205,7 @@ struct ChatListPanelView: View {
             // ollama models management
             ZStack(alignment: .bottom) {
                 if openDownloadPanel {
-                    VStack {
+                    VStack{
                         ScrollView(showsIndicators: false) {
                             VStack(spacing:0) {
                                 ForEach(OllamaLocalModelList.indices, id: \.self) { index in
@@ -270,8 +271,8 @@ struct ChatListPanelView: View {
                         .padding(.top, 10)
                     }
                     .background(Color(red: 34/255, green: 35/255, blue: 41/255))
+                    .frame(maxWidth: 300)
                     .cornerRadius(8)
-                    
                 }
                 
                 if openOptionsConfigPanel {
@@ -289,7 +290,6 @@ struct ChatListPanelView: View {
                                 }
                         }
 
-                        
                         // temperature
                         HStack(spacing:0) {
                             Text("Temperature")
@@ -461,11 +461,10 @@ struct ChatListPanelView: View {
                                 .padding(.horizontal, 20)
                                 .padding(.top, 5)
                         }
-                        
-                        Spacer()
                     }
-                    .frame(maxWidth: .infinity)
                     .background(Color(red: 34/255, green: 35/255, blue: 41/255))
+                    .frame(maxWidth: 300)
+                    .cornerRadius(8)
                 }
                 
                 // delete model success handler
@@ -509,7 +508,8 @@ struct ChatListPanelView: View {
                     .frame(maxHeight: 150)
                     .background(Color.black)
                     .opacity(0.8)
-                    .cornerRadius(8)
+                    .cornerRadius(0)
+                    .padding(.top, 120)
                     .onAppear(){
                         commonViewModel.loadAvailableLocalModels()
                     }
@@ -550,7 +550,8 @@ struct ChatListPanelView: View {
                                     .padding(.horizontal, 20)
                                     .padding(.top, 10)
                                     .onTapGesture {
-                                        downloadProcessPanel.toggle()
+                                        downloadProcessPanel = false
+                                        downloadViewModel.downloadFailed = false
                                     }
                             }
                         }
@@ -566,7 +567,7 @@ struct ChatListPanelView: View {
                                             .stroke(Color.gray, lineWidth: 1)
                                     )
                                     .onTapGesture {
-                                        downloadProcessPanel.toggle()
+                                        downloadProcessPanel = false
                                     }
                                 
                                 Text("Restart Now")
@@ -578,7 +579,7 @@ struct ChatListPanelView: View {
                                             .stroke(Color.white, lineWidth: 1)
                                     )
                                     .onTapGesture {
-                                        downloadProcessPanel.toggle()
+                                        downloadProcessPanel = false
                                         restartApp()
                                     }
                             }
@@ -590,10 +591,11 @@ struct ChatListPanelView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .frame(maxHeight: 125)
+                    .frame(maxHeight: 150)
                     .background(Color.black)
                     .opacity(0.8)
-                    .cornerRadius(8)
+                    .cornerRadius(0)
+                    .padding(.top, 120)
                     .onAppear(){
                         downloadViewModel.startDownload(modelName:modelToBeDownloaded ?? "")
                     }
@@ -625,7 +627,8 @@ struct ChatListPanelView: View {
                     }
                 )
                 .frame(maxHeight: 150)
-                .cornerRadius(8)
+                .padding(.top, 120)
+                .cornerRadius(0)
                 
                 // download confirm modal
                 ConfirmModalView(
@@ -633,13 +636,14 @@ struct ChatListPanelView: View {
                     title: "Download: \(modelToBeDownloaded ?? "No Model")",
                     content: "This will take a few minutes, continue?",
                     confirmAction: {
-                        downloadProcessPanel.toggle()  // start download process
+                        self.downloadProcessPanel = true  // start download process
                     },
                     cancelAction: {
                     }
                 )
                 .frame(maxHeight: 150)
-                .cornerRadius(8)
+                .padding(.top, 120)
+                .cornerRadius(0)
                 
                 // lock downloads panel until delete success
                 if lockDownloadPanel {
