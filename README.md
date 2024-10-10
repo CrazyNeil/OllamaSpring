@@ -11,6 +11,8 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 - Image, PDF and txt file input
 - Model Options modification
 - Quick Completion
+- Groq Fast API support
+- Http Proxy
 
 https://www.ollamaspring.com
 
@@ -18,9 +20,22 @@ https://www.ollamaspring.com
 
 # New Features
 
+### Groq Fast API
+
+If your Mac computer is not powerful enough to run the Ollama open-source models locally, you can now choose to use the Groq Fast API service. All you need is to obtain the [Groq API key](https://groq.com) to experience fast access to large open-source models.
+
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/user-attachments/assets/1c8f16da-3209-4567-bd3a-b26642c9e1a4">
+
+
+### Http Proxy 
+
+If your network accesses the internet through an HTTP proxy, now you can configure it using the Http Proxy feature in OllamaSpring (Tool Bar).
+
+### Quick Completion
+
 Quick Completion allow you send prompt in a fast way and active it by cmd + shift + h, update OllamaSpring to v1.1.5+ or just install it from [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 
-![quickCompletion](https://github.com/user-attachments/assets/0a6109b8-ab0a-454b-b9c8-627a27a43c3d)
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/user-attachments/assets/0a6109b8-ab0a-454b-b9c8-627a27a43c3d">
 
 
 
@@ -30,7 +45,7 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package ( latest v1.1.7 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
+Download the latest release package ( latest v1.1.8 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 Simply unzip the package and drag it into your Application folder. Or install sandbox version ( v1.1.4 ) from app store. _Notice: The sandbox version needs to undergo Apple App Store review. For the latest updates and versions as soon as possible, we recommend using the binary installation package._
 
 <a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
