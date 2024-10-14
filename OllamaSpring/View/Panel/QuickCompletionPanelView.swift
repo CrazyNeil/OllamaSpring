@@ -18,11 +18,21 @@ struct QuickCompletionPanelView: View {
     }
     
     private func fire() {
-        guard isOllamaApiServiceAvailable() else { return }
-        guard hasLocalModels() else { return }
-        guard isValidInput() else { return }
+        /// load api host
+        commonViewModel.loadSelectedApiHostFromDatabase()
         
-        sendPrompt()
+        if commonViewModel.selectedApiHost == ApiHostList[0].name {
+            print(ApiHostList[0].name)
+            guard isOllamaApiServiceAvailable() else { return }
+            guard hasLocalModels() else { return }
+            guard isValidInput() else { return }
+            
+            sendPrompt()
+        } else {
+            showError("Quick Completion does not support Groq API requests yet. Please use the Ollama API Host.")
+            return
+        }
+
     }
 
     private func isOllamaApiServiceAvailable() -> Bool {

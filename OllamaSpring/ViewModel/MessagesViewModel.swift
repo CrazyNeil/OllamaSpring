@@ -56,6 +56,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         modelName: String,
         responseLang: String,
         content: String,
+        historyMessages: [Message],
         image: [String] = [],
         messageFileName: String = "",
         messageFileType: String = "",
@@ -91,11 +92,23 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     ["role": "user", "content": content]
                 ]
                 
+                var historyMsg: [Message]
+                
+                if image.count > 0 {
+                    historyMsg = []
+                } else {
+                    historyMsg = historyMessages
+                }
+                
                 /// groq response
                 let response = try await groq.chat(
                     modelName: modelName,
                     responseLang: responseLang,
-                    messages: messages
+                    messages: messages,
+                    historyMessages: historyMsg,
+                    seed: Int(self.modelOptions.seed),
+                    temperature: self.modelOptions.temperature,
+                    top_p: self.modelOptions.topP
                 )
                 
                 let jsonResponse = JSON(response)
@@ -216,6 +229,128 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             }
         }
         
+    }
+    
+    func groqSendMsgWithStreamingOn(
+        chatId: UUID,
+        modelName: String,
+        responseLang: String,
+        content: String,
+        image: [String] = [],
+        messageFileName: String = "",
+        messageFileType: String = "",
+        messageFileText: String = ""
+    ){
+        self.tmpChatId = chatId
+        self.tmpModelName = modelName
+        
+        let groqAuthKey = commonViewModel.loadGroqApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        
+        /// http proxy status
+        let isHttpProxyEnabled = commonViewModel.loadHttpProxyStatusFromDatabase()
+        /// http proxy auth status
+        let isHttpProxyAuthEnabled = commonViewModel.loadHttpProxyAuthStatusFromDatabase()
+        
+        // question handler
+        let userMsg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "user", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
+        
+        DispatchQueue.main.async {
+            if(self.msgManager.saveMessage(message: userMsg)) {
+                self.messages.append(userMsg)
+                self.waitingModelResponse = true
+            }
+        }
+        
+        // answer handler
+        let endpoint = "/openai/v1/chat/completions"
+        
+        // Construct the full URL
+        guard let url = URL(string: "\(groqApiBaseUrl)" + "\(endpoint)") else {
+            return
+        }
+        
+        /// init request
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Bearer \(groqAuthKey)", forHTTPHeaderField: "Authorization")
+        request.addValue("curl/7.64.1", forHTTPHeaderField: "User-Agent")
+
+        
+        /// setup proxy configuration only if enabled
+        let configuration = URLSessionConfiguration.default
+        configuration.requestCachePolicy = URLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        
+        if isHttpProxyEnabled {
+            var proxyDict: [String: Any] = [
+                kCFNetworkProxiesHTTPEnable as String: true,
+                kCFNetworkProxiesHTTPProxy as String: httpProxy.name,
+                kCFNetworkProxiesHTTPPort as String: httpProxy.port,
+                kCFNetworkProxiesHTTPSEnable as String: true,
+                kCFNetworkProxiesHTTPSProxy as String: httpProxy.name,
+                kCFNetworkProxiesHTTPSPort as String: httpProxy.port,
+            ]
+
+            /// Add proxy authentication if enabled
+            if isHttpProxyAuthEnabled {
+                let authString = "\(httpProxyAuth.login):\(httpProxyAuth.password)"
+                if let authData = authString.data(using: .utf8) {
+                    let base64AuthString = authData.base64EncodedString()
+                    proxyDict[kCFProxyUsernameKey as String] = httpProxyAuth.login
+                    proxyDict[kCFProxyPasswordKey as String] = httpProxyAuth.password
+                    request.addValue("Basic \(base64AuthString)", forHTTPHeaderField: "Proxy-Authorization")
+                }
+            }
+
+            configuration.connectionProxyDictionary = proxyDict
+        } else {
+            configuration.connectionProxyDictionary = [:]
+        }
+        
+        
+        
+        /// init api params
+        let messages = [
+            ["role": "user", "content": content]
+        ]
+        
+        let params: [String: Any] = [
+            "model": modelName,
+            "messages": messages,
+            "stream": true
+        ]
+        
+        // send request
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
+            request.httpBody = jsonData
+        } catch {
+            NSLog("Error serializing JSON: \(error)")
+            return
+        }
+        
+        // start a session data task
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        let task = session.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    NSLog("Error: \(error.localizedDescription) - \(error)")
+                }
+            }
+
+            guard let response = response as? HTTPURLResponse, (200...299).contains(response.statusCode) else {
+                DispatchQueue.main.async {
+                    NSLog("Server Error: \(String(describing: response))")
+                }
+                return
+            }
+        }
+        task.resume()
+
+        self.waitingModelResponse = true
+        self.tmpResponse = ""
     }
     
     func sendMsgWithStreamingOn(
@@ -367,12 +502,18 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    NSLog("Error: Ollama API service not available.")
+                    NSLog("Error: API service not available.")
                 }
             }
         }
         
         // Clear processed data
         receivedData = Data()
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let error = error {
+            NSLog("Task completed with error: \(error)")
+        }
     }
 }

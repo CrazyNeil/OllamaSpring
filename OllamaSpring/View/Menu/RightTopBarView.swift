@@ -180,6 +180,7 @@ struct RightTopBarView: View {
                     if host.name == ApiHostList[0].name {
                         commonViewModel.loadAvailableLocalModels()
                         commonViewModel.ollamaApiServiceStatusCheck()
+                        messagesViewModel.streamingOutput = true
                     }
                 }) {
                     HStack {
@@ -228,7 +229,6 @@ struct RightTopBarView: View {
             } else {
                 messagesViewModel.streamingOutput.toggle()
             }
-            
         }) {
             Image(systemName: messagesViewModel.streamingOutput ? "stop.circle" : "play.circle")
                 .font(.headline)

@@ -38,6 +38,8 @@ struct SendMsgPanelView: View {
     @State private var selectedImage: NSImage? = nil
     @State private var base64EncodedImage: String = ""
     
+    @State private var isShowingVoiceRecorder = false
+    
     var body: some View {
         /// Display selected file preview
         if let image = selectedImage {
@@ -155,18 +157,37 @@ struct SendMsgPanelView: View {
                 })
             
             HStack {
-                
-                Image(systemName: "doc")
-                    .font(.subheadline)
-                    .imageScale(.large)
-                    .foregroundColor(.gray)
-                    .padding(.leading, 10)
-                    .onTapGesture {
-                        if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 {
-                            showFilePicker.toggle()
+                if commonViewModel.selectedApiHost == ApiHostList[0].name {
+                    Image(systemName: "doc")
+                        .font(.subheadline)
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                        .onTapGesture {
+                            if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 {
+                                showFilePicker.toggle()
+                            }
                         }
-                    }
-                
+                } else {
+                    Image(systemName: "record.circle")
+                        .font(.subheadline)
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                        .onTapGesture {
+                            self.isShowingVoiceRecorder.toggle()
+                        }
+                        .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
+                            VStack {
+                                Text("Voice recorder for Groq API requests is coming soon")
+                                    .padding()
+                                    .foregroundColor(.yellow)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: 500, maxHeight: 40, alignment: .leading)
+                            }
+                        }
+                }
+
                 ZStack(alignment: .topLeading) {
                     
                     CustomTextView(
@@ -275,7 +296,8 @@ struct SendMsgPanelView: View {
                         chatId: chatId,
                         modelName: commonViewModel.selectedGroqModel,
                         responseLang: responseLang,
-                        content: content
+                        content: content,
+                        historyMessages: messagesViewModel.messages
                     )
                 } else {
                     messagesViewModel.sendMsgWithStreamingOn(
@@ -296,7 +318,8 @@ struct SendMsgPanelView: View {
                         chatId: chatId,
                         modelName: commonViewModel.selectedGroqModel,
                         responseLang: responseLang,
-                        content: content
+                        content: content,
+                        historyMessages: messagesViewModel.messages
                     )
                 } else {
                     messagesViewModel.sendMsg(

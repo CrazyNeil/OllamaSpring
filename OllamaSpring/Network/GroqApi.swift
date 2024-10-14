@@ -118,10 +118,24 @@ class GroqApi {
     public func chat(
         modelName: String,
         responseLang: String = "English",
-        messages: [[String: Any]]
+        messages: [[String: Any]],
+        historyMessages:[Message] = [],
+        seed: Int = 0,
+        temperature: Double = 0.8,
+        top_p: Double = 0.9
     ) async throws -> AnyObject {
 
         var mutableMessages = messages
+        
+        /// parse history msg
+        if !historyMessages.isEmpty {
+            for historyMessage in historyMessages.suffix(5).reversed() {
+                mutableMessages.insert([
+                    "role": historyMessage.messageRole,
+                    "content": historyMessage.messageContent
+                ], at: 0)
+            }
+        }
         
         /// setup sys role for response language
         if responseLang != "Auto" {
@@ -132,10 +146,12 @@ class GroqApi {
             mutableMessages.insert(sysRolePrompt, at: 0)
         }
 
-
         let params: [String: Any] = [
             "model": modelName,
-            "messages": mutableMessages
+            "messages": mutableMessages,
+            "seed": seed,
+            "temperature": temperature,
+            "top_p": top_p
         ]
 
         return try await makeRequest(method: "POST", endpoint: "openai/v1/chat/completions", params: params)
