@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelegate {
     
@@ -19,6 +20,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
     @Published var tmpResponse:String = ""
     @Published var responseErrorMsg:String = ""
     @Published var showResponsePanel = false
+    @Published var showGroqResponsePanel = false
     @Published var showMsgPanel = false
     
     init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel(), tmpModelName: String) {
@@ -65,7 +67,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             "model": modelName,
             "options":options
         ]
-
+        
         let newPrompt = [
             "role": "user",
             "content": content
@@ -78,7 +80,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         
         var context: [[String: Any?]] = []
         
-
+        
         context.append(newPrompt)
         context.insert(sysRolePrompt, at: 0)
         
@@ -98,6 +100,66 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         
         self.waitingModelResponse = true
         self.tmpResponse = ""
+    }
+    
+    func groqSendMsg(
+        modelName: String,
+        responseLang: String,
+        content: String
+    ){
+        let groqAuthKey = commonViewModel.loadGroqApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let groq = GroqApi(
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: groqAuthKey,
+            isHttpProxyEnabled: commonViewModel.loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: commonViewModel.loadHttpProxyAuthStatusFromDatabase(),
+            login: httpProxyAuth.login,
+            password: httpProxyAuth.password
+        )
+        
+        Task {
+            do {
+                /// user prompt
+                let messages = [
+                    ["role": "user", "content": content]
+                ]
+                
+                
+                /// groq response
+                let response = try await groq.chat(
+                    modelName: modelName,
+                    responseLang: responseLang,
+                    messages: messages,
+                    historyMessages: [],
+                    seed: Int(self.modelOptions.seed),
+                    temperature: self.modelOptions.temperature,
+                    top_p: self.modelOptions.topP
+                )
+                
+                let jsonResponse = JSON(response)
+                
+                /// parse groq message content
+                let errorMessage = jsonResponse["msg"].string
+                
+                let content: String
+                if let errorMessage = errorMessage {
+                    content = errorMessage
+                } else {
+                    content = jsonResponse["choices"].array?.first?["message"]["content"].string ?? ""
+                }
+                
+                let finalContent = (content.isEmpty || content == "\n") ? "No Response from \(modelName)" : content
+                DispatchQueue.main.async {
+                    self.tmpResponse = finalContent
+                }
+                
+            } catch {
+                print("Error: \(error)")
+            }
+        }
     }
     
     

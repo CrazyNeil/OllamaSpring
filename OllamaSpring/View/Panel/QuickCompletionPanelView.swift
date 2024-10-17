@@ -20,17 +20,13 @@ struct QuickCompletionPanelView: View {
     private func fire() {
         /// load api host
         commonViewModel.loadSelectedApiHostFromDatabase()
-        
         if commonViewModel.selectedApiHost == ApiHostList[0].name {
-            print(ApiHostList[0].name)
             guard isOllamaApiServiceAvailable() else { return }
             guard hasLocalModels() else { return }
             guard isValidInput() else { return }
-            
             sendPrompt()
         } else {
-            showError("Quick Completion does not support Groq API requests yet. Please use the Ollama API Host.")
-            return
+            sendGroqPrompt()
         }
 
     }
@@ -66,13 +62,27 @@ struct QuickCompletionPanelView: View {
     }
 
     private func sendPrompt() {
+        commonViewModel.loadSelectedOllamaModelFromDatabase()
         quickCompletionViewModel.sendMsgWithStreamingOn(
             modelName: commonViewModel.selectedOllamaModel,
             content: inputText,
             responseLang: commonViewModel.selectedResponseLang
         )
+        quickCompletionViewModel.showGroqResponsePanel = false
         quickCompletionViewModel.showMsgPanel = false
         quickCompletionViewModel.showResponsePanel = true
+    }
+    
+    private func sendGroqPrompt() {
+        commonViewModel.loadSelectedGroqModelFromDatabase()
+        quickCompletionViewModel.groqSendMsg(
+            modelName: commonViewModel.selectedGroqModel,
+            responseLang: commonViewModel.selectedResponseLang,
+            content: inputText
+        )
+        quickCompletionViewModel.showResponsePanel = false
+        quickCompletionViewModel.showMsgPanel = false
+        quickCompletionViewModel.showGroqResponsePanel = true
     }
     
     var body: some View {
@@ -151,6 +161,106 @@ struct QuickCompletionPanelView: View {
             .cornerRadius(8)
         }
         
+        /// show groq response after user input
+        if quickCompletionViewModel.showGroqResponsePanel {
+            VStack(spacing: 0) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            /// response bar
+                            HStack {
+                                /// display model name
+                                Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedGroqModel)
+                                    .font(.body)
+                                    .foregroundColor(.orange)
+                                
+                                Spacer()
+                                /// copy response
+                                if quickCompletionViewModel.tmpResponse != "" {
+                                    Image(systemName: "doc.on.doc")
+                                        .font(.subheadline)
+                                        .imageScale(.medium)
+                                        .foregroundColor(.gray)
+                                        .onTapGesture {
+                                            copyToClipboard(text: quickCompletionViewModel.tmpResponse)
+                                            isCopied = true
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                isCopied = false
+                                            }
+                                        }
+                                    
+                                    if isCopied {
+                                        Text("COPIED")
+                                            .font(.subheadline)
+                                            .foregroundColor(Color.green)
+                                    }
+                                }
+                                
+                            }
+                            .textSelection(.enabled)
+                            .padding(.trailing,20)
+                            .padding(.leading,20)
+                            .padding(.top, 10)
+                            
+                            /// waiting response
+                            if quickCompletionViewModel.tmpResponse == "" {
+                                HStack(spacing: 5) {
+                                    
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        .scaleEffect(0.5)
+                                    
+                                    Text("waiting ...")
+                                        .foregroundColor(.gray)
+                                        .font(.headline)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.trailing,20)
+                                .padding(.leading,20)
+                                .padding(.top, 10)
+                            }
+                            
+                            /// response output
+                            HStack {
+                                Markdown{quickCompletionViewModel.tmpResponse}
+                                    .padding(20)
+                                    .font(.body)
+                                    .textSelection(.enabled)
+                                    .markdownTextStyle(\.code) {
+                                        FontFamilyVariant(.monospaced)
+                                        FontSize(.em(0.65))
+                                        ForegroundColor(.purple)
+                                        BackgroundColor(.purple.opacity(0.25))
+                                    }
+                                    .markdownTheme(.gitHub)
+                                
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+                            .cornerRadius(8)
+                            .padding(.trailing,20)
+                            .padding(.leading,20)
+                            .padding(.top, 10)
+                            .id("BOTTOM")
+                        }
+                    }
+                    .onChange(of: quickCompletionViewModel.tmpResponse) {
+                        withAnimation {
+                            proxy.scrollTo("BOTTOM", anchor: .bottom)  // Scroll to the bottom when tmpResponse changes
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity) // Ensure ScrollView takes available space
+                Spacer()
+            }
+            .frame(width: 800, height: 500) // Fixed height for the response panel
+            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+            .opacity(0.85)
+            .cornerRadius(8)
+        }
+        
         /// show model response after user input
         if quickCompletionViewModel.showResponsePanel {
             VStack(spacing: 0) {
@@ -160,7 +270,7 @@ struct QuickCompletionPanelView: View {
                             /// response bar
                             HStack {
                                 /// display model name
-                                Text(commonViewModel.selectedOllamaModel)
+                                Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedOllamaModel)
                                     .font(.body)
                                     .foregroundColor(.orange)
                                 

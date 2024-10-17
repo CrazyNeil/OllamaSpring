@@ -42,6 +42,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupQuickCompletionWindow()
         setupHttpProxyConfigWindow()
         registerGlobalHotkey()
+        
+    }
+    
+    func setupMainWindow() {
+        if mainWindowController == nil {
+            let mainPanelView = MainPanelView()
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                backing: .buffered,
+                defer: false
+            )
+            window.contentView = NSHostingView(rootView: mainPanelView)
+            window.title = "OllamaSpring"
+            window.center()
+            
+            mainWindowController = NSWindowController(window: window)
+        }
     }
     
     /// cmd + shift + h
@@ -142,14 +160,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-        if let window = NSApplication.shared.windows.first {
-            self.mainWindow = window
-        }
+
     }
     
     /// open main app when click dock icon
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        showApp()
+        if !flag {
+            showApp()
+        }
         return true
     }
     
@@ -160,13 +178,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func showApp() {
         NSApplication.shared.activate(ignoringOtherApps: true)
         
-        // Close the quickCompletionWindow if it's open and stop monitoring
+        // 关闭 quickCompletionWindow（如果打开）并停止监控
         if quickCompletionWindowController.window?.isVisible ?? false {
             quickCompletionWindowController.close()
             stopQuickCompletionMonitoring()
         }
         
-        mainWindow?.makeKeyAndOrderFront(nil)
+        // 显示主窗口
+        mainWindowController?.showWindow(nil)
     }
     
     @objc func showQuickCompletion() {

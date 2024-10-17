@@ -56,6 +56,25 @@ class CommonViewModel: ObservableObject {
         self.selectedApiHost = loadPreference(forKey: "apiHost", defaultValue: defaultApiHost)
     }
     
+    /// selected model config
+    func updateSelectedOllamaModel(name:String) {
+        preference.updatePreference(preferenceKey: "selectedOllamaModelName", preferenceValue: name)
+        self.selectedOllamaModel = name
+    }
+    
+    func loadSelectedOllamaModelFromDatabase() {
+        self.selectedOllamaModel = loadPreference(forKey: "selectedOllamaModelName", defaultValue: defaultSelectedModel)
+    }
+    
+    func updateSelectedGroqModel(name:String) {
+        preference.updatePreference(preferenceKey: "selectedGroqModelName", preferenceValue: name)
+        self.selectedGroqModel = name
+    }
+    
+    func loadSelectedGroqModelFromDatabase() {
+        self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: defaultSelectedGroqModel)
+    }
+    
     /// groq api key config
     func updateGroqApiKey(key: String) {
         preference.updatePreference(preferenceKey: "groqApiKey", preferenceValue: key)

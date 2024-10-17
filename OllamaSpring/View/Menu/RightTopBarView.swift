@@ -53,7 +53,7 @@ struct RightTopBarView: View {
                 Menu(commonViewModel.selectedOllamaModel) {
                     ForEach(commonViewModel.ollamaLocalModelList) { model in
                         Button(role: .destructive, action: {
-                            commonViewModel.selectedOllamaModel = model.name
+                            commonViewModel.updateSelectedOllamaModel(name: model.name)
                         }) {
                             
                             HStack {
@@ -76,7 +76,7 @@ struct RightTopBarView: View {
                 Menu(commonViewModel.selectedGroqModel) {
                     ForEach(GroqModelList) { model in
                         Button(role: .destructive, action: {
-                            commonViewModel.selectedGroqModel = model.name
+                            commonViewModel.updateSelectedGroqModel(name: model.name)
                         }) {
                             HStack {
                                 if commonViewModel.selectedGroqModel == model.name {
