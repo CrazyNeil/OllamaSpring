@@ -101,7 +101,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func constructMenu() {
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Show", action: #selector(showApp), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Quick Completion", action: #selector(showQuickCompletion), keyEquivalent: ""))        
+        menu.addItem(NSMenuItem(title: "Quick Completion", action: #selector(showQuickCompletion), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Http Proxy", action: #selector(showHttpProxy), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitAction), keyEquivalent: "q"))
@@ -148,7 +148,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         quickCompletionWindow.contentView = NSHostingView(rootView: quickCompletionPanelView)
         
         // Disable window shadow
-         quickCompletionWindow.hasShadow = false
+        quickCompletionWindow.hasShadow = false
         
         quickCompletionWindow.titleVisibility = .hidden
         quickCompletionWindow.titlebarAppearsTransparent = true
@@ -160,7 +160,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-
+        
     }
     
     /// open main app when click dock icon
@@ -178,13 +178,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func showApp() {
         NSApplication.shared.activate(ignoringOtherApps: true)
         
-        // 关闭 quickCompletionWindow（如果打开）并停止监控
         if quickCompletionWindowController.window?.isVisible ?? false {
             quickCompletionWindowController.close()
             stopQuickCompletionMonitoring()
         }
         
-        // 显示主窗口
         mainWindowController?.showWindow(nil)
     }
     
