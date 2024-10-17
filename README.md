@@ -1,5 +1,5 @@
 # OllamaSpring
-OllamaSpring is a comprehensive macOS client for managing the various models offered by the ollama community, and for creating conversational AI experiences. This is an open-source and free software project, and we welcome more users and developers to participate in it.
+OllamaSpring is a comprehensive macOS client for managing the various models offered by the ollama community (Now also support Groq API service), and for creating conversational AI experiences. This is an open-source and free software project, and we welcome more users and developers to participate in it.
 
 - Support all Ollama Models
 - Control Stream Response
@@ -45,7 +45,7 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package ( latest v1.1.8 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
+Download the latest release package ( latest v1.1.9 ) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
 Simply unzip the package and drag it into your Application folder. Or install sandbox version ( v1.1.4 ) from app store. _Notice: The sandbox version needs to undergo Apple App Store review. For the latest updates and versions as soon as possible, we recommend using the binary installation package._
 
 <a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
