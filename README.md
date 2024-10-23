@@ -14,7 +14,7 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 - Groq Fast API Support
 - HTTP Proxy Configuration
 
-Visit our website: https://www.ollamaspring.com
+Visit our website: https://www.ollamaspring.com (https://taify.ollamaspring.com for App Store Sandbox version)
 
 <img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/cd9e01e7-70d4-47c0-a879-55d02f5f1dc2">
 
@@ -42,9 +42,9 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package (v1.2.0) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section. Simply unzip the package and drag it into your Applications folder, or install the sandbox version (v1.1.4) from the App Store. _Note: The sandbox version is subject to Apple App Store review. For the latest updates, we recommend using the binary installation package._
+Download the latest release package (v1.2.0) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section. Simply unzip the package and drag it into your Applications folder, or install the sandbox version (Taify) (v1.2.1) from the App Store. _Note: The sandbox version is subject to Apple App Store review. For the latest updates, we recommend using the binary installation package._
 
-<a href="https://apps.apple.com/us/app/ollamaspring/id6502970995">
+<a href="https://apps.apple.com/us/app/taify/id65029709955">
   <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="App Store" width="150"/>
 </a>
 
