@@ -14,7 +14,7 @@ OllamaSpring is a comprehensive macOS client for managing the various models off
 - Groq Fast API Support
 - HTTP Proxy Configuration
 
-Visit our website: https://www.ollamaspring.com ( or [https://taify.ollamaspring.com](Taify) for App Store Sandbox version )
+Visit our website: https://www.ollamaspring.com ( or [Taify](https://taify.ollamaspring.com) for App Store Sandbox version )
 
 <img width="700" alt="ollamaSpring-main jpg" src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/cd9e01e7-70d4-47c0-a879-55d02f5f1dc2">
 
