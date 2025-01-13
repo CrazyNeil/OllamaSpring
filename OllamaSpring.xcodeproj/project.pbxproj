@@ -23,6 +23,7 @@
 		FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */; };
 		FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */; };
 		FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */; };
+		FB68CEB52D32035A00C5A495 /* OllamaSpringModelsApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */; };
 		FB9871692C198F3F000A4808 /* OptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9871682C198F3F000A4808 /* OptionsModel.swift */; };
 		FB98716D2C1C47BF000A4808 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB98716C2C1C47BF000A4808 /* AppDelegate.swift */; };
 		FB98716F2C1C4A8F000A4808 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB98716E2C1C4A8F000A4808 /* StatusBarView.swift */; };
@@ -111,6 +112,7 @@
 		FB65CFE42BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaDownloadViewModel.swift; sourceTree = "<group>"; };
 		FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLocalModelListRowView.swift; sourceTree = "<group>"; };
 		FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmModalView.swift; sourceTree = "<group>"; };
+		FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringModelsApi.swift; sourceTree = "<group>"; };
 		FB9871682C198F3F000A4808 /* OptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsModel.swift; sourceTree = "<group>"; };
 		FB98716C2C1C47BF000A4808 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB98716E2C1C4A8F000A4808 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 		FBA45BD42BF20AFF007E0935 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */,
 				FBA45BD52BF20B48007E0935 /* OllamaApi.swift */,
 				FBD459462C86B680000BE5C1 /* GroqApi.swift */,
 			);
@@ -427,7 +430,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					FB0FC7E02BEF1657007E4EB9 = {
 						CreatedOnToolsVersion = 15.3;
@@ -519,6 +522,7 @@
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
 				FB9871782C293877000A4808 /* QuickCompletionViewModel.swift in Sources */,
+				FB68CEB52D32035A00C5A495 /* OllamaSpringModelsApi.swift in Sources */,
 				FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */,
 				FBA45BDE2BF30103007E0935 /* SendMsgPanelView.swift in Sources */,
 				FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */,
@@ -704,7 +708,7 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -721,7 +725,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -739,7 +743,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -756,7 +760,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -767,7 +771,6 @@
 		FB0FC80A2BEF165A007E4EB9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -787,7 +790,6 @@
 		FB0FC80B2BEF165A007E4EB9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -807,7 +809,6 @@
 		FB0FC80D2BEF165A007E4EB9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -825,7 +826,6 @@
 		FB0FC80E2BEF165A007E4EB9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;

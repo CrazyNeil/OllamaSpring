@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 class CommonViewModel: ObservableObject {
     @Published var selectedResponseLang:String = defaultResponseLang
     @Published var selectedApiHost:String = defaultApiHost
@@ -18,13 +19,75 @@ class CommonViewModel: ObservableObject {
     @Published var isHttpProxyAuthEnabled:Bool = httpProxyAuthDefaultStatus
     @Published var groqApiKey:String = defaultGroqApiKey
     @Published var isOllamaApiServiceAvailable:Bool = false
-    @Published var selectedOllamaModel:String = defaultSelectedModel
-    @Published var selectedGroqModel:String = defaultSelectedGroqModel
+    @Published var selectedOllamaModel:String = ""
+    @Published var selectedGroqModel:String = ""
     @Published var ollamaLocalModelList:[OllamaModel] = []
+    @Published var ollamaRemoteModelList:[OllamaModel] = []
+    @Published var groqModelList:[GroqModel] = []
     
     
     let preference = PreferenceManager()
     let ollama = OllamaApi()
+    let ollamaSpringModelsApi = OllamaSpringModelsApi.shared
+    
+    func fetchOllamaModels() async {
+        do {
+            let apiModels = try await ollamaSpringModelsApi.fetchOllamaModels()
+            let customModels = apiModels.map { apiModel in
+                return OllamaModel(
+                    modelName: apiModel.modelName,
+                    name: apiModel.name,
+                    size: apiModel.size,
+                    parameterSize: apiModel.parameterSize,
+                    isDefault: apiModel.isDefault
+                )
+            }
+            
+            DispatchQueue.main.async {
+                self.ollamaRemoteModelList = customModels
+                if self.ollamaRemoteModelList.isEmpty {
+                    self.selectedOllamaModel = "Ollama Models"
+                } else {
+                    if let defaultModel = self.ollamaRemoteModelList.first(where: { $0.isDefault }) {
+                        self.selectedOllamaModel = defaultModel.name
+                    } else {
+                        self.selectedOllamaModel = self.ollamaRemoteModelList.first?.name ?? "Ollama Models"
+                    }
+                }
+            }
+            
+        } catch {
+            print("Failed to fetch Ollama models: \(error)")
+        }
+    }
+    
+    func fetchGroqModels() async {
+        do {
+            let apiModels = try await ollamaSpringModelsApi.fetchGroqModels()
+            let customModels = apiModels.map { apiModel in
+                return GroqModel(
+                    modelName: apiModel.modelName,
+                    name: apiModel.name,
+                    isDefault: apiModel.isDefault
+                )
+            }
+
+            DispatchQueue.main.async {
+                self.groqModelList = customModels
+                if self.groqModelList.isEmpty {
+                    self.selectedGroqModel = "Groq Fast AI"
+                } else {
+                    if let defaultModel = self.groqModelList.first(where: { $0.isDefault }) {
+                        self.selectedGroqModel = defaultModel.name
+                    } else {
+                        self.selectedGroqModel = self.groqModelList.first?.name ?? "Groq Model"
+                    }
+                }
+            }
+        } catch {
+            print("Failed to fetch Groq models: \(error)")
+        }
+    }
     
     func loadPreference(forKey key: String, defaultValue: String) -> String {
         let preferenceValue = preference.getPreference(preferenceKey: key).first?.preferenceValue
@@ -63,7 +126,7 @@ class CommonViewModel: ObservableObject {
     }
     
     func loadSelectedOllamaModelFromDatabase() {
-        self.selectedOllamaModel = loadPreference(forKey: "selectedOllamaModelName", defaultValue: defaultSelectedModel)
+        self.selectedOllamaModel = loadPreference(forKey: "selectedOllamaModelName", defaultValue: selectedOllamaModel)
     }
     
     func updateSelectedGroqModel(name:String) {
@@ -72,7 +135,7 @@ class CommonViewModel: ObservableObject {
     }
     
     func loadSelectedGroqModelFromDatabase() {
-        self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: defaultSelectedGroqModel)
+        self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: selectedGroqModel)
     }
     
     /// groq api key config
@@ -167,7 +230,6 @@ class CommonViewModel: ObservableObject {
         
         Task {
             let response = try await ollama.tags()
-            
             if let models = response["models"] as? [[String: Any]] {
                 
                 DispatchQueue.main.async {
@@ -193,17 +255,17 @@ class CommonViewModel: ObservableObject {
                             modelName: (model["name"] as? String ?? "Not Available"),
                             name: (model["name"] as? String ?? "Not Available"),
                             size: String(format: "%.2fGB", sizeInGB),
-                            parameter_size: parameterSize,
+                            parameterSize: parameterSize,
                             isDefault: false
                         ))
                         
                         // append model installed by library
-                        if self.findLocalModel(byName: model["name"] as! String, in: OllamaLocalModelList) == nil {
-                            OllamaLocalModelList.append(OllamaModel(
+                        if self.findLocalModel(byName: model["name"] as! String, in: self.ollamaRemoteModelList) == nil {
+                            self.ollamaRemoteModelList.append(OllamaModel(
                                 modelName: (model["name"] as? String ?? "Not Available"),
                                 name: (model["name"] as? String ?? "Not Available"),
                                 size: String(format: "%.2fGB", sizeInGB),
-                                parameter_size: parameterSize,
+                                parameterSize: parameterSize,
                                 isDefault: false
                             ))
                         }

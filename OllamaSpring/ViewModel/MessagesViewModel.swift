@@ -51,7 +51,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
     }
     
-    func groqSendMsg(
+    @MainActor func groqSendMsg(
         chatId: UUID,
         modelName: String,
         responseLang: String,
@@ -231,7 +231,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         
     }
     
-    func groqSendMsgWithStreamingOn(
+    @MainActor func groqSendMsgWithStreamingOn(
         chatId: UUID,
         modelName: String,
         responseLang: String,

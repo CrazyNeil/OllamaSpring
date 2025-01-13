@@ -137,6 +137,12 @@ struct MainPanelView: View {
         }
         .onAppear(){
             commonViewModel.ollamaApiServiceStatusCheck()
+            Task {
+                /// fetch groq models from api
+                await commonViewModel.fetchGroqModels()
+                /// fetch ollama models from api
+                await commonViewModel.fetchOllamaModels()
+            }
         }
     }
     

@@ -7,11 +7,19 @@
 
 import Foundation
 
-struct OllamaModel:Identifiable {
+struct OllamaModel: Identifiable, Codable {
     var id: UUID = UUID()
-    var modelName:String
-    var name:String
-    var size:String
-    var parameter_size:String
-    var isDefault:Bool
+    var modelName: String
+    var name: String
+    var size: String
+    var parameterSize: String
+    var isDefault: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case modelName = "modelName"
+        case name
+        case size
+        case parameterSize = "parameter_size"
+        case isDefault = "isDefault"
+    }
 }

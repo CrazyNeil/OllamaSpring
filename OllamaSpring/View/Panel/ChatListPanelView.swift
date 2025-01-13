@@ -208,13 +208,13 @@ struct ChatListPanelView: View {
                     VStack{
                         ScrollView(showsIndicators: false) {
                             VStack(spacing:0) {
-                                ForEach(OllamaLocalModelList.indices, id: \.self) { index in
+                                ForEach(commonViewModel.ollamaRemoteModelList.indices, id: \.self) { index in
                                     HStack {
                                         OllamaLocalModelListRowView(
-                                            ollamaLocalModel: OllamaLocalModelList[index]
+                                            ollamaLocalModel: commonViewModel.ollamaRemoteModelList[index]
                                         )
                                         // download & delete model button
-                                        let modelExists = commonViewModel.ollamaLocalModelList.contains { $0.name ==  OllamaLocalModelList[index].name}
+                                        let modelExists = commonViewModel.ollamaLocalModelList.contains { $0.name ==  commonViewModel.ollamaRemoteModelList[index].name}
                                         if modelExists {
                                             Text("Installed")
                                                 .font(.subheadline)
@@ -228,7 +228,7 @@ struct ChatListPanelView: View {
                                                 .padding(.trailing, 10)
                                                 .onTapGesture {
                                                     deleteModelConfirm = true
-                                                    modelToBeDeleted = OllamaLocalModelList[index].name
+                                                    modelToBeDeleted = commonViewModel.ollamaRemoteModelList[index].name
                                                 }
                                         } else {
                                             Text("Download")
@@ -243,7 +243,7 @@ struct ChatListPanelView: View {
                                                         // no downloading jobs
                                                         if downloadViewModel.downloadOnProcessing == false {
                                                             downloadModelConfirm = true
-                                                            modelToBeDownloaded = OllamaLocalModelList[index].name
+                                                            modelToBeDownloaded = commonViewModel.ollamaRemoteModelList[index].name
                                                         }
                                                     }
                                                 }
@@ -256,7 +256,7 @@ struct ChatListPanelView: View {
                                                 .onTapGesture {
                                                     if downloadViewModel.downloadOnProcessing == false {
                                                         downloadModelConfirm = true
-                                                        modelToBeDownloaded = OllamaLocalModelList[index].name
+                                                        modelToBeDownloaded = commonViewModel.ollamaRemoteModelList[index].name
                                                     }
                                                     
                                                 }

@@ -74,18 +74,25 @@ struct RightTopBarView: View {
                 .buttonStyle(PlainButtonStyle())
             } else {
                 Menu(commonViewModel.selectedGroqModel) {
-                    ForEach(GroqModelList) { model in
-                        Button(role: .destructive, action: {
-                            commonViewModel.updateSelectedGroqModel(name: model.name)
-                        }) {
-                            HStack {
-                                if commonViewModel.selectedGroqModel == model.name {
-                                    Text(model.modelName)
-                                        .font(.subheadline)
-                                        .foregroundColor(.green)
-                                } else {
-                                    Text(model.modelName)
-                                        .font(.subheadline)
+                    if commonViewModel.groqModelList.isEmpty {
+                        Text("No Groq models found")
+                            .foregroundColor(.gray)
+                            .font(.subheadline)
+                    } else {
+                        // 否则展示模型列表
+                        ForEach(commonViewModel.groqModelList) { model in
+                            Button(role: .destructive, action: {
+                                commonViewModel.updateSelectedGroqModel(name: model.name)
+                            }) {
+                                HStack {
+                                    if commonViewModel.selectedGroqModel == model.name {
+                                        Text(model.modelName)
+                                            .font(.subheadline)
+                                            .foregroundColor(.green)
+                                    } else {
+                                        Text(model.modelName)
+                                            .font(.subheadline)
+                                    }
                                 }
                             }
                         }

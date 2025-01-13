@@ -7,9 +7,15 @@
 
 import Foundation
 
-struct GroqModel:Identifiable {
+struct GroqModel: Identifiable, Codable {
     var id: UUID = UUID()
-    var modelName:String
-    var name:String
-    var isDefault:Bool
+    var modelName: String
+    var name: String
+    var isDefault: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case modelName = "modelName"
+        case name
+        case isDefault = "isDefault"
+    }
 }

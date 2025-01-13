@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 class ChatListViewModel: ObservableObject {
     @Published var ChatList:[Chat] = []
     @Published var selectedChat:UUID?

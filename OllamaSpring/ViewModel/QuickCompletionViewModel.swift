@@ -102,7 +102,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         self.tmpResponse = ""
     }
     
-    func groqSendMsg(
+    @MainActor func groqSendMsg(
         modelName: String,
         responseLang: String,
         content: String
