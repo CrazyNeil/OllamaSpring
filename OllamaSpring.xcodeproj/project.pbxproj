@@ -54,6 +54,7 @@
 		FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD459462C86B680000BE5C1 /* GroqApi.swift */; };
 		FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */; };
 		FBDF8C532C0775DC00BED237 /* OllamaLibraryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */; };
+		FBEF6E4F2D431812001C9AB6 /* OllamaHostConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEF6E4E2D431807001C9AB6 /* OllamaHostConfigModalView.swift */; };
 		FBEFBE512C9D077600B93648 /* HttpProxyConfigPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */; };
 		FBF304822C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */; };
 		FBF304842C8EAB9A00C91CB4 /* GroqModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */; };
@@ -139,6 +140,7 @@
 		FBD459462C86B680000BE5C1 /* GroqApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqApi.swift; sourceTree = "<group>"; };
 		FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightTopBarView.swift; sourceTree = "<group>"; };
 		FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLibraryModalView.swift; sourceTree = "<group>"; };
+		FBEF6E4E2D431807001C9AB6 /* OllamaHostConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaHostConfigModalView.swift; sourceTree = "<group>"; };
 		FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpProxyConfigPanelView.swift; sourceTree = "<group>"; };
 		FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqApiKeyConfigModalView.swift; sourceTree = "<group>"; };
 		FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqModel.swift; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 		FB65CFE82BF984FB00E1EA88 /* Modal */ = {
 			isa = PBXGroup;
 			children = (
+				FBEF6E4E2D431807001C9AB6 /* OllamaHostConfigModalView.swift */,
 				FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */,
 				FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */,
 				FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */,
@@ -507,6 +510,7 @@
 				FB9871762C281881000A4808 /* custom.swift in Sources */,
 				FB0FC7E52BEF1657007E4EB9 /* OllamaSpringApp.swift in Sources */,
 				FBEFBE512C9D077600B93648 /* HttpProxyConfigPanelView.swift in Sources */,
+				FBEF6E4F2D431812001C9AB6 /* OllamaHostConfigModalView.swift in Sources */,
 				FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */,
 				FB98716D2C1C47BF000A4808 /* AppDelegate.swift in Sources */,
 				FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */,

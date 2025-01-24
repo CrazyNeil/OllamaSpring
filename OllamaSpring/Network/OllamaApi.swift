@@ -12,11 +12,30 @@ import SwiftUI
 class OllamaApi {
     private var apiBaseUrl: String
     private var port: String
+    private let preference = PreferenceManager()
     
-    init(apiBaseUrl:String = ollamaApiBaseUrl, port:String = ollamaApiDefaultPort) {
-        self.apiBaseUrl = apiBaseUrl
-        self.port = port
+    init(apiBaseUrl: String? = nil, port: String? = nil) {
+        // First initialize stored properties
+        self.apiBaseUrl = ollamaApiDefaultBaseUrl
+        self.port = ollamaApiDefaultPort
+        
+        // Then update with provided values or load from database
+        if let baseUrl = apiBaseUrl, let portNumber = port {
+            self.apiBaseUrl = baseUrl
+            self.port = portNumber
+        } else {
+            let config = loadConfigFromDatabase()
+            self.apiBaseUrl = config.baseUrl
+            self.port = config.port
+        }
     }
+    
+    private func loadConfigFromDatabase() -> (baseUrl: String, port: String) {
+        let baseUrl = preference.loadPreferenceValue(forKey: "ollamaHostName", defaultValue: ollamaApiDefaultBaseUrl)
+        let port = preference.loadPreferenceValue(forKey: "ollamaHostPort", defaultValue: ollamaApiDefaultPort)
+        return ("http://" + baseUrl, port)
+    }
+
     
     private func makeRequest(
         method: String,

@@ -168,6 +168,17 @@ class PreferenceManager {
             realm.delete(record)
         }
     }
+    
+    /// Load preference value with default value
+    func loadPreferenceValue(forKey key: String, defaultValue: String) -> String {
+        let preferenceValue = getPreference(preferenceKey: key).first?.preferenceValue
+        if let value = preferenceValue, !value.isEmpty {
+            return value
+        } else {
+            setPreference(preferenceKey: key, preferenceValue: defaultValue)
+            return defaultValue
+        }
+    }
 
 }
 

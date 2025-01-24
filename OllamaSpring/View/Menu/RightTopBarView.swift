@@ -6,6 +6,7 @@ struct RightTopBarView: View {
     
     @Binding var openOllamaLibraryModal:Bool
     @Binding var openGroqApiKeyConfigModal:Bool
+    @Binding var openOllamaHostConfigModal:Bool
     
     @State private var streamingOutputToggleAlert = false
     
@@ -211,6 +212,15 @@ struct RightTopBarView: View {
             }) {
                 HStack {
                     Text("Groq API Key Config")
+                        .font(.subheadline)
+                }
+            }
+            
+            Button(role: .destructive, action: {
+                self.openOllamaHostConfigModal.toggle()
+            }) {
+                HStack {
+                    Text("Ollama HTTP Host Config")
                         .font(.subheadline)
                 }
             }

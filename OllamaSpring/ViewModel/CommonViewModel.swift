@@ -25,10 +25,49 @@ class CommonViewModel: ObservableObject {
     @Published var ollamaRemoteModelList:[OllamaModel] = []
     @Published var groqModelList:[GroqModel] = []
     
+    @Published var ollamaHostName: String = ollamaApiDefaultBaseUrl
+    @Published var ollamaHostPort: String = ollamaApiDefaultPort
+    
     
     let preference = PreferenceManager()
     let ollama = OllamaApi()
     let ollamaSpringModelsApi = OllamaSpringModelsApi.shared
+    
+    /// Test Ollama host configuration and update if successful
+    /// - Returns: True if connection successful and config updated, false otherwise
+    func testOllamaHostConfig(host: String, port: String) async -> Bool {
+        let testOllama = OllamaApi(apiBaseUrl: "http://" + host, port: port)
+        
+        do {
+            let response = try await testOllama.tags()
+            if response["models"] is [[String: Any]] {
+                // Connection successful, update the configuration
+                updateOllamaHostConfig(host: host, port: port)
+                return true
+            } else {
+                NSLog("Ollama host config test failed: No models found in response")
+                return false
+            }
+            
+        } catch {
+            NSLog("Error during Ollama host config test: \(error)")
+            return false
+        }
+    }
+    
+    func updateOllamaHostConfig(host: String, port: String) {
+        preference.updatePreference(preferenceKey: "ollamaHostName", preferenceValue: removeProtocolPrefix(from: host)) // remove http:// or https://
+        preference.updatePreference(preferenceKey: "ollamaHostPort", preferenceValue: port)
+        self.ollamaHostName = removeProtocolPrefix(from: host)
+        self.ollamaHostPort = port
+    }
+
+    func loadOllamaHostConfigFromDatabase() -> (host: String, port: String) {
+        self.ollamaHostName = loadPreference(forKey: "ollamaHostName", defaultValue: ollamaApiDefaultBaseUrl)
+        self.ollamaHostPort = loadPreference(forKey: "ollamaHostPort", defaultValue: ollamaApiDefaultPort)
+        
+        return (host: self.ollamaHostName, port: self.ollamaHostPort)
+    }
     
     func fetchOllamaModels() async {
         do {
@@ -48,16 +87,25 @@ class CommonViewModel: ObservableObject {
                 if self.ollamaRemoteModelList.isEmpty {
                     self.selectedOllamaModel = "Ollama Models"
                 } else {
-                    if let defaultModel = self.ollamaRemoteModelList.first(where: { $0.isDefault }) {
+                    /// setup default selected model
+                    if let defaultModel = self.ollamaLocalModelList.first(where: { $0.isDefault }) {
                         self.selectedOllamaModel = defaultModel.name
                     } else {
-                        self.selectedOllamaModel = self.ollamaRemoteModelList.first?.name ?? "Ollama Models"
+                        
+                        if self.ollamaLocalModelList.isEmpty {
+                            self.selectedOllamaModel = "No model Installed"
+                        } else {
+                            self.loadSelectedOllamaModelFromDatabase()
+                            if self.selectedOllamaModel == "" {
+                                self.selectedOllamaModel = self.ollamaLocalModelList.first?.name ?? "Ollama Models"
+                            }
+                        }
                     }
                 }
             }
             
         } catch {
-            print("Failed to fetch Ollama models: \(error)")
+            NSLog("Failed to fetch Ollama models: \(error)")
         }
     }
     
@@ -211,13 +259,23 @@ class CommonViewModel: ObservableObject {
     
     func ollamaApiServiceStatusCheck() {
         Task {
-            let response = try await ollama.tags()
-            DispatchQueue.main.async {
-                if response["msg"] is String {
-                    self.isOllamaApiServiceAvailable = false
-                } else {
-                    self.isOllamaApiServiceAvailable = true
+            let ollama = OllamaApi()
+            
+            do {
+                let response = try await ollama.tags()
+                self.loadAvailableLocalModels()
+                DispatchQueue.main.async {
+                    if response["msg"] is String {
+                        self.isOllamaApiServiceAvailable = false
+                    } else {
+                        self.isOllamaApiServiceAvailable = true
+                    }
                 }
+            } catch {
+                DispatchQueue.main.async {
+                    self.isOllamaApiServiceAvailable = false
+                }
+                NSLog("Error during Ollama API service status check: \(error)")
             }
         }
     }
@@ -229,9 +287,9 @@ class CommonViewModel: ObservableObject {
     func loadAvailableLocalModels() {
         
         Task {
+            let ollama = OllamaApi()
             let response = try await ollama.tags()
             if let models = response["models"] as? [[String: Any]] {
-                
                 DispatchQueue.main.async {
                     self.ollamaLocalModelList.removeAll()
                 }
@@ -291,6 +349,7 @@ class CommonViewModel: ObservableObject {
         do {
             let res = try await ollama.delete(model: name)
             if res {
+                self.updateSelectedOllamaModel(name: "")
                 loadAvailableLocalModels()
             }
             return res

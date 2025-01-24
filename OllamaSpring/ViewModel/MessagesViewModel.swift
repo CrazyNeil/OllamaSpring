@@ -381,7 +381,10 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         let endpoint = "/api/chat"
         
         // Construct the full URL
-        guard let url = URL(string: "\(ollamaApiBaseUrl):\(ollamaApiDefaultPort)\(endpoint)") else {
+        let preference = PreferenceManager()
+        let baseUrl = preference.loadPreferenceValue(forKey: "ollamaHostName", defaultValue: ollamaApiDefaultBaseUrl)
+        let port = preference.loadPreferenceValue(forKey: "ollamaHostPort", defaultValue: ollamaApiDefaultPort)
+        guard let url = URL(string: "http://\(baseUrl):\(port)\(endpoint)") else {
             return
         }
         
@@ -489,12 +492,23 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                         self.tmpResponse = (self.tmpResponse ?? "") + content
                     } else {
                         NSLog("Error: Missing message content")
+                        self.tmpResponse = "Error: Unable to get feedback from the selected model. Please select an available model and try again."
                     }
                     
                     // after streaming done
-                    if jsonObject["done"] as! Int == 1 {
+                    if let done = jsonObject["done"] as? Int, done == 1 {
                         self.waitingModelResponse = false
-                        let msg = Message(chatId: self.tmpChatId!, model: self.tmpModelName!, createdAt: strDatetime(), messageRole: "assistant", messageContent: self.tmpResponse ?? "", image: [], messageFileName: "", messageFileType: "", messageFileText: "")
+                        let msg = Message(
+                            chatId: self.tmpChatId!,
+                            model: self.tmpModelName!,
+                            createdAt: strDatetime(),
+                            messageRole: "assistant",
+                            messageContent: self.tmpResponse ?? "",
+                            image: [],
+                            messageFileName: "",
+                            messageFileType: "",
+                            messageFileText: ""
+                        )
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
                         }

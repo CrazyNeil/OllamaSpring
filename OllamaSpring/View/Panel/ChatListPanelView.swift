@@ -33,6 +33,7 @@ struct ChatListPanelView: View {
     
     @Binding var openOllamaLibraryModal:Bool
     @Binding var openGroqApiKeyConfigModal:Bool
+    @Binding var openOllamaHostConfigModal:Bool
     
     @State private var isShowingTemperatureDesc = false
     @State private var isShowingSeedDesc = false
@@ -181,6 +182,12 @@ struct ChatListPanelView: View {
                     GroqApiKeyConfigModalView(
                         commonViewModel: commonViewModel,
                         openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal
+                    )
+                }
+                .sheet(isPresented:$openOllamaHostConfigModal) {
+                    OllamaHostConfigModalView(
+                        commonViewModel: commonViewModel,
+                        openOllamaHostConfigModal: $openOllamaHostConfigModal
                     )
                 }
             }

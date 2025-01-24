@@ -8,6 +8,7 @@ struct MainPanelView: View {
     
     @State private var openOllamaLibraryModal = false
     @State private var openGroqApiKeyConfigModal = false
+    @State private var openOllamaHostConfigModal = false
     
     init() {
         let commonViewModel = CommonViewModel()
@@ -25,7 +26,8 @@ struct MainPanelView: View {
                     messagesViewModel: messagesViewModel,
                     commonViewModel: commonViewModel,
                     openOllamaLibraryModal: $openOllamaLibraryModal, 
-                    openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal
+                    openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
+                    openOllamaHostConfigModal: $openOllamaHostConfigModal
                 )
                 
                 VStack() {
@@ -33,7 +35,8 @@ struct MainPanelView: View {
                         commonViewModel: commonViewModel,
                         messagesViewModel: messagesViewModel,
                         openOllamaLibraryModal: $openOllamaLibraryModal, 
-                        openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal
+                        openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
+                        openOllamaHostConfigModal: $openOllamaHostConfigModal
                     )
                     
                     MessagesPanelView(
@@ -126,6 +129,18 @@ struct MainPanelView: View {
                             )
                             .onTapGesture {
                                 commonViewModel.ollamaApiServiceStatusCheck()
+                            }
+                        
+                        Text("Ollama Host Config")
+                            .font(.body)
+                            .foregroundColor(.gray)
+                            .padding(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                            .onTapGesture {
+                                openOllamaHostConfigModal.toggle()
                             }
                         
 
