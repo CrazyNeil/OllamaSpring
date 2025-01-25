@@ -74,6 +74,8 @@ struct OllamaHostConfigModalView: View {
                             let isSuccess = await commonViewModel.testOllamaHostConfig(host: hostText, port: portText)
                             if isSuccess {
                                 self.openOllamaHostConfigModal = false
+                                /// reload available models from ollama api
+                                commonViewModel.loadAvailableLocalModels()
                             } else {
                                 // 显示错误提示
                                 #if os(macOS)

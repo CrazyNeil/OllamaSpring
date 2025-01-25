@@ -266,7 +266,7 @@ struct SendMsgPanelView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.gray, lineWidth: 0.5)
-                .opacity(1)
+                .opacity(0.4)
         )
         .padding(.bottom, 10)
         .padding(.trailing,10)

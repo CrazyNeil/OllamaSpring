@@ -175,8 +175,10 @@ struct QuickCompletionPanelView: View {
                                     .foregroundColor(.orange)
                                 
                                 Spacer()
-                                /// copy response
+                                
+                                
                                 if quickCompletionViewModel.tmpResponse != "" {
+                                    /// copy response
                                     Image(systemName: "doc.on.doc")
                                         .font(.subheadline)
                                         .imageScale(.medium)
@@ -275,8 +277,9 @@ struct QuickCompletionPanelView: View {
                                     .foregroundColor(.orange)
                                 
                                 Spacer()
-                                /// copy response
+                                
                                 if quickCompletionViewModel.tmpResponse != "" {
+                                    /// copy response
                                     Image(systemName: "doc.on.doc")
                                         .font(.subheadline)
                                         .imageScale(.medium)

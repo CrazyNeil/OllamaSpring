@@ -1,8 +1,6 @@
 import SwiftUI
 import MarkdownUI
 
-
-
 struct MessagesRowView: View {
     let message: Message
     @State private var isCopied: Bool = false
@@ -25,6 +23,20 @@ struct MessagesRowView: View {
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .opacity(0.5)
+                    
+                    ShareLink(
+                        item: message.messageContent,
+                        preview: SharePreview(
+                            "Share OllamaSpring Message",
+                            image: Image(nsImage: NSApplication.shared.applicationIconImage)
+                        )
+                    )
+                    .buttonStyle(.plain)
+                    .labelStyle(.iconOnly)
+                    .foregroundColor(.gray)
+                    .font(.subheadline)
+                    .imageScale(.medium)
+                    
                     Image(systemName: "doc.on.doc")
                         .font(.subheadline)
                         .imageScale(.medium)
