@@ -2,6 +2,7 @@
 OllamaSpring is a comprehensive macOS client for managing the various models offered by the Ollama community (now with support for Groq API services), and for creating conversational AI experiences. This is an open-source and free software project, and we welcome users and developers to participate.
 
 - Supports all Ollama Models
+- Supports Ollama Http Host config
 - Stream Response Control
 - Model Download and Deletion
 - Conversation and History Contexts
@@ -30,6 +31,10 @@ If your Mac is not powerful enough to run the Ollama open-source models locally,
 
 If your network accesses the internet through an HTTP proxy, you can now configure it using the HTTP Proxy feature in OllamaSpring (available in the toolbar).
 
+### Ollama Http Host Config
+
+<img width="700" alt="ollamaSpring-main jpg" src="https://github.com/user-attachments/assets/5176e3b8-d2df-463c-b585-658b7a449e4a">
+
 ### Quick Completion
 
 Quick Completion allows you to send prompts quickly by activating it with cmd + shift + h. Update OllamaSpring to v1.1.5+ or install it from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section.
@@ -42,7 +47,7 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package (v1.2.2) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section. Simply unzip the package and drag it into your Applications folder, or install the sandbox version (Taify) (v1.2.1) from the App Store. _Note: The sandbox version is subject to Apple App Store review. For the latest updates, we recommend using the binary installation package._
+Download the latest release package (v1.2.3) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section. Simply unzip the package and drag it into your Applications folder, or install the sandbox version (Taify) (v1.2.2) from the App Store. _Note: The sandbox version is subject to Apple App Store review. For the latest updates, we recommend using the binary installation package._
 
 <a href="https://apps.apple.com/us/app/taify/id65029709955">
   <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="App Store" width="150"/>
