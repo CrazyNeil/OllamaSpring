@@ -28,7 +28,6 @@ struct RightTopBarView: View {
             streamingButton
         }
         .frame(height: 30)
-        .background(Color.black)
         .onAppear(){
             commonViewModel.loadSelectedResponseLangFromDatabase()
             commonViewModel.loadSelectedApiHostFromDatabase()
@@ -171,6 +170,7 @@ struct RightTopBarView: View {
         .font(.subheadline)
         .buttonStyle(PlainButtonStyle())
         .padding(.leading, 5)
+        .lineLimit(1)
     }
     
     private var apiHostMenu: some View {

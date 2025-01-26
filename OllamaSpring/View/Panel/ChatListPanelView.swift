@@ -80,6 +80,12 @@ struct ChatListPanelView: View {
                 }
                 .frame(height: 30)
                 .background(Color(red: 34/255, green: 35/255, blue: 41/255))
+//                .overlay(
+//                    Rectangle()
+//                        .frame(height: 0.5)  // 设置线的高度
+//                        .foregroundColor(Color.gray.opacity(0.2))  // 设置颜色和透明度
+//                        .offset(y: 14)  // 调整位置到底部
+//                )
                 
                 if showNewChatAlert {
                     HStack {
@@ -191,8 +197,7 @@ struct ChatListPanelView: View {
                     )
                 }
             }
-            .frame(maxHeight: .infinity)
-            .frame(width: 280)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.clear)
             .onAppear() {
                 DispatchQueue.main.async {
@@ -278,7 +283,6 @@ struct ChatListPanelView: View {
                         .padding(.top, 10)
                     }
                     .background(Color(red: 34/255, green: 35/255, blue: 41/255))
-                    .frame(maxWidth: 300)
                     .cornerRadius(8)
                 }
                 
@@ -470,7 +474,6 @@ struct ChatListPanelView: View {
                         }
                     }
                     .background(Color(red: 34/255, green: 35/255, blue: 41/255))
-                    .frame(maxWidth: 300)
                     .cornerRadius(8)
                 }
                 
@@ -687,7 +690,7 @@ struct ChatListPanelView: View {
             }
             
         }
-        .frame(width: 280)
+        
     }
 }
 

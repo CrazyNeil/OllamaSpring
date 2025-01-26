@@ -10,6 +10,9 @@ struct MainPanelView: View {
     @State private var openGroqApiKeyConfigModal = false
     @State private var openOllamaHostConfigModal = false
     
+    @State private var isLeftPanelVisible: Bool = true
+    @State private var leftPanelWidth: CGFloat = 280
+    
     init() {
         let commonViewModel = CommonViewModel()
         self.commonViewModel = commonViewModel
@@ -19,24 +22,51 @@ struct MainPanelView: View {
     
     var body: some View {
         ZStack {
-            HStack(spacing: 1) {
-                
-                ChatListPanelView(
-                    chatListViewModel: chatListViewModel,
-                    messagesViewModel: messagesViewModel,
-                    commonViewModel: commonViewModel,
-                    openOllamaLibraryModal: $openOllamaLibraryModal, 
-                    openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
-                    openOllamaHostConfigModal: $openOllamaHostConfigModal
-                )
-                
-                VStack() {
-                    RightTopBarView(
-                        commonViewModel: commonViewModel,
+            HSplitView {
+                if isLeftPanelVisible {
+                    ChatListPanelView(
+                        chatListViewModel: chatListViewModel,
                         messagesViewModel: messagesViewModel,
-                        openOllamaLibraryModal: $openOllamaLibraryModal, 
+                        commonViewModel: commonViewModel,
+                        openOllamaLibraryModal: $openOllamaLibraryModal,
                         openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
                         openOllamaHostConfigModal: $openOllamaHostConfigModal
+                    )
+                    .frame(minWidth: 240,  idealWidth: 280, maxWidth: 300)
+                    .animation(.easeInOut, value: isLeftPanelVisible)
+                }
+                
+                VStack {
+                    HStack {
+                        Button(action: {
+                            withAnimation {
+                                isLeftPanelVisible.toggle()
+                            }
+                        }) {
+                            Image(systemName: isLeftPanelVisible ? "sidebar.left" : "sidebar.right")
+                                .foregroundColor(.gray)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        RightTopBarView(
+                            commonViewModel: commonViewModel,
+                            messagesViewModel: messagesViewModel,
+                            openOllamaLibraryModal: $openOllamaLibraryModal,
+                            openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
+                            openOllamaHostConfigModal: $openOllamaHostConfigModal
+                        )
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 0)
+                    .background(Color(red: 44/255, green: 49/255, blue: 50/255))
+                    .frame(height: 28)
+                    .overlay(
+                        Rectangle()
+                            .frame(height: 0.5)
+                            .foregroundColor(Color.white.opacity(0.1))
+                            .offset(y: 15)
                     )
                     
                     MessagesPanelView(
@@ -53,13 +83,12 @@ struct MainPanelView: View {
                         commonViewModel: commonViewModel
                     )
                 }
-                .frame(maxHeight: .infinity)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(red: 34/255, green: 39/255, blue: 40/255))
                 
             }
             .frame(maxWidth: .infinity)
-            .frame(minWidth: 900)
+            .frame(minWidth: 1000)
             .frame(maxHeight: .infinity)
             .frame(minHeight: 600)
             .onAppear(){
