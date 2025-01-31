@@ -21,6 +21,10 @@ Visit our website: https://www.ollamaspring.com ( or [Taify](https://taify.ollam
 
 # New Features
 
+### DeepSeek
+
+Allow users to access the DeepSeek official model via apiKey. Users can also choose to deploy DeepSeek locally on a Mac or a specified host using Ollama.
+
 ### Groq Fast API
 
 If your Mac is not powerful enough to run the Ollama open-source models locally, you can now use the Groq Fast API service. All you need is a [Groq API key](https://groq.com) to experience fast access to large open-source models.
@@ -47,7 +51,7 @@ System Requirements:
 - macOS 14.0 or later
 - [Ollama](https://ollama.com) installed
 
-Download the latest release package (v1.2.4) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section. Simply unzip the package and drag it into your Applications folder, or install the sandbox version (Taify) (v1.2.2) from the App Store. _Note: The sandbox version is subject to Apple App Store review. For the latest updates, we recommend using the binary installation package._
+Download the latest release package (v1.2.5) from the [Releases](https://github.com/CrazyNeil/OllamaSpring/releases) section. Simply unzip the package and drag it into your Applications folder, or install the sandbox version (Taify) (v1.2.2) from the App Store. _Note: The sandbox version is subject to Apple App Store review. For the latest updates, we recommend using the binary installation package._
 
 <a href="https://apps.apple.com/us/app/taify/id65029709955">
   <img src="https://github.com/CrazyNeil/OllamaSpring/assets/5747549/a37c4931-9420-431d-a0b7-c2cc0fdc27fe" alt="App Store" width="150"/>
