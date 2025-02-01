@@ -18,11 +18,14 @@ class CommonViewModel: ObservableObject {
     @Published var isHttpProxyEnabled:Bool = httpProxyDefaultStatus
     @Published var isHttpProxyAuthEnabled:Bool = httpProxyAuthDefaultStatus
     @Published var groqApiKey:String = defaultGroqApiKey
+    @Published var deepSeekApiKey:String = defaultDeepSeekApiKey
     @Published var isOllamaApiServiceAvailable:Bool = false
     @Published var selectedOllamaModel:String = ""
     @Published var selectedGroqModel:String = ""
+    @Published var selectedDeepSeekModel:String = ""
     @Published var ollamaLocalModelList:[OllamaModel] = []
     @Published var ollamaRemoteModelList:[OllamaModel] = []
+    @Published var deepSeekModelList:[DeepSeekModel] = []
     @Published var groqModelList:[GroqModel] = []
     
     @Published var ollamaHostName: String = ollamaApiDefaultBaseUrl
@@ -133,7 +136,42 @@ class CommonViewModel: ObservableObject {
                 }
             }
         } catch {
-            print("Failed to fetch Groq models: \(error)")
+            NSLog("Failed to fetch Groq models: \(error)")
+        }
+    }
+    
+    func fetchDeepSeekModels(apiKey:String) async {
+        do {
+            let httpProxy = loadHttpProxyHostFromDatabase()
+            let apiModels = try await ollamaSpringModelsApi.fetchDeepSeekModels(
+                apiKey: apiKey,
+                proxyUrl: httpProxy.name,
+                proxyPort: Int(httpProxy.port) ?? 0,
+                isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+                isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase()
+            )
+            let customModels = apiModels.map { apiModel in
+                return DeepSeekModel(
+                    modelName: apiModel.modelName,
+                    name: apiModel.name,
+                    isDefault: apiModel.isDefault
+                )
+            }
+            
+            DispatchQueue.main.async {
+                self.deepSeekModelList = customModels
+                if self.deepSeekModelList.isEmpty {
+                    self.selectedDeepSeekModel = "DeepSeek"
+                } else {
+                    if let defaultModel = self.deepSeekModelList.first(where: { $0.isDefault }) {
+                        self.selectedDeepSeekModel = defaultModel.name
+                    } else {
+                        self.selectedDeepSeekModel = self.deepSeekModelList.first?.name ?? "DeepSeek Model"
+                    }
+                }
+            }
+        } catch {
+            NSLog("Failed to fetch DeepSeek models: \(error)")
         }
     }
     
@@ -182,6 +220,11 @@ class CommonViewModel: ObservableObject {
         self.selectedGroqModel = name
     }
     
+    func updateSelectedDeepSeekModel(name:String) {
+        preference.updatePreference(preferenceKey: "selectedDeepSeekModelName", preferenceValue: name)
+        self.selectedDeepSeekModel = name
+    }
+    
     func loadSelectedGroqModelFromDatabase() {
         self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: selectedGroqModel)
     }
@@ -196,6 +239,40 @@ class CommonViewModel: ObservableObject {
         self.groqApiKey = loadPreference(forKey: "groqApiKey", defaultValue: defaultGroqApiKey)
         
         return self.groqApiKey
+    }
+    
+    /// DeepSeek api key config
+    func loadDeepSeekApiKeyFromDatabase() -> String {
+        self.deepSeekApiKey = loadPreference(forKey: "deepSeekApiKey", defaultValue: defaultDeepSeekApiKey)
+        
+        return self.deepSeekApiKey
+    }
+    
+    func updateDeepSeekApiKey(key: String) {
+        preference.updatePreference(preferenceKey: "deepSeekApiKey", preferenceValue: key)
+        self.deepSeekApiKey = key
+    }
+    
+    func verifyDeepSeekApiKey(key: String) async -> Bool {
+        let httpProxy = loadHttpProxyHostFromDatabase()
+        let deepSeekApi = DeepSeekApi(
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: key,
+            isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase()
+        )
+        
+        do {
+            let response = try await deepSeekApi.models()
+            if let modelResponse = response as? [String: Any],
+               let modelsData = modelResponse["data"] as? [[String: Any]] {
+                return !modelsData.isEmpty
+            }
+            return false
+        } catch {
+            return false
+        }
     }
     
     /// http proxy config

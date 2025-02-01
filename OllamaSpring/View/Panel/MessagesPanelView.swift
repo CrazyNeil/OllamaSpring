@@ -7,6 +7,11 @@
 
 import SwiftUI
 import MarkdownUI
+import Splash
+
+
+
+
 
 struct MessagesPanelView: View {
     @ObservedObject var messagesViewModel: MessagesViewModel
@@ -43,21 +48,44 @@ struct MessagesPanelView: View {
                             if messagesViewModel.streamingOutput {
                                 HStack {
                                     HStack {
-                                        Markdown{messagesViewModel.tmpResponse ?? ""}
+                                        Markdown(messagesViewModel.tmpResponse ?? "")
                                             .padding(10)
                                             .font(.body)
                                             .textSelection(.enabled)
-                                            .markdownTextStyle(\.code) {
-                                                FontFamilyVariant(.monospaced)
-                                                FontSize(.em(0.65))
-                                                ForegroundColor(.purple)
-                                                BackgroundColor(.purple.opacity(0.25))
+                                            .markdownBlockStyle(\.codeBlock) { configuration in
+                                                VStack(alignment: .leading, spacing: 4) {
+                                                    // lang tag
+                                                    if let language = configuration.language,
+                                                       !language.trimmingCharacters(in: .whitespaces).isEmpty {  // 移除空格后检查
+                                                        Text(language)
+                                                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                                            .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                            .padding(.horizontal, 8)
+                                                            .padding(.top, 8)
+                                                    }
+                                                    
+                                                    // code
+                                                    ScrollView(.horizontal, showsIndicators: false) {
+                                                        SyntaxHighlightedText(
+                                                            code: configuration.content,
+                                                            language: configuration.language ?? ""
+                                                        )
+                                                        .padding(10)
+                                                        .lineSpacing(8)
+                                                    }
+                                                }
+                                                .background(Color(red: 40/255, green: 42/255, blue: 48/255))
+                                                .cornerRadius(6)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 6)
+                                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                                )
+                                                .padding(.bottom, 20)
                                             }
-                                            .markdownTheme(.gitHub)
                                     }
                                     .background(Color(red: 24/255, green: 25/255, blue: 29/255))
                                     .cornerRadius(8)
-                                    .padding(.trailing,65)
+                                    .padding(.trailing, 65)
                                     .id("tmpStreamingResponse")
                                     Spacer()
                                 }

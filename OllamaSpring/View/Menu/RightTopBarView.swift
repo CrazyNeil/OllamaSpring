@@ -6,6 +6,7 @@ struct RightTopBarView: View {
     
     @Binding var openOllamaLibraryModal:Bool
     @Binding var openGroqApiKeyConfigModal:Bool
+    @Binding var openDeepSeekApiKeyConfigModal:Bool
     @Binding var openOllamaHostConfigModal:Bool
     
     @State private var streamingOutputToggleAlert = false
@@ -38,6 +39,33 @@ struct RightTopBarView: View {
         }
     }
     
+    private func modelMenuItem(name: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(role: .destructive, action: action) {
+            Text(name)
+                .font(.subheadline)
+                .foregroundColor(isSelected ? .green : nil)
+        }
+    }
+    
+    private func emptyModelListText() -> some View {
+        Text("No models found")
+            .foregroundColor(.gray)
+            .font(.subheadline)
+    }
+    
+    private func getSelectedModel() -> String {
+        switch commonViewModel.selectedApiHost {
+        case ApiHostList[0].name:
+            return commonViewModel.selectedOllamaModel
+        case ApiHostList[1].name:
+            return commonViewModel.selectedGroqModel
+        case ApiHostList[2].name:
+            return commonViewModel.selectedDeepSeekModel
+        default:
+            return "Unknown Model"
+        }
+    }
+    
     private var library: some View {
         Text("Library")
             .font(.subheadline)
@@ -49,61 +77,52 @@ struct RightTopBarView: View {
     
     private var modelListMenu: some View {
         Group {
-            if commonViewModel.selectedApiHost == "Ollama" {
-                Menu(commonViewModel.selectedOllamaModel) {
+            Menu(getSelectedModel()) {
+                switch commonViewModel.selectedApiHost {
+                case ApiHostList[0].name:
                     ForEach(commonViewModel.ollamaLocalModelList) { model in
-                        Button(role: .destructive, action: {
-                            commonViewModel.updateSelectedOllamaModel(name: model.name)
-                        }) {
-                            
-                            HStack {
-                                if commonViewModel.selectedOllamaModel == model.name {
-                                    Text(model.name)
-                                        .font(.subheadline)
-                                        .foregroundColor(.green)
-                                } else {
-                                    Text(model.name)
-                                        .font(.subheadline)
-                                }
-                            }
-                        }
+                        modelMenuItem(
+                            name: model.name,
+                            isSelected: commonViewModel.selectedOllamaModel == model.name,
+                            action: { commonViewModel.updateSelectedOllamaModel(name: model.name) }
+                        )
                     }
-                }
-                .font(.subheadline)
-                .lineLimit(1)
-                .buttonStyle(PlainButtonStyle())
-            } else {
-                Menu(commonViewModel.selectedGroqModel) {
+                    
+                case ApiHostList[1].name:
                     if commonViewModel.groqModelList.isEmpty {
-                        Text("No Groq models found")
-                            .foregroundColor(.gray)
-                            .font(.subheadline)
+                        emptyModelListText()
                     } else {
-                        // 否则展示模型列表
                         ForEach(commonViewModel.groqModelList) { model in
-                            Button(role: .destructive, action: {
-                                commonViewModel.updateSelectedGroqModel(name: model.name)
-                            }) {
-                                HStack {
-                                    if commonViewModel.selectedGroqModel == model.name {
-                                        Text(model.modelName)
-                                            .font(.subheadline)
-                                            .foregroundColor(.green)
-                                    } else {
-                                        Text(model.modelName)
-                                            .font(.subheadline)
-                                    }
-                                }
-                            }
+                            modelMenuItem(
+                                name: model.modelName,
+                                isSelected: commonViewModel.selectedGroqModel == model.name,
+                                action: { commonViewModel.updateSelectedGroqModel(name: model.name) }
+                            )
                         }
                     }
+                    
+                case ApiHostList[2].name:
+                    if commonViewModel.deepSeekModelList.isEmpty {
+                        emptyModelListText()
+                    } else {
+                        ForEach(commonViewModel.deepSeekModelList) { model in
+                            modelMenuItem(
+                                name: model.modelName,
+                                isSelected: commonViewModel.selectedDeepSeekModel == model.name,
+                                action: { commonViewModel.updateSelectedDeepSeekModel(name: model.name) }
+                            )
+                        }
+                    }
+                    
+                default:
+                    emptyModelListText()
                 }
-                .font(.subheadline)
-                .lineLimit(1)
-                .buttonStyle(PlainButtonStyle())
             }
+            .font(.subheadline)
+            .lineLimit(1)
+            .buttonStyle(PlainButtonStyle())
+            .padding(.leading, 5)
         }
-        .padding(.leading, 5)
     }
     
     private var chevronDownImage: some View {
@@ -180,8 +199,18 @@ struct RightTopBarView: View {
                 Button(role: .destructive, action: {
                     commonViewModel.updateSelectedApiHost(name: host.name)
                     /// disable groq streaming output
-                    if host.name == ApiHostList[1].name {
-                        messagesViewModel.streamingOutput = false
+//                    if host.name == ApiHostList[1].name {
+//                        messagesViewModel.streamingOutput = false
+//                    }
+                    
+                    /// disable deepSeek streaming output
+                    if host.name == ApiHostList[2].name {
+//                        messagesViewModel.streamingOutput = false
+                        let deepSeekApiKey = commonViewModel.loadDeepSeekApiKeyFromDatabase()
+                        Task {
+                            await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)
+                        }
+                        
                     }
                     
                     /// init ollama api service
@@ -204,9 +233,9 @@ struct RightTopBarView: View {
                 }
             }
             
-            /// groq fast AI key config
-            Divider()
             
+            Divider()
+            /// groq fast AI key config
             Button(role: .destructive, action: {
                 self.openGroqApiKeyConfigModal.toggle()
             }) {
@@ -215,12 +244,21 @@ struct RightTopBarView: View {
                         .font(.subheadline)
                 }
             }
-            
+            /// ollama host config
             Button(role: .destructive, action: {
                 self.openOllamaHostConfigModal.toggle()
             }) {
                 HStack {
                     Text("Ollama HTTP Host Config")
+                        .font(.subheadline)
+                }
+            }
+            /// deepseek api key config
+            Button(role: .destructive, action: {
+                self.openDeepSeekApiKeyConfigModal.toggle()
+            }) {
+                HStack {
+                    Text("DeepSeek API Key Config")
                         .font(.subheadline)
                 }
             }
@@ -241,11 +279,12 @@ struct RightTopBarView: View {
     
     private var streamingButton: some View {
         Button(action: {
-            if commonViewModel.selectedApiHost == ApiHostList[1].name {
-                streamingOutputToggleAlert = true
-            } else {
-                messagesViewModel.streamingOutput.toggle()
-            }
+//            if commonViewModel.selectedApiHost == ApiHostList[1].name {
+//                streamingOutputToggleAlert = true
+//            } else {
+//                messagesViewModel.streamingOutput.toggle()
+//            }
+            messagesViewModel.streamingOutput.toggle()
         }) {
             Image(systemName: messagesViewModel.streamingOutput ? "stop.circle" : "play.circle")
                 .font(.headline)

@@ -43,7 +43,7 @@ struct SendMsgPanelView: View {
     var body: some View {
         /// Display selected file preview
         if let image = selectedImage {
-            // 处理图像文件
+            // image handler
             HStack(spacing: 0) {
                 Spacer()
                 VStack {
@@ -168,7 +168,7 @@ struct SendMsgPanelView: View {
                                 showFilePicker.toggle()
                             }
                         }
-                } else {
+                } else if commonViewModel.selectedApiHost == ApiHostList[1].name {
                     Image(systemName: "record.circle")
                         .font(.subheadline)
                         .imageScale(.large)
@@ -180,6 +180,24 @@ struct SendMsgPanelView: View {
                         .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
                             VStack {
                                 Text("Voice recorder for Groq API requests is coming soon")
+                                    .padding()
+                                    .foregroundColor(.yellow)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: 500, maxHeight: 40, alignment: .leading)
+                            }
+                        }
+                } else {
+                    Image(systemName: "doc")
+                        .font(.subheadline)
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 10)
+                        .onTapGesture {
+                            self.isShowingVoiceRecorder.toggle()
+                        }
+                        .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
+                            VStack {
+                                Text("File upload for DeepSeek is coming soon")
                                     .padding()
                                     .foregroundColor(.yellow)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -284,6 +302,7 @@ struct SendMsgPanelView: View {
             /// api host
             let selectedApiHost = commonViewModel.selectedApiHost
             let isGroqFastAI = (selectedApiHost == ApiHostList[1].name)
+            let isDeepSeek = (selectedApiHost == ApiHostList[2].name)
 
             // msg params
             let chatId = chatListViewModel.selectedChat!
@@ -292,9 +311,17 @@ struct SendMsgPanelView: View {
 
             if messagesViewModel.streamingOutput {
                 if isGroqFastAI {
-                    messagesViewModel.groqSendMsg(
+                    messagesViewModel.groqSendMsgWithStreamingOn(
                         chatId: chatId,
                         modelName: commonViewModel.selectedGroqModel,
+                        responseLang: responseLang,
+                        content: content,
+                        historyMessages: messagesViewModel.messages
+                    )
+                } else if isDeepSeek {
+                    messagesViewModel.deepSeekSendMsgWithStreamingOn(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedDeepSeekModel,
                         responseLang: responseLang,
                         content: content,
                         historyMessages: messagesViewModel.messages
@@ -321,7 +348,16 @@ struct SendMsgPanelView: View {
                         content: content,
                         historyMessages: messagesViewModel.messages
                     )
-                } else {
+                } else if isDeepSeek {
+                    messagesViewModel.deepSeekSendMsg(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedDeepSeekModel,
+                        responseLang: responseLang,
+                        content: content,
+                        historyMessages: messagesViewModel.messages
+                    )
+                }
+                else {
                     messagesViewModel.sendMsg(
                         chatId: chatId,
                         modelName: commonViewModel.selectedOllamaModel,

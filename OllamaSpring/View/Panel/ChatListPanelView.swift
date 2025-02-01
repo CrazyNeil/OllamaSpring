@@ -34,6 +34,7 @@ struct ChatListPanelView: View {
     @Binding var openOllamaLibraryModal:Bool
     @Binding var openGroqApiKeyConfigModal:Bool
     @Binding var openOllamaHostConfigModal:Bool
+    @Binding var openDeepSeekApiKeyConfigModal:Bool
     
     @State private var isShowingTemperatureDesc = false
     @State private var isShowingSeedDesc = false
@@ -80,12 +81,6 @@ struct ChatListPanelView: View {
                 }
                 .frame(height: 30)
                 .background(Color(red: 34/255, green: 35/255, blue: 41/255))
-//                .overlay(
-//                    Rectangle()
-//                        .frame(height: 0.5)  // 设置线的高度
-//                        .foregroundColor(Color.gray.opacity(0.2))  // 设置颜色和透明度
-//                        .offset(y: 14)  // 调整位置到底部
-//                )
                 
                 if showNewChatAlert {
                     HStack {
@@ -194,6 +189,12 @@ struct ChatListPanelView: View {
                     OllamaHostConfigModalView(
                         commonViewModel: commonViewModel,
                         openOllamaHostConfigModal: $openOllamaHostConfigModal
+                    )
+                }
+                .sheet(isPresented:$openDeepSeekApiKeyConfigModal) {
+                    DeepSeekApiKeyConfigModalView(
+                        commonViewModel: commonViewModel,
+                        openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal
                     )
                 }
             }

@@ -24,6 +24,13 @@
 		FB65CFE72BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */; };
 		FB65CFEA2BF9851900E1EA88 /* ConfirmModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */; };
 		FB68CEB52D32035A00C5A495 /* OllamaSpringModelsApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */; };
+		FB8ED47A2D4705CB00D59410 /* DeepSeekApiKeyConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8ED4792D4705BC00D59410 /* DeepSeekApiKeyConfigModalView.swift */; };
+		FB8ED47C2D470E5200D59410 /* DeepSeekApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8ED47B2D470E4C00D59410 /* DeepSeekApi.swift */; };
+		FB8ED47E2D4A44EA00D59410 /* DeepSeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8ED47D2D4A44E500D59410 /* DeepSeekModel.swift */; };
+		FB8ED4852D4CF59800D59410 /* SplashHTMLGen in Frameworks */ = {isa = PBXBuildFile; productRef = FB8ED4842D4CF59800D59410 /* SplashHTMLGen */; };
+		FB8ED4892D4CF59800D59410 /* SplashMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = FB8ED4882D4CF59800D59410 /* SplashMarkdown */; };
+		FB8ED48B2D4CF59800D59410 /* SplashTokenizer in Frameworks */ = {isa = PBXBuildFile; productRef = FB8ED48A2D4CF59800D59410 /* SplashTokenizer */; };
+		FB8ED48D2D4CF7FE00D59410 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = FB8ED48C2D4CF7FE00D59410 /* Splash */; };
 		FB9871692C198F3F000A4808 /* OptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9871682C198F3F000A4808 /* OptionsModel.swift */; };
 		FB98716D2C1C47BF000A4808 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB98716C2C1C47BF000A4808 /* AppDelegate.swift */; };
 		FB98716F2C1C4A8F000A4808 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB98716E2C1C4A8F000A4808 /* StatusBarView.swift */; };
@@ -114,6 +121,9 @@
 		FB65CFE62BF8798C00E1EA88 /* OllamaLocalModelListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLocalModelListRowView.swift; sourceTree = "<group>"; };
 		FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmModalView.swift; sourceTree = "<group>"; };
 		FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaSpringModelsApi.swift; sourceTree = "<group>"; };
+		FB8ED4792D4705BC00D59410 /* DeepSeekApiKeyConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekApiKeyConfigModalView.swift; sourceTree = "<group>"; };
+		FB8ED47B2D470E4C00D59410 /* DeepSeekApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekApi.swift; sourceTree = "<group>"; };
+		FB8ED47D2D4A44E500D59410 /* DeepSeekModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekModel.swift; sourceTree = "<group>"; };
 		FB9871682C198F3F000A4808 /* OptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsModel.swift; sourceTree = "<group>"; };
 		FB98716C2C1C47BF000A4808 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB98716E2C1C4A8F000A4808 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
@@ -153,9 +163,13 @@
 			files = (
 				FB2FB9F92C06197C00621595 /* Sparkle in Frameworks */,
 				FBA45BEE2BF436C3007E0935 /* RealmSwift in Frameworks */,
+				FB8ED4852D4CF59800D59410 /* SplashHTMLGen in Frameworks */,
 				FBA45BD92BF21240007E0935 /* SwiftyJSON in Frameworks */,
+				FB8ED4892D4CF59800D59410 /* SplashMarkdown in Frameworks */,
+				FB8ED48D2D4CF7FE00D59410 /* Splash in Frameworks */,
 				FBA45BF92BF627D8007E0935 /* Metal.framework in Frameworks */,
 				FBA45BE12BF3030F007E0935 /* MarkdownUI in Frameworks */,
+				FB8ED48B2D4CF59800D59410 /* SplashTokenizer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,6 +273,7 @@
 		FB65CFE82BF984FB00E1EA88 /* Modal */ = {
 			isa = PBXGroup;
 			children = (
+				FB8ED4792D4705BC00D59410 /* DeepSeekApiKeyConfigModalView.swift */,
 				FBEF6E4E2D431807001C9AB6 /* OllamaHostConfigModalView.swift */,
 				FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */,
 				FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */,
@@ -270,6 +285,7 @@
 		FBA45BC52BF1906A007E0935 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				FB8ED47D2D4A44E500D59410 /* DeepSeekModel.swift */,
 				FBA45BC62BF19115007E0935 /* ChatModel.swift */,
 				FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */,
 				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
@@ -308,6 +324,7 @@
 		FBA45BD42BF20AFF007E0935 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				FB8ED47B2D470E4C00D59410 /* DeepSeekApi.swift */,
 				FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */,
 				FBA45BD52BF20B48007E0935 /* OllamaApi.swift */,
 				FBD459462C86B680000BE5C1 /* GroqApi.swift */,
@@ -384,6 +401,10 @@
 				FBA45BE02BF3030F007E0935 /* MarkdownUI */,
 				FBA45BED2BF436C3007E0935 /* RealmSwift */,
 				FB2FB9F82C06197C00621595 /* Sparkle */,
+				FB8ED4842D4CF59800D59410 /* SplashHTMLGen */,
+				FB8ED4882D4CF59800D59410 /* SplashMarkdown */,
+				FB8ED48A2D4CF59800D59410 /* SplashTokenizer */,
+				FB8ED48C2D4CF7FE00D59410 /* Splash */,
 			);
 			productName = OllamaSpring;
 			productReference = FB0FC7E12BEF1657007E4EB9 /* OllamaSpring.app */;
@@ -462,6 +483,7 @@
 				FBA45BDF2BF3030F007E0935 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				FBA45BE42BF34F67007E0935 /* XCRemoteSwiftPackageReference "realm-swift" */,
 				FB2FB9F72C06197C00621595 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				FB8ED4812D4CF4C800D59410 /* XCRemoteSwiftPackageReference "Splash" */,
 			);
 			productRefGroup = FB0FC7E22BEF1657007E4EB9 /* Products */;
 			projectDirPath = "";
@@ -515,6 +537,7 @@
 				FB98716D2C1C47BF000A4808 /* AppDelegate.swift in Sources */,
 				FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */,
 				FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */,
+				FB8ED47C2D470E5200D59410 /* DeepSeekApi.swift in Sources */,
 				FBF304822C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift in Sources */,
 				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
 				FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */,
@@ -522,6 +545,7 @@
 				FB65CFE52BF82AAB00E1EA88 /* OllamaDownloadViewModel.swift in Sources */,
 				FBF304842C8EAB9A00C91CB4 /* GroqModel.swift in Sources */,
 				FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */,
+				FB8ED47A2D4705CB00D59410 /* DeepSeekApiKeyConfigModalView.swift in Sources */,
 				FBD459452C855FBD000BE5C1 /* ApiHostModel.swift in Sources */,
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
@@ -545,6 +569,7 @@
 				FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */,
 				FB2FB9FD2C061B1300621595 /* CheckForUpdatesView.swift in Sources */,
 				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
+				FB8ED47E2D4A44EA00D59410 /* DeepSeekModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -712,7 +737,7 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -729,7 +754,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -747,7 +772,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -764,7 +789,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -894,6 +919,14 @@
 				minimumVersion = 2.6.2;
 			};
 		};
+		FB8ED4812D4CF4C800D59410 /* XCRemoteSwiftPackageReference "Splash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JohnSundell/Splash";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.16.0;
+			};
+		};
 		FBA45BD72BF21240007E0935 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
@@ -925,6 +958,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FB2FB9F72C06197C00621595 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		FB8ED4842D4CF59800D59410 /* SplashHTMLGen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB8ED4812D4CF4C800D59410 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashHTMLGen;
+		};
+		FB8ED4882D4CF59800D59410 /* SplashMarkdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB8ED4812D4CF4C800D59410 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashMarkdown;
+		};
+		FB8ED48A2D4CF59800D59410 /* SplashTokenizer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB8ED4812D4CF4C800D59410 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashTokenizer;
+		};
+		FB8ED48C2D4CF7FE00D59410 /* Splash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB8ED4812D4CF4C800D59410 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = Splash;
 		};
 		FBA45BD82BF21240007E0935 /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;

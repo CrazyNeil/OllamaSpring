@@ -77,7 +77,6 @@ struct OllamaHostConfigModalView: View {
                                 /// reload available models from ollama api
                                 commonViewModel.loadAvailableLocalModels()
                             } else {
-                                // 显示错误提示
                                 #if os(macOS)
                                 let alert = NSAlert()
                                 alert.messageText = "Connection Failed"

@@ -9,6 +9,7 @@ struct MainPanelView: View {
     @State private var openOllamaLibraryModal = false
     @State private var openGroqApiKeyConfigModal = false
     @State private var openOllamaHostConfigModal = false
+    @State private var openDeepSeekApiKeyConfigModal = false
     
     @State private var isLeftPanelVisible: Bool = true
     @State private var leftPanelWidth: CGFloat = 280
@@ -30,7 +31,8 @@ struct MainPanelView: View {
                         commonViewModel: commonViewModel,
                         openOllamaLibraryModal: $openOllamaLibraryModal,
                         openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
-                        openOllamaHostConfigModal: $openOllamaHostConfigModal
+                        openOllamaHostConfigModal: $openOllamaHostConfigModal,
+                        openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal
                     )
                     .frame(minWidth: 240,  idealWidth: 280, maxWidth: 300)
                     .animation(.easeInOut, value: isLeftPanelVisible)
@@ -55,6 +57,7 @@ struct MainPanelView: View {
                             messagesViewModel: messagesViewModel,
                             openOllamaLibraryModal: $openOllamaLibraryModal,
                             openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
+                            openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal,
                             openOllamaHostConfigModal: $openOllamaHostConfigModal
                         )
                     }
@@ -186,6 +189,9 @@ struct MainPanelView: View {
                 await commonViewModel.fetchGroqModels()
                 /// fetch ollama models from api
                 await commonViewModel.fetchOllamaModels()
+                //// fetch deepseek models from api
+                let deepSeekApiKey = commonViewModel.loadDeepSeekApiKeyFromDatabase()
+                await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)
             }
         }
     }
