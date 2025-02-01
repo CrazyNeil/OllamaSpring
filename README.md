@@ -1,6 +1,7 @@
 # OllamaSpring
 OllamaSpring is a comprehensive macOS client for managing the various models offered by the Ollama community (now with support for Groq API services), and for creating conversational AI experiences. This is an open-source and free software project, and we welcome users and developers to participate.
 
+- Supports DeepSeek Official API
 - Supports all Ollama Models
 - Supports Ollama Http Host config
 - Stream Response Control
