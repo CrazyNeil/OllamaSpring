@@ -20,6 +20,7 @@ class CommonViewModel: ObservableObject {
     @Published var groqApiKey:String = defaultGroqApiKey
     @Published var deepSeekApiKey:String = defaultDeepSeekApiKey
     @Published var isOllamaApiServiceAvailable:Bool = false
+    @Published var hasLocalModelInstalled:Bool = false
     @Published var selectedOllamaModel:String = ""
     @Published var selectedGroqModel:String = ""
     @Published var selectedDeepSeekModel:String = ""
@@ -133,6 +134,7 @@ class CommonViewModel: ObservableObject {
                     } else {
                         self.selectedGroqModel = self.groqModelList.first?.name ?? "Groq Model"
                     }
+                    self.updateSelectedGroqModel(name: self.selectedGroqModel)
                 }
             }
         } catch {
@@ -346,15 +348,38 @@ class CommonViewModel: ObservableObject {
                 let response = try await ollama.tags()
                 self.loadAvailableLocalModels()
                 DispatchQueue.main.async {
-                    if response["msg"] is String {
-                        self.isOllamaApiServiceAvailable = false
-                    } else {
+                    if let models = response["models"] as? [[String: Any]], !models.isEmpty {
                         self.isOllamaApiServiceAvailable = true
+                    } else {
+                        self.isOllamaApiServiceAvailable = false
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
                     self.isOllamaApiServiceAvailable = false
+                }
+                NSLog("Error during Ollama API service status check: \(error)")
+            }
+        }
+    }
+    
+    func localModelInstalledCheck() {
+        Task {
+            let ollama = OllamaApi()
+            
+            do {
+                let response = try await ollama.tags()
+                self.loadAvailableLocalModels()
+                DispatchQueue.main.async {
+                    if let models = response["models"] as? [[String: Any]], !models.isEmpty {
+                        self.hasLocalModelInstalled = true
+                    } else {
+                        self.hasLocalModelInstalled = false
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.hasLocalModelInstalled = false
                 }
                 NSLog("Error during Ollama API service status check: \(error)")
             }

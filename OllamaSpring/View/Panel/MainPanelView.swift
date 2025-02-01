@@ -100,7 +100,7 @@ struct MainPanelView: View {
             
             
             // ollama api service not available
-            if commonViewModel.isOllamaApiServiceAvailable == false && commonViewModel.selectedApiHost == ApiHostList[0].name {
+            if commonViewModel.isOllamaApiServiceAvailable == false || commonViewModel.hasLocalModelInstalled == false  {
                 Color.clear
                     .background(
                         Color.black
@@ -146,6 +146,7 @@ struct MainPanelView: View {
                             )
                             .onTapGesture {
                                 commonViewModel.isOllamaApiServiceAvailable = true
+                                commonViewModel.hasLocalModelInstalled = true
                                 commonViewModel.updateSelectedApiHost(name: "Groq Fast AI")
                                 messagesViewModel.streamingOutput = false
                             }
@@ -184,6 +185,7 @@ struct MainPanelView: View {
         }
         .onAppear(){
             commonViewModel.ollamaApiServiceStatusCheck()
+            commonViewModel.localModelInstalledCheck()
             Task {
                 /// fetch groq models from api
                 await commonViewModel.fetchGroqModels()

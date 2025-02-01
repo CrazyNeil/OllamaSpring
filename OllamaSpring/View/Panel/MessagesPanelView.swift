@@ -82,6 +82,7 @@ struct MessagesPanelView: View {
                                                 )
                                                 .padding(.bottom, 20)
                                             }
+                                            .markdownTheme(.gitHub)
                                     }
                                     .background(Color(red: 24/255, green: 25/255, blue: 29/255))
                                     .cornerRadius(8)
