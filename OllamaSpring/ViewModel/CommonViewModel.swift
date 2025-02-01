@@ -229,6 +229,10 @@ class CommonViewModel: ObservableObject {
         self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: selectedGroqModel)
     }
     
+    func loadSelectedDeepSeekModelFromDatabase() {
+        self.selectedDeepSeekModel = loadPreference(forKey: "selectedDeepSeekModelName", defaultValue: selectedDeepSeekModel)
+    }
+    
     /// groq api key config
     func updateGroqApiKey(key: String) {
         preference.updatePreference(preferenceKey: "groqApiKey", preferenceValue: key)

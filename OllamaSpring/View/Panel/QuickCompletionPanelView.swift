@@ -25,8 +25,10 @@ struct QuickCompletionPanelView: View {
             guard hasLocalModels() else { return }
             guard isValidInput() else { return }
             sendPrompt()
-        } else {
+        } else if commonViewModel.selectedApiHost == ApiHostList[1].name {
             sendGroqPrompt()
+        } else {
+            sendDeepSeekPrompt()
         }
 
     }
@@ -75,14 +77,26 @@ struct QuickCompletionPanelView: View {
     
     private func sendGroqPrompt() {
         commonViewModel.loadSelectedGroqModelFromDatabase()
-        quickCompletionViewModel.groqSendMsg(
+        quickCompletionViewModel.groqSendMsgWithStreamingOn(
             modelName: commonViewModel.selectedGroqModel,
-            responseLang: commonViewModel.selectedResponseLang,
-            content: inputText
+            content: inputText,
+            responseLang: commonViewModel.selectedResponseLang
         )
         quickCompletionViewModel.showResponsePanel = false
         quickCompletionViewModel.showMsgPanel = false
         quickCompletionViewModel.showGroqResponsePanel = true
+    }
+    
+    private func sendDeepSeekPrompt() {
+        commonViewModel.loadSelectedDeepSeekModelFromDatabase()
+        quickCompletionViewModel.deepSeekSendMsgWithStreamingOn(
+            modelName: commonViewModel.selectedDeepSeekModel,
+            content: inputText,
+            responseLang: commonViewModel.selectedResponseLang
+        )
+        quickCompletionViewModel.showResponsePanel = false
+        quickCompletionViewModel.showMsgPanel = false
+        quickCompletionViewModel.showDeepSeekResponsePanel = true
     }
     
     var body: some View {
@@ -162,7 +176,7 @@ struct QuickCompletionPanelView: View {
         }
         
         /// show groq response after user input
-        if quickCompletionViewModel.showGroqResponsePanel {
+        if quickCompletionViewModel.showGroqResponsePanel || quickCompletionViewModel.showDeepSeekResponsePanel {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -170,9 +184,19 @@ struct QuickCompletionPanelView: View {
                             /// response bar
                             HStack {
                                 /// display model name
-                                Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedGroqModel)
-                                    .font(.body)
-                                    .foregroundColor(.orange)
+                                if commonViewModel.selectedApiHost == ApiHostList[2].name {
+                                    Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedDeepSeekModel)
+                                        .font(.body)
+                                        .foregroundColor(.orange)
+                                } else if commonViewModel.selectedApiHost == ApiHostList[1].name  {
+                                    Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedGroqModel)
+                                        .font(.body)
+                                        .foregroundColor(.orange)
+                                } else {
+                                    Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedOllamaModel)
+                                        .font(.body)
+                                        .foregroundColor(.orange)
+                                }
                                 
                                 Spacer()
                                 
@@ -235,6 +259,36 @@ struct QuickCompletionPanelView: View {
                                         ForegroundColor(.purple)
                                         BackgroundColor(.purple.opacity(0.25))
                                     }
+                                    .markdownBlockStyle(\.codeBlock) { configuration in
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            // lang tag
+                                            if let language = configuration.language,
+                                               !language.trimmingCharacters(in: .whitespaces).isEmpty {  // 移除空格后检查
+                                                Text(language)
+                                                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                                    .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                    .padding(.horizontal, 8)
+                                                    .padding(.top, 8)
+                                            }
+                                            
+                                            // code
+                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                SyntaxHighlightedText(
+                                                    code: configuration.content,
+                                                    language: configuration.language ?? ""
+                                                )
+                                                .padding(10)
+                                                .lineSpacing(8)
+                                            }
+                                        }
+                                        .background(Color(red: 40/255, green: 42/255, blue: 48/255))
+                                        .cornerRadius(6)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .padding(.bottom, 20)
+                                    }
                                     .markdownTheme(.gitHub)
                                 
                                 Spacer()
@@ -261,10 +315,7 @@ struct QuickCompletionPanelView: View {
             .background(Color(red: 24/255, green: 25/255, blue: 29/255))
             .opacity(0.85)
             .cornerRadius(8)
-        }
-        
-        /// show model response after user input
-        if quickCompletionViewModel.showResponsePanel {
+        } else if quickCompletionViewModel.showResponsePanel {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -335,6 +386,36 @@ struct QuickCompletionPanelView: View {
                                         FontSize(.em(0.65))
                                         ForegroundColor(.purple)
                                         BackgroundColor(.purple.opacity(0.25))
+                                    }
+                                    .markdownBlockStyle(\.codeBlock) { configuration in
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            // lang tag
+                                            if let language = configuration.language,
+                                               !language.trimmingCharacters(in: .whitespaces).isEmpty {  // 移除空格后检查
+                                                Text(language)
+                                                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                                    .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                    .padding(.horizontal, 8)
+                                                    .padding(.top, 8)
+                                            }
+                                            
+                                            // code
+                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                SyntaxHighlightedText(
+                                                    code: configuration.content,
+                                                    language: configuration.language ?? ""
+                                                )
+                                                .padding(10)
+                                                .lineSpacing(8)
+                                            }
+                                        }
+                                        .background(Color(red: 40/255, green: 42/255, blue: 48/255))
+                                        .cornerRadius(6)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .padding(.bottom, 20)
                                     }
                                     .markdownTheme(.gitHub)
                                 
