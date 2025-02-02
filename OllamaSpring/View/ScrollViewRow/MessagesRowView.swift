@@ -68,13 +68,29 @@ struct MessagesRowView: View {
                         .markdownBlockStyle(\.codeBlock) { configuration in
                             VStack(alignment: .leading, spacing: 4) {
                                 // lang tag
-                                if let language = configuration.language,
-                                   !language.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    Text(language)
-                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                        .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                HStack {
+                                    if let language = configuration.language,
+                                       !language.trimmingCharacters(in: .whitespaces).isEmpty {
+                                        Text(language)
+                                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                            .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                            .padding(.horizontal, 8)
+                                            .padding(.top, 8)
+                                        
+                                        Spacer()
+                                        
+                                        Button(action: {
+                                            NSPasteboard.general.clearContents()
+                                            NSPasteboard.general.setString(configuration.content, forType: .string)
+                                        }) {
+                                            Image(systemName: "doc.on.doc")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
                                         .padding(.horizontal, 8)
                                         .padding(.top, 8)
+                                    }
                                 }
                                 
                                 // code
