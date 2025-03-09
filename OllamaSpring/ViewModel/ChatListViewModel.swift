@@ -11,6 +11,7 @@ import Foundation
 class ChatListViewModel: ObservableObject {
     @Published var ChatList:[Chat] = []
     @Published var selectedChat:UUID?
+    @Published var editingChatId: UUID? = nil
     
     let chatManager = ChatManager()
     let msgManager = MessageManager()

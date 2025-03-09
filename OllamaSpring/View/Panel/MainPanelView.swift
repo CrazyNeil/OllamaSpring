@@ -107,39 +107,26 @@ struct MainPanelView: View {
                             .opacity(0.85)
                     )
                     .edgesIgnoringSafeArea(.all)
-                
                 VStack {
+                    Image("ollama-2")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(4)
                     HStack {
-                        Image("ollama-1")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 40, height: 40)
-                            .cornerRadius(8)
-                        
-                        Text("Opps! Ollama API service not available on your Mac. Please ensure that you have installed and are running Ollama. Or you can use Groq Fast API service instead of running model locally.")
-                            .font(.title2)
+                        Text("Welcome To OllamaSpring")
+                            .font(.system(size: 26))
                             .padding()
                             .foregroundColor(.white)
                     }
                     .frame(maxWidth: 600)
                     
                     HStack {
-                        Text("Download & Install Ollama")
-                            .font(.body)
+  
+                        Text("Start Now")
+                            .font(.system(size: 20))
                             .foregroundColor(.green)
-                            .padding(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.green, lineWidth: 1)
-                            )
-                            .onTapGesture {
-                                openURL(ollamaWebUrl)
-                            }
-                        
-                        Text("Groq Fast API")
-                            .font(.body)
-                            .foregroundColor(.green)
-                            .padding(8)
+                            .padding(14)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.green, lineWidth: 1)
@@ -150,27 +137,50 @@ struct MainPanelView: View {
                                 commonViewModel.updateSelectedApiHost(name: "Groq Fast AI")
                                 messagesViewModel.streamingOutput = false
                             }
+                    }
+                    .frame(maxWidth: 600)
 
-                        
-                        Text("Refresh & Try again")
-                            .font(.body)
-                            .foregroundColor(.blue)
-                            .padding(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.blue, lineWidth: 1)
-                            )
-                            .onTapGesture {
-                                commonViewModel.ollamaApiServiceStatusCheck()
-                            }
-                        
-                        Text("Ollama Host Config")
-                            .font(.body)
+                    HStack {
+                        Text("Ollama API service is not available on your Mac. If you want to run Ollama models locally on your Mac, follow these steps to install and set up Ollama first. If you host Ollama api service on specific host, you should just enter your own Ollama host below.")
+                            .font(.system(size: 12))
+                            .padding()
+                            .foregroundColor(.gray)
+                    }
+                    .frame(maxWidth: 600)
+                    .padding(.top, 20)
+
+                    HStack {
+                        Text("Step 1: Install Ollama")
+                            .font(.system(size: 10))
                             .foregroundColor(.gray)
                             .padding(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray, lineWidth: 1)
+                            )
+                            .onTapGesture {
+                                openURL(ollamaWebUrl)
+                            }
+                        
+                        Text("Step 2: Refresh")
+                            .font(.system(size: 10))
+                            .foregroundColor(.gray)
+                            .padding(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                            .onTapGesture {
+                                commonViewModel.ollamaApiServiceStatusCheck()
+                            }
+                        
+                        Text("Enter your own Ollama host")
+                            .font(.system(size: 10))
+                            .foregroundColor(.blue)
+                            .padding(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.blue, lineWidth: 1)
                             )
                             .onTapGesture {
                                 openOllamaHostConfigModal.toggle()

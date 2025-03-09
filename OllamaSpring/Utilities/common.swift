@@ -10,6 +10,45 @@ import SwiftUI
 import Carbon
 import PDFKit
 
+func formatRelativeDate(_ dateString: String) -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    
+    guard let date = dateFormatter.date(from: dateString) else {
+        return dateString
+    }
+    
+    let now = Date()
+    let calendar = Calendar.current
+    let components = calendar.dateComponents([.year, .month, .weekOfYear, .day], from: date, to: now)
+    
+    if let days = components.day {
+        if days == 0 {
+            return "Today"
+        } else if days == 1 {
+            return "Yesterday"
+        } else if days < 7 {
+            return "\(days) days ago"
+        }
+    }
+    
+    if let weeks = components.weekOfYear, weeks < 4 {
+        return "\(weeks) weeks ago"
+    }
+    
+    if let months = components.month {
+        if months < 12 {
+            return "\(months) months ago"
+        }
+    }
+    
+    if let years = components.year, years > 0 {
+        return "\(years) years ago"
+    }
+    
+    return dateString
+}
+
 
 func extractTextFromPDF(url: URL) -> String? {
     guard let pdfDocument = PDFDocument(url: url) else {

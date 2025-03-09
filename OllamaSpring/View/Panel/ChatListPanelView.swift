@@ -102,8 +102,8 @@ struct ChatListPanelView: View {
                 // conversation list
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0){
-                        ForEach(chatListViewModel.ChatList.indices, id: \.self) { index in
-                            ChatListRowView(chat: chatListViewModel.ChatList[index]) { newChatName in
+                        ForEach(chatListViewModel.ChatList.indices.reversed(), id: \.self) { index in
+                            ChatListRowView(chat: chatListViewModel.ChatList[index], chatListViewModel: chatListViewModel) { newChatName in
                                 chatListViewModel.ChatList[index].name = newChatName
                             }
                             .background(chatListViewModel.selectedChat == chatListViewModel.ChatList[index].id ? Color.gray.opacity(0.1) : Color.clear)
@@ -123,6 +123,8 @@ struct ChatListPanelView: View {
                                 }
                             }
                             .onTapGesture {
+                                // 关闭任何正在编辑的聊天
+                                chatListViewModel.editingChatId = nil
                                 // change conversation when waiting model response not allowed
                                 if messagesViewModel.waitingModelResponse == false {
                                     // change conversation
