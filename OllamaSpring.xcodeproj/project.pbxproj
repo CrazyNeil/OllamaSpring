@@ -17,6 +17,7 @@
 		FB2FB9F92C06197C00621595 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB2FB9F82C06197C00621595 /* Sparkle */; };
 		FB2FB9FB2C0619F900621595 /* CheckForUpdatesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2FB9FA2C0619F900621595 /* CheckForUpdatesViewModel.swift */; };
 		FB2FB9FD2C061B1300621595 /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2FB9FC2C061B1300621595 /* CheckForUpdatesView.swift */; };
+		FB6456132D84A544000FD81E /* MarkdownStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6456122D84A541000FD81E /* MarkdownStyle.swift */; };
 		FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */; };
 		FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE02BF7241000E1EA88 /* Constant.swift */; };
 		FB65CFE32BF7A83F00E1EA88 /* common.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB65CFE22BF7A83F00E1EA88 /* common.swift */; };
@@ -114,6 +115,7 @@
 		FB2FB9FA2C0619F900621595 /* CheckForUpdatesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckForUpdatesViewModel.swift; sourceTree = "<group>"; };
 		FB2FB9FC2C061B1300621595 /* CheckForUpdatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckForUpdatesView.swift; sourceTree = "<group>"; };
 		FB340CA02BFDB45800DD5C3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		FB6456122D84A541000FD81E /* MarkdownStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownStyle.swift; sourceTree = "<group>"; };
 		FB65CFDE2BF7238700E1EA88 /* OllamaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaModel.swift; sourceTree = "<group>"; };
 		FB65CFE02BF7241000E1EA88 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		FB65CFE22BF7A83F00E1EA88 /* common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = common.swift; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 		FB0FC7E32BEF1657007E4EB9 /* OllamaSpring */ = {
 			isa = PBXGroup;
 			children = (
+				FB6456122D84A541000FD81E /* MarkdownStyle.swift */,
 				FB1642E12BFDDDF800161BB1 /* OllamaSpringRelease.entitlements */,
 				FB340CA02BFDB45800DD5C3C /* Info.plist */,
 				FBA45BF12BF51871007E0935 /* Utilities */,
@@ -553,6 +556,7 @@
 				FB68CEB52D32035A00C5A495 /* OllamaSpringModelsApi.swift in Sources */,
 				FBA45BCF2BF1AC51007E0935 /* MessageModel.swift in Sources */,
 				FBA45BDE2BF30103007E0935 /* SendMsgPanelView.swift in Sources */,
+				FB6456132D84A544000FD81E /* MarkdownStyle.swift in Sources */,
 				FB65CFDF2BF7238700E1EA88 /* OllamaModel.swift in Sources */,
 				FB65CFE12BF7241000E1EA88 /* Constant.swift in Sources */,
 				FB9871742C281814000A4808 /* extension.swift in Sources */,
@@ -737,7 +741,7 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 30;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -754,7 +758,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.7;
+				MARKETING_VERSION = 1.2.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -772,7 +776,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 30;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -789,7 +793,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.7;
+				MARKETING_VERSION = 1.2.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

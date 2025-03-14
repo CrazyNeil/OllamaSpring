@@ -6,23 +6,16 @@ struct MessagesRowView: View {
     @State private var isCopied: Bool = false
     
     var body: some View {
-        let avatar = Image("ollama-1")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: 20, height: 20)
-            .cornerRadius(8)
-        
         VStack {
             if message.messageRole == "assistant" {
                 HStack {
-                    avatar
-                    Text("assistant")
-                        .font(.subheadline)
-                        .foregroundColor(Color.white)
-                    Text(message.createdAt)
-                        .font(.subheadline)
+                    Text("Assistant")
+                        .font(.system(size: 12))
                         .foregroundColor(Color.gray)
-                        .opacity(0.5)
+                    Text(message.createdAt)
+                        .font(.system(size: 12))
+                        .foregroundColor(Color.gray)
+                        .opacity(1)
                     
                     ShareLink(
                         item: message.messageContent,
@@ -34,11 +27,11 @@ struct MessagesRowView: View {
                     .buttonStyle(.plain)
                     .labelStyle(.iconOnly)
                     .foregroundColor(.gray)
-                    .font(.subheadline)
+                    .font(.system(size: 12))
                     .imageScale(.medium)
                     
-                    Image(systemName: "doc.on.doc")
-                        .font(.subheadline)
+                    Image(systemName: "square.on.square")
+                        .font(.system(size: 12))
                         .imageScale(.medium)
                         .foregroundColor(.gray)
                         .onTapGesture {
@@ -48,11 +41,13 @@ struct MessagesRowView: View {
                                 isCopied = false
                             }
                         }
+                        .padding(.top, 2)
                     
                     if isCopied {
                         Text("COPIED")
-                            .font(.subheadline)
+                            .font(.system(size: 12))
                             .foregroundColor(Color.green)
+                            .padding(.top, 2)
                     }
                     
                     Spacer()
@@ -62,8 +57,8 @@ struct MessagesRowView: View {
                 
                 HStack {
                     Markdown(message.messageContent)
-                        .padding(10)
-                        .font(.body)
+                        .padding(.horizontal, 0)
+                        .padding(.top, 5)
                         .textSelection(.enabled)
                         .markdownBlockStyle(\.codeBlock) { configuration in
                             VStack(alignment: .leading, spacing: 4) {
@@ -72,10 +67,9 @@ struct MessagesRowView: View {
                                     if let language = configuration.language,
                                        !language.trimmingCharacters(in: .whitespaces).isEmpty {
                                         Text(language)
-                                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                            .font(.system(size: 13, weight: .medium, design: .monospaced))
                                             .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                             .padding(.horizontal, 8)
-                                            .padding(.top, 8)
                                         
                                         Spacer()
                                         
@@ -83,15 +77,25 @@ struct MessagesRowView: View {
                                             NSPasteboard.general.clearContents()
                                             NSPasteboard.general.setString(configuration.content, forType: .string)
                                         }) {
-                                            Image(systemName: "doc.on.doc")
-                                                .font(.system(size: 12))
+                                            Image(systemName: "square.on.square")
+                                                .font(.system(size: 13))
                                                 .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                         }
                                         .buttonStyle(PlainButtonStyle())
                                         .padding(.horizontal, 8)
-                                        .padding(.top, 8)
+                                    }
+                                    else {
+                                        Text("Text")
+                                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                            .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                            .padding(.horizontal, 8)
+                                        Spacer()
                                     }
                                 }
+                                .padding(8)  // 让内容不紧贴边框
+                                .background(Color.black.opacity(0.1))  // 轻微背景色
+                                .cornerRadius(4)  // 让边框圆角
+                                
                                 
                                 // code
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -99,21 +103,17 @@ struct MessagesRowView: View {
                                         code: configuration.content,
                                         language: configuration.language ?? ""
                                     )
-                                    .padding(10)
-                                    .lineSpacing(8)
+                                    .padding(.horizontal, 8)
+                                    .lineSpacing(4)
                                 }
                             }
-                            .background(Color(red: 40/255, green: 42/255, blue: 48/255))
-                            .cornerRadius(6)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
+                            .background(.black.opacity(0.2))
+                            .cornerRadius(4)
                             .padding(.bottom, 20)
                         }
-                        .markdownTheme(.gitHub)
-                        .background(Color(red: 24/255, green: 25/255, blue: 29/255))
-                        .cornerRadius(8)
+                        .markdownTheme(.ollamaSpring)
+                    //                        .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+                        .cornerRadius(4)
                         .padding(.trailing, 65)
                     
                     Spacer()
@@ -128,20 +128,13 @@ struct MessagesRowView: View {
                             Spacer()
                             Markdown(message.messageContent)
                                 .padding(10)
-                                .font(.body)
                                 .textSelection(.enabled)
-                                .markdownTextStyle(\.code) {
-                                    FontFamilyVariant(.monospaced)
-                                    FontSize(.em(0.65))
-                                    ForegroundColor(.purple)
-                                    BackgroundColor(.purple.opacity(0.25))
-                                }
-                                .background(Color.teal.opacity(0.5))
-                                .background(Color(red: 24/255, green: 25/255, blue: 29/255))
-                                .cornerRadius(8)
+                                .markdownTheme(.ollamaSpringUser)
+                                .background(Color(red: 240/255, green: 240/255, blue: 240/255).opacity(0.1))
+                                .cornerRadius(5)
                         }
                         .padding(.horizontal, 20)
-                        .padding(.top, 10)
+                        .padding(.top, 30)
                     }
                     
                     if !message.image.isEmpty, let image = convertFromBase64(base64String: message.image[0]) {

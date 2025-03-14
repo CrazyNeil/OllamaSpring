@@ -12,40 +12,59 @@ import Splash
 struct SyntaxHighlightedText: View {
     let code: String
     let language: String
-    
+
     var body: some View {
         Group {
             if let attributedString = highlightCode() {
                 Text(AttributedString(attributedString))
                     .textSelection(.enabled)
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .lineSpacing(3)
+                    .padding(10)
             } else {
                 Text(code)
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .lineSpacing(3)
+                    .padding(10)
             }
         }
     }
-    
+
     private func highlightCode() -> NSAttributedString? {
         let format = AttributedStringOutputFormat(
             theme: Theme(
-                font: .init(path: "Consolas", size: 14),
-                plainTextColor: NSColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1),   // Light gray text
+                font: .init(path: "Menlo", size: 14),
+                plainTextColor: NSColor(hex: "#D4D4D4"),
                 tokenColors: [
-                    .keyword: NSColor(red: 197/255, green: 134/255, blue: 192/255, alpha: 1),     // Purple (Keywords)
-                    .string: NSColor(red: 206/255, green: 145/255, blue: 120/255, alpha: 1),      // Orange (Strings)
-                    .type: NSColor(red: 78/255, green: 201/255, blue: 176/255, alpha: 1),         // Cyan (Types)
-                    .call: NSColor(red: 220/255, green: 220/255, blue: 170/255, alpha: 1),        // Light yellow (Function calls)
-                    .number: NSColor(red: 181/255, green: 206/255, blue: 168/255, alpha: 1),      // Light green (Numbers)
-                    .comment: NSColor(red: 106/255, green: 153/255, blue: 85/255, alpha: 1),      // Dark green (Comments)
-                    .property: NSColor(red: 156/255, green: 220/255, blue: 254/255, alpha: 1),    // Light blue (Properties)
-                    .dotAccess: NSColor(red: 156/255, green: 220/255, blue: 254/255, alpha: 1)    // Light blue (Dot access)
+                    .keyword: NSColor(hex: "#569CD6"),
+                    .string: NSColor(hex: "#CE9178"),
+                    .type: NSColor(hex: "#4EC9B0"),
+                    .call: NSColor(hex: "#DCDCAA"),
+                    .number: NSColor(hex: "#B5CEA8"),
+                    .comment: NSColor(hex: "#6A9955"),
+                    .property: NSColor(hex: "#9CDCFE"),
+                    .dotAccess: NSColor(hex: "#D4D4D4")
                 ]
             )
         )
         
         let highlighter = SyntaxHighlighter(format: format)
         return highlighter.highlight(code)
+    }
+}
+
+extension NSColor {
+    convenience init(hex: String) {
+        let scanner = Scanner(string: hex)
+        _ = scanner.scanString("#")
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        
+        let r = CGFloat((rgb >> 16) & 0xFF) / 255.0
+        let g = CGFloat((rgb >> 8) & 0xFF) / 255.0
+        let b = CGFloat(rgb & 0xFF) / 255.0
+
+        self.init(red: r, green: g, blue: b, alpha: 1.0)
     }
 }
 
