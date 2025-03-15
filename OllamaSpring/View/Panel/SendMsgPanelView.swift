@@ -45,22 +45,6 @@ struct SendMsgPanelView: View {
         if let image = selectedImage {
             // image handler
             HStack(spacing: 0) {
-                Spacer()
-                VStack {
-                    HStack {
-                        Spacer()
-                        Text("Only multimodal models such as llava, bakllava support image recognition. If the selected model does not support multimodal capabilities, you may not receive the correct response.")
-                            .font(.subheadline)
-                            .foregroundColor(.orange)
-                            .padding(8)
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.orange, lineWidth: 1)
-                            }
-                    }
-                    .frame(width: 240)
-                    Spacer()
-                }
                 VStack(spacing: 0) {
                     Image(nsImage: image)
                         .resizable()
@@ -91,26 +75,17 @@ struct SendMsgPanelView: View {
                     }
                     Spacer()
                 }
+                Spacer()
             }
             .padding(.top, 25)
             .cornerRadius(8)
             .frame(maxHeight: 200)
+            .background(.red.opacity(0.1))
+            
         } else if let fileURL = selectedFileURL {
             let fileIcon = NSWorkspace.shared.icon(forFile: fileURL.path)
             
             HStack(spacing: 0) {
-                Spacer()
-                VStack {
-                    HStack {
-                        Spacer()
-                        Text(fileURL.lastPathComponent)
-                            .font(.headline)
-                            .foregroundColor(.black)
-                            .padding(8)
-                    }
-                    .frame(width: 240)
-                    Spacer()
-                }
                 VStack(spacing: 0) {
                     Image(nsImage: fileIcon)
                         .resizable()
@@ -119,10 +94,15 @@ struct SendMsgPanelView: View {
                         .padding(.trailing, 20)
                         .padding(.leading, 10)
                     
+                    Text(fileURL.lastPathComponent)
+                        .font(.headline)
+                        .foregroundColor(.white.opacity(0.75))
+                        .padding(.vertical, 5)
+                    
                     HStack(spacing: 0) {
                         Text("Revoke")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white.opacity(0.75))
                             .padding(.top, 10)
                             .onTapGesture {
                                 self.selectedFileURL = nil
@@ -131,7 +111,7 @@ struct SendMsgPanelView: View {
                         Image(systemName: "x.circle")
                             .font(.subheadline)
                             .imageScale(.large)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.white.opacity(0.75))
                             .padding(.leading, 5)
                             .padding(.top, 10)
                             .onTapGesture {
@@ -140,10 +120,12 @@ struct SendMsgPanelView: View {
                     }
                     Spacer()
                 }
+                Spacer()
+                
             }
             .padding(.top, 25)
-            .cornerRadius(8)
             .frame(maxHeight: 200)
+            .background(.red.opacity(0.1))
         }
         
         ZStack(alignment: .leading) {
@@ -158,28 +140,28 @@ struct SendMsgPanelView: View {
             
             HStack {
                 if commonViewModel.selectedApiHost == ApiHostList[0].name {
-                    Image(systemName: "doc")
+                    Image(systemName: "paperclip")
                         .font(.subheadline)
                         .imageScale(.large)
                         .foregroundColor(.gray)
-                        .padding(.leading, 10)
+                        .padding(.leading, 0)
                         .onTapGesture {
                             if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 {
                                 showFilePicker.toggle()
                             }
                         }
                 } else if commonViewModel.selectedApiHost == ApiHostList[1].name {
-                    Image(systemName: "record.circle")
+                    Image(systemName: "mic.circle")
                         .font(.subheadline)
                         .imageScale(.large)
                         .foregroundColor(.gray)
-                        .padding(.leading, 10)
+                        .padding(.leading, 0)
                         .onTapGesture {
                             self.isShowingVoiceRecorder.toggle()
                         }
                         .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
                             VStack {
-                                Text("Voice recorder for Groq API requests is coming soon")
+                                Text("Voice-to-text is not available currently")
                                     .padding()
                                     .foregroundColor(.yellow)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -187,11 +169,11 @@ struct SendMsgPanelView: View {
                             }
                         }
                 } else {
-                    Image(systemName: "doc")
+                    Image(systemName: "paperclip")
                         .font(.subheadline)
                         .imageScale(.large)
                         .foregroundColor(.gray)
-                        .padding(.leading, 10)
+                        .padding(.leading, 0)
                         .onTapGesture {
                             self.isShowingVoiceRecorder.toggle()
                         }
@@ -222,8 +204,8 @@ struct SendMsgPanelView: View {
                     .font(.system(.subheadline))
                     .frame(height: max(20, min(300, textEditorHeight)))
                     .padding(.trailing, 5)
-                    .padding(.bottom, 0)
-                    .padding(.top, 5)
+                    .padding(.bottom, 3)
+                    .padding(.top, 7)
                     .padding(.leading, 0)
                     
                     // no ollama model found. disable send msg.
@@ -233,7 +215,7 @@ struct SendMsgPanelView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
-                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
+                                .padding(EdgeInsets(top: 8, leading: 5, bottom: 0, trailing: 0))
                                 .onAppear(){
                                     inputText = ""
                                 }
@@ -245,7 +227,7 @@ struct SendMsgPanelView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
-                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
+                                .padding(EdgeInsets(top: 8, leading: 5, bottom: 0, trailing: 0))
                                 .onAppear(){
                                     inputText = ""
                                 }
@@ -257,7 +239,7 @@ struct SendMsgPanelView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .opacity(0.4)
-                                .padding(EdgeInsets(top: 5, leading: 5, bottom: 0, trailing: 0))
+                                .padding(EdgeInsets(top: 8, leading: 5, bottom: 0, trailing: 0))
                         }
                     }
                     
@@ -281,14 +263,10 @@ struct SendMsgPanelView: View {
             }
         }
         .onPreferenceChange(TextEditorViewHeightKey.self) { textEditorHeight = $0 }
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.gray, lineWidth: 0.5)
-                .opacity(0.4)
-        )
-        .padding(.bottom, 10)
+//        .padding(.bottom, 10)
         .padding(.trailing,10)
         .padding(.leading,10)
+        .background(.blue.opacity(0.1))
         
     }
     

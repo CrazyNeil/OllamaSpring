@@ -77,8 +77,7 @@ struct MainPanelView: View {
                         chatListViewModel: chatListViewModel,
                         commonViewModel: commonViewModel
                     )
-                    
-                    Spacer()
+                    .padding(.bottom, 10)
                     
                     SendMsgPanelView(
                         messagesViewModel: messagesViewModel,

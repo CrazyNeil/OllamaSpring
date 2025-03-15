@@ -25,7 +25,7 @@ extension Theme {
     
     public static let ollamaSpringUser = Theme()
         .text {
-            ForegroundColor(.white.opacity(0.75))
+            ForegroundColor(.white.opacity(0.85))
             FontSize(16)
         }
         .code {
@@ -174,7 +174,7 @@ extension Theme {
         }
     public static let ollamaSpring = Theme()
         .text {
-            ForegroundColor(.white.opacity(0.7))
+            ForegroundColor(.white.opacity(0.85))
             FontSize(16)
         }
         .code {

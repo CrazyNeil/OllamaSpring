@@ -262,14 +262,39 @@ struct QuickCompletionPanelView: View {
                                     .markdownBlockStyle(\.codeBlock) { configuration in
                                         VStack(alignment: .leading, spacing: 4) {
                                             // lang tag
-                                            if let language = configuration.language,
-                                               !language.trimmingCharacters(in: .whitespaces).isEmpty {  // 移除空格后检查
-                                                Text(language)
-                                                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                                    .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                            HStack {
+                                                if let language = configuration.language,
+                                                   !language.trimmingCharacters(in: .whitespaces).isEmpty {
+                                                    Text(language)
+                                                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                                        .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                        .padding(.horizontal, 8)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Button(action: {
+                                                        NSPasteboard.general.clearContents()
+                                                        NSPasteboard.general.setString(configuration.content, forType: .string)
+                                                    }) {
+                                                        Image(systemName: "square.on.square")
+                                                            .font(.system(size: 13))
+                                                            .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                    }
+                                                    .buttonStyle(PlainButtonStyle())
                                                     .padding(.horizontal, 8)
-                                                    .padding(.top, 8)
+                                                }
+                                                else {
+                                                    Text("Text")
+                                                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                                        .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                        .padding(.horizontal, 8)
+                                                    Spacer()
+                                                }
                                             }
+                                            .padding(8)  // 让内容不紧贴边框
+                                            .background(Color.black.opacity(0.1))  // 轻微背景色
+                                            .cornerRadius(4)  // 让边框圆角
+                                            
                                             
                                             // code
                                             ScrollView(.horizontal, showsIndicators: false) {
@@ -277,24 +302,19 @@ struct QuickCompletionPanelView: View {
                                                     code: configuration.content,
                                                     language: configuration.language ?? ""
                                                 )
-                                                .padding(10)
-                                                .lineSpacing(8)
+                                                .padding(.horizontal, 8)
+                                                .lineSpacing(4)
                                             }
                                         }
-                                        .background(Color(red: 40/255, green: 42/255, blue: 48/255))
-                                        .cornerRadius(6)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                        )
+                                        .background(.black.opacity(0.2))
+                                        .cornerRadius(4)
                                         .padding(.bottom, 20)
                                     }
-                                    .markdownTheme(.gitHub)
+                                    .markdownTheme(.ollamaSpring)
                                 
                                 Spacer()
                             }
                             .frame(maxWidth: .infinity)
-                            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
                             .cornerRadius(8)
                             .padding(.trailing,20)
                             .padding(.leading,20)
@@ -390,14 +410,39 @@ struct QuickCompletionPanelView: View {
                                     .markdownBlockStyle(\.codeBlock) { configuration in
                                         VStack(alignment: .leading, spacing: 4) {
                                             // lang tag
-                                            if let language = configuration.language,
-                                               !language.trimmingCharacters(in: .whitespaces).isEmpty {  // 移除空格后检查
-                                                Text(language)
-                                                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                                    .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                            HStack {
+                                                if let language = configuration.language,
+                                                   !language.trimmingCharacters(in: .whitespaces).isEmpty {
+                                                    Text(language)
+                                                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                                        .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                        .padding(.horizontal, 8)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Button(action: {
+                                                        NSPasteboard.general.clearContents()
+                                                        NSPasteboard.general.setString(configuration.content, forType: .string)
+                                                    }) {
+                                                        Image(systemName: "square.on.square")
+                                                            .font(.system(size: 13))
+                                                            .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                    }
+                                                    .buttonStyle(PlainButtonStyle())
                                                     .padding(.horizontal, 8)
-                                                    .padding(.top, 8)
+                                                }
+                                                else {
+                                                    Text("Text")
+                                                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                                        .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                        .padding(.horizontal, 8)
+                                                    Spacer()
+                                                }
                                             }
+                                            .padding(8)  // 让内容不紧贴边框
+                                            .background(Color.black.opacity(0.1))  // 轻微背景色
+                                            .cornerRadius(4)  // 让边框圆角
+                                            
                                             
                                             // code
                                             ScrollView(.horizontal, showsIndicators: false) {
@@ -405,24 +450,20 @@ struct QuickCompletionPanelView: View {
                                                     code: configuration.content,
                                                     language: configuration.language ?? ""
                                                 )
-                                                .padding(10)
-                                                .lineSpacing(8)
+                                                .padding(.horizontal, 8)
+                                                .lineSpacing(4)
                                             }
                                         }
-                                        .background(Color(red: 40/255, green: 42/255, blue: 48/255))
-                                        .cornerRadius(6)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                        )
+                                        .background(.black.opacity(0.2))
+                                        .cornerRadius(4)
                                         .padding(.bottom, 20)
                                     }
-                                    .markdownTheme(.gitHub)
+                                    .markdownTheme(.ollamaSpring)
                                 
                                 Spacer()
                             }
                             .frame(maxWidth: .infinity)
-                            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
+//                            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
                             .cornerRadius(8)
                             .padding(.trailing,20)
                             .padding(.leading,20)
@@ -440,7 +481,6 @@ struct QuickCompletionPanelView: View {
                 Spacer()
             }
             .frame(width: 800, height: 500) // Fixed height for the response panel
-            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
             .opacity(0.85)
             .cornerRadius(8)
         }

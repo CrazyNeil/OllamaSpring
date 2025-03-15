@@ -112,7 +112,6 @@ struct MessagesRowView: View {
                             .padding(.bottom, 20)
                         }
                         .markdownTheme(.ollamaSpring)
-                    //                        .background(Color(red: 24/255, green: 25/255, blue: 29/255))
                         .cornerRadius(4)
                         .padding(.trailing, 65)
                     

@@ -32,14 +32,9 @@ struct MessagesPanelView: View {
                         
                         if messagesViewModel.waitingModelResponse {
                             HStack {
-                                Image("ollama-1")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 20, height: 20)
-                                    .cornerRadius(8)
-                                Text("assistant")
-                                    .font(.subheadline)
-                                    .foregroundColor(Color.white)
+                                Text("Assistant")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color.gray)
                                 Spacer()
                             }
                             .padding(.top, 20)
@@ -49,7 +44,7 @@ struct MessagesPanelView: View {
                                 HStack {
                                     HStack {
                                         Markdown(messagesViewModel.tmpResponse ?? "")
-                                            .padding(10)
+                                            .padding(0)
                                             .font(.body)
                                             .textSelection(.enabled)
                                             .markdownBlockStyle(\.codeBlock) { configuration in
@@ -59,10 +54,9 @@ struct MessagesPanelView: View {
                                                         if let language = configuration.language,
                                                            !language.trimmingCharacters(in: .whitespaces).isEmpty {
                                                             Text(language)
-                                                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                                                .font(.system(size: 13, weight: .medium, design: .monospaced))
                                                                 .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                                                 .padding(.horizontal, 8)
-                                                                .padding(.top, 8)
                                                             
                                                             Spacer()
                                                             
@@ -70,15 +64,25 @@ struct MessagesPanelView: View {
                                                                 NSPasteboard.general.clearContents()
                                                                 NSPasteboard.general.setString(configuration.content, forType: .string)
                                                             }) {
-                                                                Image(systemName: "doc.on.doc")
-                                                                    .font(.system(size: 12))
+                                                                Image(systemName: "square.on.square")
+                                                                    .font(.system(size: 13))
                                                                     .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                                             }
                                                             .buttonStyle(PlainButtonStyle())
                                                             .padding(.horizontal, 8)
-                                                            .padding(.top, 8)
+                                                        }
+                                                        else {
+                                                            Text("Text")
+                                                                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                                                .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
+                                                                .padding(.horizontal, 8)
+                                                            Spacer()
                                                         }
                                                     }
+                                                    .padding(8)  // 让内容不紧贴边框
+                                                    .background(Color.black.opacity(0.1))  // 轻微背景色
+                                                    .cornerRadius(4)  // 让边框圆角
+                                                    
                                                     
                                                     // code
                                                     ScrollView(.horizontal, showsIndicators: false) {
@@ -86,22 +90,17 @@ struct MessagesPanelView: View {
                                                             code: configuration.content,
                                                             language: configuration.language ?? ""
                                                         )
-                                                        .padding(10)
-                                                        .lineSpacing(8)
+                                                        .padding(.horizontal, 8)
+                                                        .lineSpacing(4)
                                                     }
                                                 }
-                                                .background(Color(red: 40/255, green: 42/255, blue: 48/255))
-                                                .cornerRadius(6)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 6)
-                                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                )
+                                                .background(.black.opacity(0.2))
+                                                .cornerRadius(4)
                                                 .padding(.bottom, 20)
                                             }
-                                            .markdownTheme(.gitHub)
+                                            .markdownTheme(.ollamaSpring)
                                     }
-                                    .background(Color(red: 24/255, green: 25/255, blue: 29/255))
-                                    .cornerRadius(8)
+                                    .cornerRadius(4)
                                     .padding(.trailing, 65)
                                     .id("tmpStreamingResponse")
                                     Spacer()
