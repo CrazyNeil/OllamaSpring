@@ -53,6 +53,7 @@ struct SyntaxHighlightedText: View {
     }
 }
 
+// NSColor HEX 扩展
 extension NSColor {
     convenience init(hex: String) {
         let scanner = Scanner(string: hex)
@@ -74,6 +75,7 @@ struct CustomTextView: NSViewRepresentable {
     var onShiftReturn: () -> Void
     var backgroundColor: NSColor
     var isEditable: Bool
+    var isFocused: Bool
     
     class Coordinator: NSObject, NSTextViewDelegate {
         var parent: CustomTextView
@@ -110,40 +112,29 @@ struct CustomTextView: NSViewRepresentable {
     }
     
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSScrollView()
-        scrollView.hasVerticalScroller = true
-        scrollView.hasHorizontalScroller = false
-        scrollView.autohidesScrollers = true
-        scrollView.borderType = .noBorder
-        scrollView.drawsBackground = false
+        let scrollView = NSTextView.scrollableTextView()
+        let textView = scrollView.documentView as! NSTextView
         
-        let textView = NSTextView()
         textView.delegate = context.coordinator
-        textView.isRichText = false
-        textView.font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        textView.drawsBackground = true
         textView.backgroundColor = backgroundColor
         textView.isEditable = isEditable
-        textView.isSelectable = isEditable
-        textView.textContainerInset = NSSize(width: 0, height: 0)
-        textView.drawsBackground = true
-        textView.autoresizingMask = [.width]
+        textView.isSelectable = true
+        textView.allowsUndo = true
         
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = 0
-        paragraphStyle.paragraphSpacing = 0
-        paragraphStyle.paragraphSpacingBefore = 0
-        paragraphStyle.alignment = .left
+        textView.textContainer?.containerSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.textContainer?.widthTracksTextView = true
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
         
-        textView.defaultParagraphStyle = paragraphStyle
-        textView.usesFontPanel = false
-        textView.autoresizingMask = [.width]
-        textView.typingAttributes = [
-            .paragraphStyle: paragraphStyle,
-            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
-            .foregroundColor: NSColor.textColor
-        ]
+        // 确保视图已经加载完成后再设置焦点
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if let window = textView.window {
+                window.makeFirstResponder(textView)
+                textView.selectedRanges = [NSValue(range: NSRange(location: textView.string.count, length: 0))]
+            }
+        }
         
-        scrollView.documentView = textView
         return scrollView
     }
     
@@ -168,6 +159,13 @@ struct CustomTextView: NSViewRepresentable {
                 .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
                 .foregroundColor: NSColor.textColor
             ]
+            
+            // 在更新视图时也检查是否需要设置焦点
+            if isFocused {
+                DispatchQueue.main.async {
+                    textView.window?.makeFirstResponder(textView)
+                }
+            }
         }
     }
 }

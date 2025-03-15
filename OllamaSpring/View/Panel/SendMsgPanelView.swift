@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PDFKit
 
 struct TextEditorViewHeightKey: PreferenceKey {
     static var defaultValue: CGFloat { 0 }
@@ -20,6 +21,7 @@ struct SendMsgPanelView: View {
     @ObservedObject var chatListViewModel:ChatListViewModel
     @ObservedObject var commonViewModel:CommonViewModel
     
+    @FocusState private var isFocused: Bool
     @State private var inputText = ""
     @State private var placeHolder = ""
     @State var textEditorHeight : CGFloat = 20
@@ -198,8 +200,9 @@ struct SendMsgPanelView: View {
                         onShiftReturn: {
                             inputText += "\n"
                         },
-                        backgroundColor:NSColor.clear,
-                        isEditable: self.allowEditable()
+                        backgroundColor: NSColor.clear,
+                        isEditable: self.allowEditable(),
+                        isFocused: isFocused
                     )
                     .font(.system(.subheadline))
                     .frame(height: max(20, min(300, textEditorHeight)))
@@ -235,7 +238,7 @@ struct SendMsgPanelView: View {
                         HStack {}.frame(maxWidth: .infinity)
                     } else {
                         if inputText.isEmpty {
-                            Text("send a message (shift + return for new line)")
+                            Text("")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .opacity(0.4)
@@ -263,11 +266,17 @@ struct SendMsgPanelView: View {
             }
         }
         .onPreferenceChange(TextEditorViewHeightKey.self) { textEditorHeight = $0 }
-//        .padding(.bottom, 10)
         .padding(.trailing,10)
         .padding(.leading,10)
-        .background(.blue.opacity(0.1))
-        
+        .background(.white.opacity(0.08))
+        .onAppear {
+            // 应用启动时设置焦点
+            isFocused = true
+        }
+        .onChange(of: chatListViewModel.ChatList.count) { oldValue, newValue in
+            // 当创建新对话时设置焦点
+            isFocused = true
+        }
     }
     
     private func fire() {
@@ -358,34 +367,179 @@ struct SendMsgPanelView: View {
         (inputText, isTextFileSelected, msgFileText, msgFileName, msgFileType, selectedImage, selectedFileURL) = ("", false, "", "", "", nil, nil)
     }
     
+    private func decodeText(data: Data) -> String? {
+        // 首先尝试 UTF-8
+        if let text = String(data: data, encoding: .utf8) {
+            return text
+        }
+        
+        // 尝试检测编码
+        let encodings: [(String.Encoding, String)] = [
+            (.utf8, "UTF-8"),
+            (.windowsCP1252, "Windows CP1252"),
+            (.macOSRoman, "MacOS Roman"),
+            (.isoLatin1, "ISO Latin 1"),
+            (.ascii, "ASCII"),
+            (.japaneseEUC, "Japanese EUC"),
+            (.shiftJIS, "Shift JIS"),
+            (.unicode, "Unicode")
+        ]
+        
+        for (encoding, name) in encodings {
+            if let text = String(data: data, encoding: encoding) {
+                print("Successfully decoded text with encoding: \(name)")
+                return text
+            }
+        }
+        
+        // 如果所有编码都失败了，尝试使用 CFStringConvertEncodingToNSStringEncoding
+        let cfEncodings: [CFStringEncoding] = [
+            CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue),
+            CFStringEncoding(CFStringEncodings.big5.rawValue),
+            CFStringEncoding(CFStringEncodings.EUC_CN.rawValue),
+            CFStringEncoding(CFStringEncodings.EUC_TW.rawValue)
+        ]
+        
+        for cfEncoding in cfEncodings {
+            let nsEncoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding)
+            if nsEncoding != UInt(kCFStringEncodingInvalidId) {
+                let encoding = String.Encoding(rawValue: nsEncoding)
+                if let text = String(data: data, encoding: encoding) {
+                    print("Successfully decoded text with CF encoding: \(cfEncoding)")
+                    return text
+                }
+            }
+        }
+        
+        return nil
+    }
+    
     private func handleFileSelection(result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
-            for url in urls {
-                let fileExtension = url.pathExtension.lowercased()
-                let fileName = url.lastPathComponent
-                
-                if ["png", "jpg", "jpeg"].contains(fileExtension) {
-                    if let image = NSImage(contentsOf: url) {
-                        selectedImage = image
-                        base64EncodedImage = convertToBase64(image: image)
+            guard let url = urls.first else { return }
+            
+            print("Selected file URL: \(url)")
+            print("File extension: \(url.pathExtension.lowercased())")
+            
+            // 获取文件访问权限
+            let securitySuccess = url.startAccessingSecurityScopedResource()
+            print("Security access granted: \(securitySuccess)")
+            
+            defer {
+                if securitySuccess {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
+            
+            let fileExtension = url.pathExtension.lowercased()
+            let fileName = url.lastPathComponent
+            
+            if ["png", "jpg", "jpeg"].contains(fileExtension) {
+                do {
+                    let fileHandle = try FileHandle(forReadingFrom: url)
+                    let imageData = fileHandle.readDataToEndOfFile()
+                    try fileHandle.close()
+                    
+                    print("Successfully read image data of size: \(imageData.count) bytes")
+                    
+                    if let image = NSImage(data: imageData) {
+                        print("Successfully created NSImage with size: \(image.size)")
+                        DispatchQueue.main.async {
+                            self.selectedImage = image
+                            self.selectedFileURL = nil
+                            
+                            // Convert to PNG base64
+                            if let tiffData = image.tiffRepresentation,
+                               let bitmapRep = NSBitmapImageRep(data: tiffData),
+                               let pngData = bitmapRep.representation(using: .png, properties: [:]) {
+                                self.base64EncodedImage = pngData.base64EncodedString()
+                                print("Successfully converted image to base64")
+                            } else {
+                                print("Failed to convert image to base64")
+                            }
+                        }
+                    } else {
+                        print("Failed to create NSImage from data")
                     }
-                } else if fileExtension == "pdf" {
-                    if let text = extractTextFromPDF(url: url) {
+                } catch {
+                    print("Error loading image data: \(error.localizedDescription)")
+                    print("Detailed error: \(error)")
+                }
+            } else if fileExtension == "pdf" {
+                print("开始处理PDF文件：\(fileName)")
+                do {
+                    let fileHandle = try FileHandle(forReadingFrom: url)
+                    let pdfData = fileHandle.readDataToEndOfFile()
+                    try fileHandle.close()
+                    
+                    guard let pdf = PDFDocument(data: pdfData) else {
+                        print("无法创建PDF文档对象")
+                        return
+                    }
+                    
+                    print("成功创建PDF文档，页数：\(pdf.pageCount)")
+                    var text = ""
+                    var errorPages: [Int] = []
+                    
+                    for i in 0..<pdf.pageCount {
+                        if let page = pdf.page(at: i) {
+                            if let pageText = page.string {
+                                text += pageText
+                                print("成功提取第\(i + 1)页文本，长度：\(pageText.count)")
+                            } else {
+                                errorPages.append(i + 1)
+                                print("警告：第\(i + 1)页文本提取失败")
+                            }
+                        }
+                    }
+                    
+                    if !errorPages.isEmpty {
+                        print("警告：以下页面提取失败：\(errorPages)")
+                    }
+                    
+                    print("PDF文本提取完成，总长度：\(text.count)")
+                    
+                    DispatchQueue.main.async {
+                        self.selectedFileURL = url
+                        self.selectedImage = nil
                         self.isTextFileSelected = true
                         self.msgFileText = text
                         self.msgFileType = fileExtension
                         self.msgFileName = fileName
-                        self.selectedFileURL = url
+                        
+                        // 如果提取的文本为空，显示警告
+                        if text.isEmpty {
+                            print("警告：提取的PDF文本内容为空")
+                        }
                     }
-                } else if fileExtension == "txt" {
-                    if let text = extractTextFromPlainText(url: url) {
-                        self.isTextFileSelected = true
-                        self.msgFileText = text
-                        self.msgFileType = fileExtension
-                        self.msgFileName = fileName
-                        self.selectedFileURL = url
+                } catch {
+                    print("PDF文件读取错误：\(error.localizedDescription)")
+                    print("详细错误信息：\(error)")
+                }
+            } else if fileExtension == "txt" {
+                print("Processing TXT file")
+                do {
+                    let fileHandle = try FileHandle(forReadingFrom: url)
+                    let data = fileHandle.readDataToEndOfFile()
+                    try fileHandle.close()
+                    
+                    if let text = decodeText(data: data) {
+                        print("Successfully read text file with length: \(text.count)")
+                        DispatchQueue.main.async {
+                            self.selectedFileURL = url
+                            self.selectedImage = nil
+                            self.isTextFileSelected = true
+                            self.msgFileText = text
+                            self.msgFileType = fileExtension
+                            self.msgFileName = fileName
+                        }
+                    } else {
+                        print("Failed to decode text file with any known encoding")
                     }
+                } catch {
+                    print("Error reading text file: \(error.localizedDescription)")
+                    print("Detailed error: \(error)")
                 }
             }
         case .failure(let error):
@@ -406,5 +560,6 @@ struct SendMsgPanelView: View {
         return true
     }
 }
+
 
 

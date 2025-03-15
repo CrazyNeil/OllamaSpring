@@ -481,6 +481,7 @@ struct QuickCompletionPanelView: View {
                 Spacer()
             }
             .frame(width: 800, height: 500) // Fixed height for the response panel
+            .background(Color(red: 24/255, green: 25/255, blue: 29/255))
             .opacity(0.85)
             .cornerRadius(8)
         }
