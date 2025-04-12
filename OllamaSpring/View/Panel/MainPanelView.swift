@@ -16,9 +16,10 @@ struct MainPanelView: View {
     
     init() {
         let commonViewModel = CommonViewModel()
+        let messagesViewModel = MessagesViewModel(commonViewModel: commonViewModel)
         self.commonViewModel = commonViewModel
-        self.messagesViewModel = MessagesViewModel(commonViewModel: commonViewModel)
-        self.chatListViewModel = ChatListViewModel()
+        self.messagesViewModel = messagesViewModel
+        self.chatListViewModel = ChatListViewModel(messagesViewModel: messagesViewModel)
     }
     
     var body: some View {

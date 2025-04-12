@@ -118,7 +118,7 @@ class RealmMessage: Object {
 class PreferenceManager {
 
     func updatePreference(preferenceKey: String, preferenceValue: String) {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
 
         if let record = realm.objects(RealmPreference.self).filter("preferenceKey == %@", preferenceKey).first {
             // update if exists
@@ -138,18 +138,18 @@ class PreferenceManager {
     }
     
     func setPreference(preferenceKey: String, preferenceValue: String) {
-            let realm = try! Realm()
-            guard realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) == nil else {
-                return
-            }
-            let record = RealmPreference(preferenceKey: preferenceKey, preferenceValue: preferenceValue)
-            try! realm.write {
-                realm.add(record)
-            }
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
+        guard realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) == nil else {
+            return
         }
+        let record = RealmPreference(preferenceKey: preferenceKey, preferenceValue: preferenceValue)
+        try! realm.write {
+            realm.add(record)
+        }
+    }
 
     func getPreference(preferenceKey: String) -> Results<RealmPreference> {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         let all = realm.objects(RealmPreference.self)
         let item = all.where {
@@ -160,7 +160,7 @@ class PreferenceManager {
     }
     
     func deletePreference(preferenceKey: String) {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         guard let record = realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) else {
             return
         }
@@ -186,7 +186,7 @@ class MessageManager {
     
     
     func getMessagesByChatId(chatId: String) -> Results<RealmMessage> {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         let all = realm.objects(RealmMessage.self)
         let messages = all.where {
@@ -197,7 +197,7 @@ class MessageManager {
     }
     
     func deleteMessagesByChatId(chatId: String) {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         let all = realm.objects(RealmMessage.self)
         let messages = all.where {
@@ -210,7 +210,7 @@ class MessageManager {
     }
     
     func saveMessage(message:Message) -> Bool {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         do {
             try realm.write {
@@ -250,7 +250,7 @@ class MessageManager {
 class ChatManager {
     
     func saveChat(chat:Chat) -> Bool {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         do {
             try realm.write {
@@ -270,7 +270,7 @@ class ChatManager {
     }
     
     func deleteChat(withId id: UUID) -> Bool {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         do {
             if let record = realm.objects(RealmChat.self).filter("chatId == %@", id.uuidString).first {
@@ -289,7 +289,7 @@ class ChatManager {
     }
     
     func updateChatName(withId id: UUID, newName: String) -> Bool {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         do {
             if let record = realm.objects(RealmChat.self).filter("chatId == %@", id.uuidString).first {
@@ -308,7 +308,7 @@ class ChatManager {
     }
     
     func getAllChats() -> Results<RealmChat> {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         return  realm.objects(RealmChat.self)
     }
 }
