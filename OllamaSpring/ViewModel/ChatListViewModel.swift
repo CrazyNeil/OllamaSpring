@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 @MainActor
 class ChatListViewModel: ObservableObject {
@@ -17,6 +18,28 @@ class ChatListViewModel: ObservableObject {
     let msgManager = MessageManager()
     let preference = PreferenceManager()
     
+    private var messagesViewModel: MessagesViewModel
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(messagesViewModel: MessagesViewModel) {
+        self.messagesViewModel = messagesViewModel
+        setupBindings()
+    }
+    
+    private func setupBindings() {
+        messagesViewModel.chatTitleUpdated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] (chatId, newName) in
+                self?.updateChatNameInList(chatId: chatId, newName: newName)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateChatNameInList(chatId: UUID, newName: String) {
+        if let index = ChatList.firstIndex(where: { $0.id == chatId }) {
+            ChatList[index].name = newName
+        }
+    }
     
     func newChat() {
         let chat = Chat(name: default_conversation_name, image: avatars.randomElement()!, createdAt: strDatetime())
@@ -25,7 +48,6 @@ class ChatListViewModel: ObservableObject {
             selectedChat = chat.id
         }
     }
-    
     
     func removeChat(at index: Int) {
         if chatManager.deleteChat(withId: ChatList[index].id) {
@@ -60,5 +82,4 @@ class ChatListViewModel: ObservableObject {
             }
         }
     }
-    
 }

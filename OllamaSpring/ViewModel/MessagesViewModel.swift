@@ -134,7 +134,19 @@ class GroqStreamDelegate: NSObject, URLSessionDataDelegate {
         )
         if(self.messagesViewModel.msgManager.saveMessage(message: msg)) {
             self.messagesViewModel.messages.append(msg)
+            // Check if it's the first assistant response to generate title
+            if self.messagesViewModel.messages.count == 2 {
+                self.messagesViewModel.triggerChatTitleGeneration(
+                    chatId: msg.chatId,
+                    userPrompt: self.messagesViewModel.messages[0].messageContent, // Assuming first message is user
+                    assistantResponse: msg.messageContent,
+                    modelName: msg.model,
+                    apiType: .groq // Indicate API type
+                )
+            }
         }
+        // Clear tmp response after saving
+        self.messagesViewModel.tmpResponse = ""
     }
 }
 
@@ -277,8 +289,25 @@ class DeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
         )
         if(self.messagesViewModel.msgManager.saveMessage(message: msg)) {
             self.messagesViewModel.messages.append(msg)
+            // Check if it's the first assistant response to generate title
+            if self.messagesViewModel.messages.count == 2 {
+                self.messagesViewModel.triggerChatTitleGeneration(
+                    chatId: msg.chatId,
+                    userPrompt: self.messagesViewModel.messages[0].messageContent, // Assuming first message is user
+                    assistantResponse: msg.messageContent,
+                    modelName: msg.model,
+                    apiType: .deepseek // Indicate API type
+                )
+            }
         }
+        // Clear tmp response after saving
+        self.messagesViewModel.tmpResponse = ""
     }
+}
+
+// Enum to represent API type
+enum ApiType {
+    case ollama, groq, deepseek
 }
 
 class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
@@ -296,6 +325,9 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     
     var tmpChatId: UUID?
     var tmpModelName: String?
+    
+    // Publisher to notify ChatListViewModel about title updates
+    let chatTitleUpdated = PassthroughSubject<(UUID, String), Never>()
     
     init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel()) {
         self.commonViewModel = commonViewModel
@@ -330,6 +362,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     }
     
     let msgManager = MessageManager()
+    let chatManager = ChatManager() // Add ChatManager instance
     
     func loadMessagesFromDatabase(selectedChat: UUID) {
         self.messages.removeAll()
@@ -639,6 +672,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     if self.msgManager.saveMessage(message: msg) {
                         self.messages.append(msg)
                         self.waitingModelResponse = false
+                        // Check if it's the first assistant response to generate title
+                        if self.messages.count == 2 {
+                            self.triggerChatTitleGeneration(
+                                chatId: msg.chatId,
+                                userPrompt: self.messages[0].messageContent, // Assuming first message is user
+                                assistantResponse: msg.messageContent,
+                                modelName: msg.model,
+                                apiType: .deepseek // Indicate API type
+                            )
+                        }
                     }
                 }
             } catch {
@@ -738,6 +781,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     if self.msgManager.saveMessage(message: msg) {
                         self.messages.append(msg)
                         self.waitingModelResponse = false
+                        // Check if it's the first assistant response to generate title
+                        if self.messages.count == 2 {
+                            self.triggerChatTitleGeneration(
+                                chatId: msg.chatId,
+                                userPrompt: self.messages[0].messageContent, // Assuming first message is user
+                                assistantResponse: msg.messageContent,
+                                modelName: msg.model,
+                                apiType: .groq // Indicate API type
+                            )
+                        }
                     }
                 }
             } catch {
@@ -812,6 +865,16 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
                             self.waitingModelResponse = false
+                            // Check if it's the first assistant response to generate title
+                            if self.messages.count == 2 {
+                                self.triggerChatTitleGeneration(
+                                    chatId: msg.chatId,
+                                    userPrompt: self.messages[0].messageContent, // Assuming first message is user
+                                    assistantResponse: msg.messageContent,
+                                    modelName: msg.model,
+                                    apiType: .ollama // Indicate API type
+                                )
+                            }
                         }
                     }
                 } else {
@@ -1141,12 +1204,26 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                         )
                         if(self.msgManager.saveMessage(message: msg)) {
                             self.messages.append(msg)
+                            // Check if it's the first assistant response to generate title
+                            if self.messages.count == 2 {
+                                self.triggerChatTitleGeneration(
+                                    chatId: msg.chatId,
+                                    userPrompt: self.messages[0].messageContent, // Assuming first message is user
+                                    assistantResponse: msg.messageContent,
+                                    modelName: msg.model,
+                                    apiType: .ollama // Indicate API type for Ollama stream
+                                )
+                            }
                         }
+                        // Clear tmp response after saving
+                        self.tmpResponse = ""
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
                     NSLog("Error: API service not available.")
+                    // Also clear tmpResponse on error if stream fails mid-way before 'done'
+                    self.tmpResponse = ""
                 }
             }
         }
@@ -1158,6 +1235,148 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
             NSLog("Task completed with error: \(error)")
+        }
+    }
+
+    // Function to trigger title generation
+    func triggerChatTitleGeneration(chatId: UUID, userPrompt: String, assistantResponse: String, modelName: String, apiType: ApiType) {
+        Task {
+             await generateAndSaveChatTitle(
+                chatId: chatId,
+                userPrompt: userPrompt,
+                assistantResponse: assistantResponse,
+                modelName: modelName,
+                apiType: apiType
+            )
+        }
+    }
+
+    // New function to generate and save chat title
+    private func generateAndSaveChatTitle(chatId: UUID, userPrompt: String, assistantResponse: String, modelName: String, apiType: ApiType) async {
+        // Updated prompt to explicitly ask for a maximum of 8 words
+        let titlePrompt = """
+        Based on the following start of a conversation, generate a very short, concise title (max 8 words) that summarizes the main topic. Output ONLY the title text, nothing else.
+
+        User: \(userPrompt)
+        Assistant: \(assistantResponse)
+
+        Title:
+        """
+
+        let titleMessages = [["role": "user", "content": titlePrompt]]
+        var generatedTitle = "Chat" // Default title
+
+        do {
+            let response: AnyObject? // Use AnyObject? to handle potential nil or different types
+
+             // --- Determine API and make call ---
+             // We need access to API keys and proxy settings from CommonViewModel
+             // Also need to instantiate the correct API client (OllamaApi, GroqApi, DeepSeekApi)
+
+             // Get API keys and proxy settings (similar to send message functions)
+             let groqAuthKey = await commonViewModel.loadGroqApiKeyFromDatabase()
+             let deepSeekAuthKey = await commonViewModel.loadDeepSeekApiKeyFromDatabase()
+             let httpProxy = await commonViewModel.loadHttpProxyHostFromDatabase()
+             let httpProxyAuth = await commonViewModel.loadHttpProxyAuthFromDatabase()
+             let isHttpProxyEnabled = await commonViewModel.loadHttpProxyStatusFromDatabase()
+             let isHttpProxyAuthEnabled = await commonViewModel.loadHttpProxyAuthStatusFromDatabase()
+
+
+             switch apiType {
+             case .ollama:
+                 let ollama = OllamaApi() // Assuming default host/port or need PreferenceManager access
+                 response = try await ollama.chat(
+                     modelName: modelName,
+                     role: "user", // Simple user role for title prompt
+                     content: titlePrompt, // Send the constructed prompt directly
+                     stream: false, // Non-streaming for title
+                     messages: [], // No history needed for title generation
+                     // Use default options or options from self.modelOptions? Let's use defaults for simplicity.
+                     temperature: 0.5, // Lower temp for more focused title
+                     seed: Int(self.modelOptions.seed),
+                     num_ctx: Int(self.modelOptions.numContext),
+                     top_k: Int(self.modelOptions.topK),
+                     top_p: self.modelOptions.topP
+                 )
+                 if let responseDict = response as? [String: Any],
+                    let messageDict = responseDict["message"] as? [String: Any],
+                    let titleContent = messageDict["content"] as? String {
+                     generatedTitle = titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
+                 }
+
+             case .groq:
+                 let groq = GroqApi(
+                     proxyUrl: httpProxy.name,
+                     proxyPort: Int(httpProxy.port) ?? 0,
+                     authorizationToken: groqAuthKey,
+                     isHttpProxyEnabled: isHttpProxyEnabled,
+                     isHttpProxyAuthEnabled: isHttpProxyAuthEnabled,
+                     login: httpProxyAuth.login,
+                     password: httpProxyAuth.password
+                 )
+                 response = try await groq.chat(
+                     modelName: modelName,
+                     messages: titleMessages, // Use the simple message structure
+                     historyMessages: [],
+                     seed: Int(self.modelOptions.seed),
+                     temperature: 0.5, // Lower temp
+                     top_p: self.modelOptions.topP
+                 )
+                 let jsonResponse = JSON(response ?? [:]) // Handle potential nil response
+                 if let titleContent = jsonResponse["choices"].array?.first?["message"]["content"].string {
+                     generatedTitle = titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
+                 } else if let errorMsg = jsonResponse["msg"].string {
+                     NSLog("Groq title generation error: \(errorMsg)")
+                 }
+
+
+             case .deepseek:
+                 let deepSeek = DeepSeekApi(
+                    proxyUrl: httpProxy.name,
+                    proxyPort: Int(httpProxy.port) ?? 0,
+                    authorizationToken: deepSeekAuthKey,
+                    isHttpProxyEnabled: isHttpProxyEnabled,
+                    isHttpProxyAuthEnabled: isHttpProxyAuthEnabled,
+                    login: httpProxyAuth.login,
+                    password: httpProxyAuth.password
+                 )
+                 response = try await deepSeek.chat(
+                     modelName: modelName,
+                     messages: titleMessages,
+                     historyMessages: [],
+                     seed: Int(self.modelOptions.seed),
+                     temperature: 0.5, // Lower temp
+                     top_p: self.modelOptions.topP
+                 )
+                 let jsonResponse = JSON(response ?? [:]) // Handle potential nil response
+                  // DeepSeek might have reasoning_content, just grab content
+                 if let titleContent = jsonResponse["choices"].array?.first?["message"]["content"].string {
+                     generatedTitle = titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
+                 } else if let errorMsg = jsonResponse["msg"].string {
+                    NSLog("DeepSeek title generation error: \(errorMsg)")
+                 }
+             }
+
+             // --- Update Chat Title ---
+             if !generatedTitle.isEmpty && generatedTitle != "Chat" { // Only update if we got a meaningful title
+                 // Ensure update happens on main thread for UI consistency
+                 DispatchQueue.main.async {
+                    let success = self.chatManager.updateChatName(withId: chatId, newName: generatedTitle)
+                    if success {
+                         NSLog("Successfully updated chat \(chatId) title to: \(generatedTitle)")
+                         // Notify listener (ChatListViewModel)
+                         self.chatTitleUpdated.send((chatId, generatedTitle))
+                    } else {
+                         NSLog("Failed to update chat title for \(chatId)")
+                    }
+                 }
+             } else {
+                 NSLog("Generated title was empty or default for chat \(chatId). Skipping update.")
+             }
+
+        } catch {
+            NSLog("Error generating chat title for \(chatId) using \(modelName): \(error)")
+            // Handle error appropriately, maybe retry or log
         }
     }
 }
