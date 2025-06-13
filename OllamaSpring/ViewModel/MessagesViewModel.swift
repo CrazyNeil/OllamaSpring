@@ -477,7 +477,6 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         configuration.timeoutIntervalForResource = 300
         
         if isHttpProxyEnabled {
-            // 使用 URLSessionConfiguration 的代理设置
             let proxyHost = httpProxy.name.replacingOccurrences(of: "@", with: "")
             let proxyPort = Int(httpProxy.port) ?? 0
             
@@ -1036,7 +1035,6 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         }
         
         // start a session data task
-        // 在创建 session 时使用 GroqStreamDelegate
         let groqDelegate = GroqStreamDelegate(messagesViewModel: self)
         let session = URLSession(configuration: configuration, delegate: groqDelegate, delegateQueue: nil)
         let task = session.dataTask(with: request)
@@ -1255,12 +1253,11 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     private func generateAndSaveChatTitle(chatId: UUID, userPrompt: String, assistantResponse: String, modelName: String, apiType: ApiType) async {
         // Updated prompt to explicitly ask for a maximum of 8 words
         let titlePrompt = """
-        Based on the following start of a conversation, generate a very short, concise title (max 8 words) that summarizes the main topic. Output ONLY the title text, nothing else.
+        Based on the following conversation, generate a very short title (max 8 words) that summarizes the main topic.
+        IMPORTANT: Respond with ONLY the title text on a single line, no explanations, no quotes, no formatting, no line breaks.
 
         User: \(userPrompt)
         Assistant: \(assistantResponse)
-
-        Title:
         """
 
         let titleMessages = [["role": "user", "content": titlePrompt]]
@@ -1301,7 +1298,33 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                  if let responseDict = response as? [String: Any],
                     let messageDict = responseDict["message"] as? [String: Any],
                     let titleContent = messageDict["content"] as? String {
-                     generatedTitle = titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
+                     // Clean response text
+                     var cleanedTitle = titleContent
+                         .trimmingCharacters(in: .whitespacesAndNewlines)
+                         // Remove all possible prefixes
+                         .replacingOccurrences(of: "Sure, here is the title:", with: "")
+                         .replacingOccurrences(of: "Sure, here's the title:", with: "")
+                         .replacingOccurrences(of: "Sure, here's the title you requested:", with: "")
+                         .replacingOccurrences(of: "Title:", with: "")
+                         .replacingOccurrences(of: "\"", with: "")
+                         .replacingOccurrences(of: "**", with: "")
+                         // Remove all line breaks
+                         .replacingOccurrences(of: "\n", with: " ")
+                         // Remove extra spaces
+                         .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+                         .trimmingCharacters(in: .whitespacesAndNewlines)
+                     
+                     // Use default title if cleaned title is empty
+                     if cleanedTitle.isEmpty {
+                         cleanedTitle = "Chat"
+                     }
+
+                     // Limit title to maximum 30 characters
+                    if cleanedTitle.count > 30 {
+                        cleanedTitle = String(cleanedTitle.prefix(30))
+                    }
+                     
+                     generatedTitle = cleanedTitle
                  }
 
              case .groq:

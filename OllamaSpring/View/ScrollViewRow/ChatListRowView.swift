@@ -20,6 +20,11 @@ struct ChatListRowView: View {
         self.chatListViewModel = chatListViewModel
         self.onChatNameChanged = onChatNameChanged
     }
+
+    private func cancelEditing() {
+        chatListViewModel.editingChatId = nil
+        editedChatName = chat.name  // Restore original name
+    }
     
     private var isEditing: Bool {
         chatListViewModel.editingChatId == chat.id
@@ -40,11 +45,10 @@ struct ChatListRowView: View {
                     Color.clear
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            saveChanges()
+                            cancelEditing()  // Cancel editing when tapping outside
                         }
                 }
                 
-                // 主要内容
                 HStack {
                     VStack {
                         Image(chat.image)
@@ -61,13 +65,14 @@ struct ChatListRowView: View {
                                 TextField("Chat Name", text: $editedChatName, onCommit: saveChanges)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .onKeyPress(keys: [.escape]) { press in
-                                        chatListViewModel.editingChatId = nil
+                                        cancelEditing()  // Cancel editing when pressing ESC
                                         return .handled
                                     }
                             } else {
                                 Text(chat.name)
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 12))
                                     .foregroundColor(.white)
+                                    .lineSpacing(0)
                                     .onTapGesture {
                                         chatListViewModel.editingChatId = chat.id
                                     }
@@ -77,7 +82,7 @@ struct ChatListRowView: View {
                         
                         HStack {
                             Text(formatRelativeDate(chat.createdAt))
-                                .font(.system(size: 13))
+                                .font(.system(size: 11))
                                 .foregroundColor(.gray)
                                 .opacity(0.85)
                                 .padding(.top, 4)
