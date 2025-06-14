@@ -214,7 +214,7 @@ struct SendMsgPanelView: View {
                     // no ollama model found. disable send msg.
                     if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == "Ollama" {
                         HStack {
-                            Text("You need select a model on top bar first")
+                            Text("You need select a model on top bar first or download a model first")
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)

@@ -100,7 +100,7 @@ struct MainPanelView: View {
             
             
             // ollama api service not available
-            if commonViewModel.isOllamaApiServiceAvailable == false || commonViewModel.hasLocalModelInstalled == false  {
+            if commonViewModel.isOllamaApiServiceAvailable == false  {
                 Color.clear
                     .background(
                         Color.black
@@ -123,7 +123,7 @@ struct MainPanelView: View {
                     
                     HStack {
   
-                        Text("Start Now")
+                        Text("Start Without Ollama")
                             .font(.system(size: 20))
                             .foregroundColor(.green)
                             .padding(14)
@@ -144,7 +144,7 @@ struct MainPanelView: View {
                         Text("Ollama API service is not available on your Mac. If you want to run Ollama models locally on your Mac, follow these steps to install and set up Ollama first. If you host Ollama api service on specific host, you should just enter your own Ollama host below.")
                             .font(.system(size: 12))
                             .padding()
-                            .foregroundColor(.gray)
+                            .foregroundColor(.red)
                     }
                     .frame(maxWidth: 600)
                     .padding(.top, 20)

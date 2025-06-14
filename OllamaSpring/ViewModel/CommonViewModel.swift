@@ -348,7 +348,7 @@ class CommonViewModel: ObservableObject {
                 let response = try await ollama.tags()
                 self.loadAvailableLocalModels()
                 DispatchQueue.main.async {
-                    if let models = response["models"] as? [[String: Any]], !models.isEmpty {
+                    if response["models"] is [[String: Any]] {
                         self.isOllamaApiServiceAvailable = true
                     } else {
                         self.isOllamaApiServiceAvailable = false

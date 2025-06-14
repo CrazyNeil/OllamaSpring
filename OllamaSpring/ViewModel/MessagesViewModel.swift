@@ -1281,15 +1281,14 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
 
              switch apiType {
              case .ollama:
-                 let ollama = OllamaApi() // Assuming default host/port or need PreferenceManager access
+                 let ollama = OllamaApi()
                  response = try await ollama.chat(
                      modelName: modelName,
-                     role: "user", // Simple user role for title prompt
-                     content: titlePrompt, // Send the constructed prompt directly
-                     stream: false, // Non-streaming for title
-                     messages: [], // No history needed for title generation
-                     // Use default options or options from self.modelOptions? Let's use defaults for simplicity.
-                     temperature: 0.5, // Lower temp for more focused title
+                     role: "user",
+                     content: titlePrompt,
+                     stream: false,
+                     messages: [],
+                     temperature: 0.5,
                      seed: Int(self.modelOptions.seed),
                      num_ctx: Int(self.modelOptions.numContext),
                      top_k: Int(self.modelOptions.topK),
@@ -1298,33 +1297,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                  if let responseDict = response as? [String: Any],
                     let messageDict = responseDict["message"] as? [String: Any],
                     let titleContent = messageDict["content"] as? String {
-                     // Clean response text
-                     var cleanedTitle = titleContent
-                         .trimmingCharacters(in: .whitespacesAndNewlines)
-                         // Remove all possible prefixes
-                         .replacingOccurrences(of: "Sure, here is the title:", with: "")
-                         .replacingOccurrences(of: "Sure, here's the title:", with: "")
-                         .replacingOccurrences(of: "Sure, here's the title you requested:", with: "")
-                         .replacingOccurrences(of: "Title:", with: "")
-                         .replacingOccurrences(of: "\"", with: "")
-                         .replacingOccurrences(of: "**", with: "")
-                         // Remove all line breaks
-                         .replacingOccurrences(of: "\n", with: " ")
-                         // Remove extra spaces
-                         .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
-                         .trimmingCharacters(in: .whitespacesAndNewlines)
-                     
-                     // Use default title if cleaned title is empty
-                     if cleanedTitle.isEmpty {
-                         cleanedTitle = "Chat"
-                     }
-
-                     // Limit title to maximum 30 characters
-                    if cleanedTitle.count > 30 {
-                        cleanedTitle = String(cleanedTitle.prefix(30))
-                    }
-                     
-                     generatedTitle = cleanedTitle
+                     generatedTitle = cleanGeneratedTitle(titleContent)
                  }
 
              case .groq:
@@ -1339,15 +1312,15 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                  )
                  response = try await groq.chat(
                      modelName: modelName,
-                     messages: titleMessages, // Use the simple message structure
+                     messages: titleMessages,
                      historyMessages: [],
                      seed: Int(self.modelOptions.seed),
-                     temperature: 0.5, // Lower temp
+                     temperature: 0.5,
                      top_p: self.modelOptions.topP
                  )
-                 let jsonResponse = JSON(response ?? [:]) // Handle potential nil response
+                 let jsonResponse = JSON(response ?? [:])
                  if let titleContent = jsonResponse["choices"].array?.first?["message"]["content"].string {
-                     generatedTitle = titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
+                     generatedTitle = cleanGeneratedTitle(titleContent)
                  } else if let errorMsg = jsonResponse["msg"].string {
                      NSLog("Groq title generation error: \(errorMsg)")
                  }
@@ -1368,13 +1341,13 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                      messages: titleMessages,
                      historyMessages: [],
                      seed: Int(self.modelOptions.seed),
-                     temperature: 0.5, // Lower temp
+                     temperature: 0.5,
                      top_p: self.modelOptions.topP
                  )
-                 let jsonResponse = JSON(response ?? [:]) // Handle potential nil response
+                 let jsonResponse = JSON(response ?? [:])
                   // DeepSeek might have reasoning_content, just grab content
                  if let titleContent = jsonResponse["choices"].array?.first?["message"]["content"].string {
-                     generatedTitle = titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
+                     generatedTitle = cleanGeneratedTitle(titleContent)
                  } else if let errorMsg = jsonResponse["msg"].string {
                     NSLog("DeepSeek title generation error: \(errorMsg)")
                  }
@@ -1401,5 +1374,59 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             NSLog("Error generating chat title for \(chatId) using \(modelName): \(error)")
             // Handle error appropriately, maybe retry or log
         }
+    }
+    
+    private func cleanGeneratedTitle(_ titleContent: String) -> String {
+        var cleanedTitle = titleContent
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            // Remove thinking process (both complete and incomplete)
+            .replacingOccurrences(of: "<think>.*?</think>", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "<think>.*", with: "", options: .regularExpression)
+            .replacingOccurrences(of: ".*?</think>", with: "", options: .regularExpression)
+            // Remove all possible prefixes
+            .replacingOccurrences(of: "Sure, here is the title:", with: "")
+            .replacingOccurrences(of: "Sure, here's the title:", with: "")
+            .replacingOccurrences(of: "Sure, here's the title you requested:", with: "")
+            .replacingOccurrences(of: "Title:", with: "")
+            .replacingOccurrences(of: "\"", with: "")
+            .replacingOccurrences(of: "**", with: "")
+            // Remove all line breaks
+            .replacingOccurrences(of: "\n", with: " ")
+            // Remove extra spaces
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Use default title if cleaned title is empty
+        if cleanedTitle.isEmpty {
+            cleanedTitle = "Chat"
+        }
+
+        // Calculate effective length based on character types
+        let maxEffectiveLength = 30 // Maximum length for English characters
+        var currentLength = 0
+        var truncatedTitle = ""
+        
+        for char in cleanedTitle {
+            // Check if character is CJK (Chinese, Japanese, Korean)
+            let isCJK = char.unicodeScalars.contains { scalar in
+                let value = scalar.value
+                return (value >= 0x4E00 && value <= 0x9FFF) || // CJK Unified Ideographs
+                       (value >= 0x3040 && value <= 0x309F) || // Hiragana
+                       (value >= 0x30A0 && value <= 0x30FF) || // Katakana
+                       (value >= 0xAC00 && value <= 0xD7AF)    // Hangul
+            }
+            
+            // Add character length (2 for CJK, 1 for others)
+            let charLength = isCJK ? 2 : 1
+            
+            if currentLength + charLength <= maxEffectiveLength {
+                truncatedTitle.append(char)
+                currentLength += charLength
+            } else {
+                break
+            }
+        }
+        
+        return truncatedTitle
     }
 }
