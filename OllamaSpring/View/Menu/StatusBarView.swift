@@ -10,13 +10,13 @@ import SwiftUI
 struct StatusBarView: View {
     var body: some View {
         VStack(spacing: 10) {
-            HoverButton(text: "Option 1", action: {
+            HoverButton(text: NSLocalizedString("statusbar.option_1", comment: ""), action: {
                 print("Option 1 selected")
             })
-            HoverButton(text: "Option 2", action: {
+            HoverButton(text: NSLocalizedString("statusbar.option_2", comment: ""), action: {
                 print("Option 2 selected")
             })
-            HoverButton(text: "Quit", action: {
+            HoverButton(text: NSLocalizedString("statusbar.quit", comment: ""), action: {
                 NSApplication.shared.terminate(nil)
             })
         }

@@ -35,7 +35,7 @@ struct QuickCompletionPanelView: View {
 
     private func isOllamaApiServiceAvailable() -> Bool {
         if !commonViewModel.isOllamaApiServiceAvailable {
-            showError("You should start Ollama or install it first.")
+            showError(NSLocalizedString("quick.ollama_not_available", comment: ""))
             return false
         }
         return true
@@ -43,7 +43,7 @@ struct QuickCompletionPanelView: View {
 
     private func hasLocalModels() -> Bool {
         if commonViewModel.ollamaLocalModelList.isEmpty {
-            showError("No model found. You may need to download a model and restart OllamaSpring first.")
+            showError(NSLocalizedString("quick.no_model", comment: ""))
             return false
         }
         return true
@@ -51,7 +51,7 @@ struct QuickCompletionPanelView: View {
 
     private func isValidInput() -> Bool {
         if inputText.isEmpty {
-            showError("Just tell me what is your question.")
+            showError(NSLocalizedString("quick.empty_input", comment: ""))
             quickCompletionViewModel.showResponsePanel = false
             return false
         }
@@ -101,7 +101,7 @@ struct QuickCompletionPanelView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            TextField("Prompt", text: $inputText)
+            TextField(NSLocalizedString("quick.prompt", comment: ""), text: $inputText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .font(.system(size: 30)) // Adjust font size
                 .padding(.horizontal)
@@ -122,7 +122,7 @@ struct QuickCompletionPanelView: View {
                             }
                             .popover(isPresented: $showShortcuts, arrowEdge: .leading) {
                                 VStack {
-                                    Text("You can open quick completion by shortcut cmd + shift + h")
+                                    Text(NSLocalizedString("quick.shortcut_hint", comment: ""))
                                         .padding()
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                 }
@@ -216,7 +216,7 @@ struct QuickCompletionPanelView: View {
                                         }
                                     
                                     if isCopied {
-                                        Text("COPIED")
+                                        Text(NSLocalizedString("quick.copied", comment: ""))
                                             .font(.subheadline)
                                             .foregroundColor(Color.green)
                                     }
@@ -236,7 +236,7 @@ struct QuickCompletionPanelView: View {
                                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                         .scaleEffect(0.5)
                                     
-                                    Text("waiting ...")
+                                    Text(NSLocalizedString("quick.waiting", comment: ""))
                                         .foregroundColor(.gray)
                                         .font(.headline)
                                     
@@ -284,7 +284,7 @@ struct QuickCompletionPanelView: View {
                                                     .padding(.horizontal, 8)
                                                 }
                                                 else {
-                                                    Text("Text")
+                                                    Text(NSLocalizedString("quick.text", comment: ""))
                                                         .font(.system(size: 13, weight: .medium, design: .monospaced))
                                                         .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                                         .padding(.horizontal, 8)
@@ -364,7 +364,7 @@ struct QuickCompletionPanelView: View {
                                         }
                                     
                                     if isCopied {
-                                        Text("COPIED")
+                                        Text(NSLocalizedString("quick.copied", comment: ""))
                                             .font(.subheadline)
                                             .foregroundColor(Color.green)
                                     }
@@ -384,7 +384,7 @@ struct QuickCompletionPanelView: View {
                                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                         .scaleEffect(0.5)
                                     
-                                    Text("waiting ...")
+                                    Text(NSLocalizedString("quick.waiting", comment: ""))
                                         .foregroundColor(.gray)
                                         .font(.headline)
                                     
@@ -432,7 +432,7 @@ struct QuickCompletionPanelView: View {
                                                     .padding(.horizontal, 8)
                                                 }
                                                 else {
-                                                    Text("Text")
+                                                    Text(NSLocalizedString("quick.text", comment: ""))
                                                         .font(.system(size: 13, weight: .medium, design: .monospaced))
                                                         .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                                         .padding(.horizontal, 8)

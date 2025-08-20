@@ -18,7 +18,7 @@ struct OllamaHostConfigModalView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Ollama HTTP Host Configuration")
+                Text(NSLocalizedString("ollama.host_config_title", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -62,7 +62,7 @@ struct OllamaHostConfigModalView: View {
             HStack {
                 Spacer()
                 
-                Text("Save")
+                Text(NSLocalizedString("proxy.save", comment: ""))
                     .font(.subheadline)
                     .padding(.horizontal, 2)
                     .padding(.vertical, 3)
@@ -79,17 +79,17 @@ struct OllamaHostConfigModalView: View {
                             } else {
                                 #if os(macOS)
                                 let alert = NSAlert()
-                                alert.messageText = "Connection Failed"
-                                alert.informativeText = "Failed to connect to Ollama host. Please check your configuration and try again."
+                                alert.messageText = NSLocalizedString("ollama.connection_failed", comment: "")
+                                alert.informativeText = NSLocalizedString("ollama.connection_failed_desc", comment: "")
                                 alert.alertStyle = .warning
-                                alert.addButton(withTitle: "OK")
+                                alert.addButton(withTitle: NSLocalizedString("ollama.ok", comment: ""))
                                 alert.runModal()
                                 #endif
                             }
                         }
                     }
                 
-                Text("Cancel")
+                Text(NSLocalizedString("modal.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 2)
@@ -106,7 +106,7 @@ struct OllamaHostConfigModalView: View {
             .padding(.top, 0)
             
             HStack(spacing: 0) {
-                Text("Configure the Ollama HTTP host and port. By default, the host is set to 127.0.0.1 and the port to 11434 in your local environment. You may only connect to remote hosts that do not require authentication.")
+                Text(NSLocalizedString("ollama.description", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .lineLimit(4)

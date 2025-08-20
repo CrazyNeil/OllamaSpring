@@ -45,14 +45,14 @@ struct HttpProxyConfigPanelView: View {
         
         VStack(spacing:0) {
             HStack {
-                RadioButtonMacOS(text: "Enable Http Proxy", isSelected: $isProxyEnabled, value: true)
-                RadioButtonMacOS(text: "Disable Http Proxy", isSelected: $isProxyEnabled, value: false)
+                RadioButtonMacOS(text: NSLocalizedString("proxy.enable", comment: ""), isSelected: $isProxyEnabled, value: true)
+                RadioButtonMacOS(text: NSLocalizedString("proxy.disable", comment: ""), isSelected: $isProxyEnabled, value: false)
                 Spacer()
             }
             .padding(.leading, 30)
             
             HStack {
-                Text("Host Name")
+                Text(NSLocalizedString("proxy.host_name", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -76,7 +76,7 @@ struct HttpProxyConfigPanelView: View {
             .padding(.top, 0)
             
             HStack {
-                Text("Port Number")
+                Text(NSLocalizedString("proxy.port_number", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -99,15 +99,15 @@ struct HttpProxyConfigPanelView: View {
             .padding(.top, 0)
             
             HStack {
-                RadioButtonMacOS(text: "Enable Proxy Auth", isSelected: $isProxyAuthEnabled, value: true)
-                RadioButtonMacOS(text: "Disable Proxy Auth", isSelected: $isProxyAuthEnabled, value: false)
+                RadioButtonMacOS(text: NSLocalizedString("proxy.enable_auth", comment: ""), isSelected: $isProxyAuthEnabled, value: true)
+                RadioButtonMacOS(text: NSLocalizedString("proxy.disable_auth", comment: ""), isSelected: $isProxyAuthEnabled, value: false)
                 Spacer()
             }
             .padding(.leading, 30)
             .padding(.top, 20)
             
             HStack {
-                Text("Login")
+                Text(NSLocalizedString("proxy.login", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -131,7 +131,7 @@ struct HttpProxyConfigPanelView: View {
             .padding(.top, 0)
             
             HStack {
-                Text("Password")
+                Text(NSLocalizedString("proxy.password", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -153,12 +153,10 @@ struct HttpProxyConfigPanelView: View {
             }
             .padding(.top, 0)
             
-            
-            
             HStack {
                 Spacer()
                 
-                Text("Save")
+                Text(NSLocalizedString("proxy.save", comment: ""))
                     .font(.subheadline)
                     .padding(.horizontal, 2)
                     .padding(.vertical, 3)
@@ -176,7 +174,7 @@ struct HttpProxyConfigPanelView: View {
                         closeWindow()
                     }
                 
-                Text("Cancel")
+                Text(NSLocalizedString("proxy.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 2)

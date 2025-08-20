@@ -32,7 +32,7 @@ struct MessagesPanelView: View {
                         
                         if messagesViewModel.waitingModelResponse {
                             HStack {
-                                Text("Assistant")
+                                Text(NSLocalizedString("messages.assistant", comment: ""))
                                     .font(.system(size: 12))
                                     .foregroundColor(Color.gray)
                                 Spacer()
@@ -72,19 +72,17 @@ struct MessagesPanelView: View {
                                                             .padding(.horizontal, 8)
                                                         }
                                                         else {
-                                                            Text("Text")
+                                                            Text(NSLocalizedString("messages.text", comment: ""))
                                                                 .font(.system(size: 13, weight: .medium, design: .monospaced))
                                                                 .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                                                 .padding(.horizontal, 8)
                                                             Spacer()
                                                         }
                                                     }
-                                                    .padding(8)  // 让内容不紧贴边框
-                                                    .background(Color.black.opacity(0.1))  // 轻微背景色
-                                                    .cornerRadius(4)  // 让边框圆角
+                                                    .padding(8) 
+                                                    .background(Color.black.opacity(0.1)) 
+                                                    .cornerRadius(4)
                                                     
-                                                    
-                                                    // code
                                                     ScrollView(.horizontal, showsIndicators: false) {
                                                         SyntaxHighlightedText(
                                                             code: configuration.content,
@@ -113,7 +111,7 @@ struct MessagesPanelView: View {
                                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                         .scaleEffect(0.5)
                                     
-                                    Text("waiting ...")
+                                    Text(NSLocalizedString("messages.waiting", comment: ""))
                                         .foregroundColor(.gray)
                                         .font(.headline)
                                     

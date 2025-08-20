@@ -56,7 +56,7 @@ struct ChatListPanelView: View {
             VStack(spacing:0) {
                 // top bar: create conversation
                 HStack {
-                    Text("Conversation")
+                    Text(NSLocalizedString("chatlist.conversation", comment: ""))
                         .font(.subheadline)
                         .padding(.leading, 10)
                         .background(Color.clear)
@@ -84,7 +84,7 @@ struct ChatListPanelView: View {
                 
                 if showNewChatAlert {
                     HStack {
-                        Text("You should download a model first and select a preffered one before creating a new chat")
+                        Text(NSLocalizedString("chatlist.download_first", comment: ""))
                             .padding()
                             .font(.subheadline)
                             .foregroundColor(.white)
@@ -118,7 +118,7 @@ struct ChatListPanelView: View {
                                     // load selected conversation history messages
                                     messagesViewModel.loadMessagesFromDatabase(selectedChat: chatListViewModel.selectedChat!)
                                 }) {
-                                    Text("Remove")
+                                    Text(NSLocalizedString("chatlist.remove", comment: ""))
                                     Image(systemName: "trash")
                                 }
                             }
@@ -157,7 +157,7 @@ struct ChatListPanelView: View {
                     Spacer()
                     
                     // download
-                    Text("Downloads")
+                    Text(NSLocalizedString("chatlist.downloads", comment: ""))
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .padding(.trailing, 10)
@@ -231,7 +231,7 @@ struct ChatListPanelView: View {
                                         // download & delete model button
                                         let modelExists = commonViewModel.ollamaLocalModelList.contains { $0.name ==  commonViewModel.ollamaRemoteModelList[index].name}
                                         if modelExists {
-                                            Text("Installed")
+                                            Text(NSLocalizedString("chatlist.installed", comment: ""))
                                                 .font(.subheadline)
                                                 .foregroundColor(.green)
                                                 .padding(.trailing, 10)
@@ -246,7 +246,7 @@ struct ChatListPanelView: View {
                                                     modelToBeDeleted = commonViewModel.ollamaRemoteModelList[index].name
                                                 }
                                         } else {
-                                            Text("Download")
+                                            Text(NSLocalizedString("chatlist.download", comment: ""))
                                                 .font(.subheadline)
                                                 .foregroundColor(.gray)
                                                 .padding(.trailing, 10)
@@ -293,7 +293,7 @@ struct ChatListPanelView: View {
                     VStack(spacing:0) {
                         HStack(spacing:0) {
                             Spacer()
-                            Text("Reset All")
+                            Text(NSLocalizedString("chatlist.reset_all", comment: ""))
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .padding(.trailing, 20)
@@ -306,7 +306,7 @@ struct ChatListPanelView: View {
 
                         // temperature
                         HStack(spacing:0) {
-                            Text("Temperature")
+                            Text(NSLocalizedString("chatlist.temperature", comment: ""))
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .padding(.leading, 20)
@@ -316,7 +316,7 @@ struct ChatListPanelView: View {
                                 }
                                 .popover(isPresented: $isShowingTemperatureDesc, arrowEdge: .trailing) {
                                     VStack {
-                                        Text("The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)")
+                                        Text(NSLocalizedString("chatlist.temperature_desc", comment: ""))
                                             .padding()
                                             .fixedSize(horizontal: false, vertical: true)
                                             .frame(maxWidth: 300, maxHeight: 70, alignment: .leading)
@@ -340,7 +340,7 @@ struct ChatListPanelView: View {
                         
                         // seed
                         HStack(spacing:0) {
-                            Text("Seed")
+                            Text(NSLocalizedString("chatlist.seed", comment: ""))
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .padding(.leading, 20)
@@ -350,7 +350,7 @@ struct ChatListPanelView: View {
                                 }
                                 .popover(isPresented: $isShowingSeedDesc, arrowEdge: .trailing) {
                                     VStack {
-                                        Text("Sets the random number seed to use for generation. Setting this to a specific number will make the model generate the same text for the same prompt. (Default: 0)")
+                                        Text(NSLocalizedString("chatlist.seed_desc", comment: ""))
                                             .padding()
                                             .fixedSize(horizontal: false, vertical: true)
                                             .frame(maxWidth: 300, maxHeight: 85, alignment: .leading)
@@ -617,8 +617,8 @@ struct ChatListPanelView: View {
                 // delete model confirm modal
                 ConfirmModalView(
                     isPresented: $deleteModelConfirm,
-                    title: "Warning",
-                    content: "Are you sure to delete \(modelToBeDeleted ?? "")?",
+                    title: NSLocalizedString("chatlist.warning", comment: ""),
+                    content: String(format: NSLocalizedString("chatlist.delete_confirm", comment: ""), modelToBeDeleted ?? ""),
                     confirmAction: {
                         lockDownloadPanel.toggle() // lock download panel
                         Task {
@@ -646,8 +646,8 @@ struct ChatListPanelView: View {
                 // download confirm modal
                 ConfirmModalView(
                     isPresented: $downloadModelConfirm,
-                    title: "Download: \(modelToBeDownloaded ?? "No Model")",
-                    content: "This will take a few minutes, continue?",
+                    title: String(format: NSLocalizedString("chatlist.download_confirm_title", comment: ""), modelToBeDownloaded ?? "No Model"),
+                    content: NSLocalizedString("chatlist.download_confirm_content", comment: ""),
                     confirmAction: {
                         self.downloadProcessPanel = true  // start download process
                     },
@@ -683,12 +683,12 @@ struct ChatListPanelView: View {
             .alert(isPresented: $modelNotExistAlert) {
                 // delete a none exsit model
                 Alert(
-                    title: Text("Warning"),
-                    message: Text("The model does not exist. You may want to restart OllamaSpring."),
-                    primaryButton: .default(Text("Restart Now"), action: {
+                    title: Text(NSLocalizedString("chatlist.warning", comment: "")),
+                    message: Text(NSLocalizedString("chatlist.model_not_exist", comment: "")),
+                    primaryButton: .default(Text(NSLocalizedString("chatlist.restart_now", comment: "")), action: {
                         restartApp()
                     }),
-                    secondaryButton: .cancel(Text("Later"))
+                    secondaryButton: .cancel(Text(NSLocalizedString("chatlist.later", comment: "")))
                 )
             }
             

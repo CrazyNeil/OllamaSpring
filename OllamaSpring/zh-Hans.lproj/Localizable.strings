@@ -1,0 +1,148 @@
+//
+//  Localizable.strings
+//  OllamaSpring
+//
+//  Created by NeilStudio on 2025/6/17.
+//
+
+"Welcome to OllamaSpring" = "欢迎使用 OllamaSpring";
+"welcome.help_today" = "今天我能帮您什么？";
+"welcome.no_model_message" = "抱歉，您需要先下载一个 Ollama 模型。您可以在左下角找到下载按钮。祝您使用愉快！";
+"welcome.description" = "OllamaSpring 是一个全面的 Mac 客户端，用于管理 ollama 社区提供的各种模型，并创建对话式 AI 体验。";
+
+// SendMsgPanel
+"sendmsg.revoke" = "撤销";
+"sendmsg.voice_not_available" = "语音转文字功能暂未开放";
+"sendmsg.deepseek_upload_coming" = "DeepSeek 文件上传功能即将推出";
+"sendmsg.select_model_first" = "请先在顶部选择模型或下载模型";
+"sendmsg.create_conversation_first" = "请先在左上角创建新对话";
+
+// MainPanel
+"main.welcome" = "欢迎使用 OllamaSpring";
+"main.start_without_ollama" = "不使用 Ollama 启动";
+"main.ollama_not_available" = "您的 Mac 上没有可用的 Ollama API 服务。如果您想在本地运行 Ollama 模型，请按照以下步骤安装和设置 Ollama。如果您在特定主机上托管 Ollama API 服务，您可以在下方输入您自己的 Ollama 主机地址。";
+"main.step1_install" = "步骤 1：安装 Ollama";
+"main.step2_refresh" = "步骤 2：刷新";
+"main.enter_ollama_host" = "输入您的 Ollama 主机地址";
+
+// MessagesPanel
+"messages.assistant" = "助手";
+"messages.text" = "文本";
+"messages.waiting" = "等待中...";
+
+// ChatListPanel
+"chatlist.conversation" = "对话";
+"chatlist.model" = "模型";
+"chatlist.download_first" = "请先下载一个模型并选择您喜欢的模型，然后再创建新对话";
+"chatlist.remove" = "删除";
+"chatlist.downloads" = "下载";
+"chatlist.reset_all" = "重置全部";
+"chatlist.temperature" = "温度";
+"chatlist.temperature_desc" = "模型的温度参数。增加温度会使模型的回答更具创造性。（默认值：0.8）";
+"chatlist.seed" = "种子";
+"chatlist.seed_desc" = "设置用于生成的随机数种子。设置为特定数字将使模型对相同的提示生成相同的文本。（默认值：0）";
+"chatlist.context_tokens" = "上下文长度";
+"chatlist.context_tokens_desc" = "设置用于生成下一个标记的上下文窗口大小。（默认值：2048）";
+"chatlist.top_k" = "Top K";
+"chatlist.top_k_desc" = "减少生成无意义内容的概率。较高的值（如100）会产生更多样化的答案，而较低的值（如10）会更保守。（默认值：40）";
+"chatlist.top_p" = "Top P";
+"chatlist.top_p_desc" = "与 top-k 配合使用。较高的值（如0.95）会产生更多样化的文本，而较低的值（如0.5）会生成更集中和保守的文本。（默认值：0.9）";
+"chatlist.delete_success" = "模型已成功删除。您可能需要重启 OllamaSpring。";
+"chatlist.close" = "关闭";
+"chatlist.restart_now" = "立即重启";
+"chatlist.download_process" = "下载进度";
+"chatlist.warning" = "警告";
+"chatlist.delete_confirm" = "确定要删除 %@ 吗？";
+"chatlist.download_confirm_title" = "下载：%@";
+"chatlist.download_confirm_content" = "这可能需要几分钟时间，是否继续？";
+"chatlist.model_not_exist" = "模型不存在。您可能需要重启 OllamaSpring。";
+"chatlist.later" = "稍后";
+"chatlist.installed" = "已安装";
+"chatlist.download" = "下载";
+
+// HttpProxyConfig
+"proxy.enable" = "启用 HTTP 代理";
+"proxy.disable" = "禁用 HTTP 代理";
+"proxy.host_name" = "主机名";
+"proxy.port_number" = "端口号";
+"proxy.enable_auth" = "启用代理认证";
+"proxy.disable_auth" = "禁用代理认证";
+"proxy.login" = "登录名";
+"proxy.password" = "密码";
+"proxy.save" = "保存";
+"proxy.cancel" = "取消";
+
+// Modal
+"modal.cancel" = "取消";
+"modal.confirm" = "确认";
+
+// DeepSeek API Config
+"deepseek.api_title" = "DeepSeek API";
+"deepseek.enter_secret_key" = "输入密钥";
+"deepseek.how_to_apply" = "如何申请 DeepSeek API 密钥？";
+"deepseek.click_here" = "点击这里";
+"deepseek.connection_failed" = "连接失败";
+"deepseek.connection_failed_desc" = "无法连接到 DeepSeek 服务器。请验证您的 API 密钥或 HTTP 代理配置。";
+"deepseek.ok" = "确定";
+"deepseek.description" = "DeepSeek 在推理速度方面取得了重大突破。它在开源模型中位居榜首，并与全球最先进的闭源模型相媲美。";
+
+// Groq API Config
+"groq.api_title" = "Groq 快速 API";
+"groq.enter_secret_key" = "输入密钥";
+"groq.how_to_apply" = "如何申请 Groq API 密钥？";
+"groq.click_here" = "点击这里";
+"groq.description" = "Groq 是一个快速的 AI 推理平台，由 LPU™ AI 推理技术驱动，提供快速、经济且节能的 AI 服务。";
+
+// Ollama Host Config
+"ollama.host_config_title" = "Ollama HTTP 主机配置";
+"ollama.connection_failed" = "连接失败";
+"ollama.connection_failed_desc" = "无法连接到 Ollama 主机。请检查您的配置并重试。";
+"ollama.ok" = "确定";
+"ollama.description" = "配置 Ollama HTTP 主机和端口。在本地环境中，主机默认设置为 127.0.0.1，端口设置为 11434。您只能连接到不需要身份验证的远程主机。";
+
+// Ollama Library
+"ollama.library.install_title" = "安装 Ollama 模型";
+"ollama.library.enter_model_name" = "输入模型名称";
+"ollama.library.what_is_model_name" = "什么是模型名称？例如 llama3:70b";
+"ollama.library.click_here" = "点击这里";
+"ollama.library.warning" = "警告！并非所有 Ollama 库模型都支持聊天对话。就像 CodeGemma 作为代码补全的填充中间模型一样。";
+
+// Menu
+"menu.check_for_updates" = "检查更新…";
+
+// Right Top Bar
+"righttopbar.library" = "模型市场";
+"righttopbar.response_language" = "响应语言";
+"righttopbar.api_host" = "API 主机";
+"righttopbar.streaming" = "流式输出";
+"righttopbar.no_models_found" = "未找到模型";
+"righttopbar.unknown_model" = "未知模型";
+"righttopbar.groq_api_key_config" = "Groq API 密钥配置";
+"righttopbar.ollama_http_host_config" = "Ollama HTTP 主机配置";
+"righttopbar.deepseek_api_key_config" = "DeepSeek API 密钥配置";
+"righttopbar.notice" = "提示";
+"righttopbar.groq_no_streaming" = "Groq 不支持流式输出";
+"righttopbar.confirm" = "确认";
+
+// Status Bar
+"statusbar.option_1" = "选项 1";
+"statusbar.option_2" = "选项 2";
+"statusbar.quit" = "退出";
+
+// QuickCompletion
+"quick.prompt" = "请输入";
+"quick.shortcut_hint" = "您可以使用快捷键 cmd + shift + h 打开快速完成";
+"quick.ollama_not_available" = "您需要先启动 Ollama 或安装它。";
+"quick.no_model" = "未找到模型。您可能需要下载一个模型并重启 OllamaSpring。";
+"quick.empty_input" = "请告诉我您的问题。";
+"quick.waiting" = "等待中...";
+"quick.text" = "文本";
+"quick.copied" = "已复制";
+
+// MessagesRowView
+"messages.assistant" = "助手";
+"messages.copied" = "已复制";
+"messages.code_block_text" = "文本";
+"messages.share_preview" = "分享 OllamaSpring 消息";
+
+

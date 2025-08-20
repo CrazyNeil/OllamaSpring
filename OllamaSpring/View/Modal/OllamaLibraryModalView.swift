@@ -23,7 +23,7 @@ struct OllamaLibraryModalView: View {
         VStack(spacing:0) {
             
             HStack {
-                Text("Install Ollama Model")
+                Text(NSLocalizedString("ollama.library.install_title", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -32,7 +32,7 @@ struct OllamaLibraryModalView: View {
             .padding(.leading, 45)
             
             HStack {
-                TextField("Enter Model Name", text: $modelNameText)
+                TextField(NSLocalizedString("ollama.library.enter_model_name", comment: ""), text: $modelNameText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .frame(width: 300, height: 25)
                     .padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 12))
@@ -50,13 +50,13 @@ struct OllamaLibraryModalView: View {
                     .imageScale(.medium)
                     .foregroundColor(.gray)
                 
-                Text("what is model name? like llama3:70b")
+                Text(NSLocalizedString("ollama.library.what_is_model_name", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .opacity(0.6)
                     .padding(.leading, 5)
                 
-                Text("click here")
+                Text(NSLocalizedString("ollama.library.click_here", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.orange)
                     .padding(.leading, 15)
@@ -72,7 +72,7 @@ struct OllamaLibraryModalView: View {
             HStack {
                 Spacer()
                 
-                Text("Download")
+                Text(NSLocalizedString("chatlist.download", comment: ""))
                     .font(.subheadline)
                     .padding(.horizontal, 2)
                     .padding(.vertical, 3)
@@ -98,7 +98,7 @@ struct OllamaLibraryModalView: View {
                     }
 
                 
-                Text("Cancel")
+                Text(NSLocalizedString("modal.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 2)
@@ -117,7 +117,7 @@ struct OllamaLibraryModalView: View {
             
             HStack(spacing:0) {
                 
-                Text("WARNING! Not all ollama library models support chat conversations. Just like CodeGemma works as a fill-in-the-middle model for code completion.")
+                Text(NSLocalizedString("ollama.library.warning", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .lineLimit(3)

@@ -13,17 +13,17 @@ struct WelcomePanelView: View {
     var body: some View {
         VStack {
             Spacer()
-            Text("Welcome to OllamaSpring 😊")
+            Text(NSLocalizedString("Welcome to OllamaSpring", comment: ""))
                 .font(.title2)
                 .foregroundColor(.white)
-            Text("How can I help you today?")
+            Text(NSLocalizedString("welcome.help_today", comment: ""))
                 .font(.largeTitle)
                 .foregroundColor(.white)
             
             // ollama no model installed
             if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == ApiHostList[0].name {
                 HStack {
-                    Text("Oops, you need to download a Ollama model first. You can find a 'Downloads' button at the bottom left. Enjoy!")
+                    Text(NSLocalizedString("welcome.no_model_message", comment: ""))
                         .font(.body)
                         .foregroundColor(.red)
                         .padding()
@@ -36,7 +36,7 @@ struct WelcomePanelView: View {
                 .frame(maxWidth: 500)
             } else {
                 HStack {
-                    Text("OllamaSpring is a comprehensive Mac client for managing the various models offered by the ollama community, and for creating conversational AI experiences.")
+                    Text(NSLocalizedString("welcome.description", comment: ""))
                         .font(.body)
                         .foregroundColor(.gray)
                         .padding()

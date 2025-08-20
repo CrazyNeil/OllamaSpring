@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 import Splash
 
+
+
 struct SyntaxHighlightedText: View {
     let code: String
     let language: String
@@ -169,4 +171,6 @@ struct CustomTextView: NSViewRepresentable {
         }
     }
 }
+
+
 

@@ -9,7 +9,7 @@ struct MessagesRowView: View {
         VStack {
             if message.messageRole == "assistant" {
                 HStack {
-                    Text("Assistant")
+                    Text(NSLocalizedString("messages.assistant", comment: ""))
                         .font(.system(size: 12))
                         .foregroundColor(Color.gray)
                     Text(message.createdAt)
@@ -20,7 +20,7 @@ struct MessagesRowView: View {
                     ShareLink(
                         item: message.messageContent,
                         preview: SharePreview(
-                            "Share OllamaSpring Message",
+                            NSLocalizedString("messages.share_preview", comment: ""),
                             image: Image(nsImage: NSApplication.shared.applicationIconImage)
                         )
                     )
@@ -44,7 +44,7 @@ struct MessagesRowView: View {
                         .padding(.top, 2)
                     
                     if isCopied {
-                        Text("COPIED")
+                        Text(NSLocalizedString("messages.copied", comment: ""))
                             .font(.system(size: 12))
                             .foregroundColor(Color.green)
                             .padding(.top, 2)
@@ -85,7 +85,7 @@ struct MessagesRowView: View {
                                         .padding(.horizontal, 8)
                                     }
                                     else {
-                                        Text("Text")
+                                        Text(NSLocalizedString("messages.code_block_text", comment: ""))
                                             .font(.system(size: 13, weight: .medium, design: .monospaced))
                                             .foregroundColor(Color(red: 158/255, green: 158/255, blue: 158/255))
                                             .padding(.horizontal, 8)

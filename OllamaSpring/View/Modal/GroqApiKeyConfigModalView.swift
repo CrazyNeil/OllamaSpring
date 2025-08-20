@@ -19,7 +19,7 @@ struct GroqApiKeyConfigModalView: View {
         VStack(spacing:0) {
             
             HStack {
-                Text("Groq Fast API")
+                Text(NSLocalizedString("groq.api_title", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -31,7 +31,7 @@ struct GroqApiKeyConfigModalView: View {
             }
             
             HStack {
-                TextField(self.groqApiKeyText == "" ? "ENTER SECRET KEY" : self.groqApiKeyText, text: $groqApiKeyText)
+                TextField(self.groqApiKeyText == "" ? NSLocalizedString("groq.enter_secret_key", comment: "") : self.groqApiKeyText, text: $groqApiKeyText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .frame(width: 300, height: 25)
                     .padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 12))
@@ -49,13 +49,13 @@ struct GroqApiKeyConfigModalView: View {
                     .imageScale(.medium)
                     .foregroundColor(.gray)
                 
-                Text("How to apply a Groq API key?")
+                Text(NSLocalizedString("groq.how_to_apply", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .opacity(0.6)
                     .padding(.leading, 5)
                 
-                Text("click here")
+                Text(NSLocalizedString("groq.click_here", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.orange)
                     .padding(.leading, 15)
@@ -71,7 +71,7 @@ struct GroqApiKeyConfigModalView: View {
             HStack {
                 Spacer()
                 
-                Text("Save")
+                Text(NSLocalizedString("proxy.save", comment: ""))
                     .font(.subheadline)
                     .padding(.horizontal, 2)
                     .padding(.vertical, 3)
@@ -83,7 +83,7 @@ struct GroqApiKeyConfigModalView: View {
                         self.openGroqApiKeyConfigModal = false
                     }
 
-                Text("Cancel")
+                Text(NSLocalizedString("modal.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 2)
@@ -100,7 +100,7 @@ struct GroqApiKeyConfigModalView: View {
             .padding(.top, 15)
 
             HStack(spacing:0) {
-                Text("Groq is a fast AI inference, powered by LPU™ AI inference technology which delivers fast, affordable, and energy efficient AI.")
+                Text(NSLocalizedString("groq.description", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .lineLimit(3)

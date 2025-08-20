@@ -3,7 +3,7 @@ import SwiftUI
 struct RightTopBarView: View {
     @ObservedObject var commonViewModel: CommonViewModel
     @ObservedObject var messagesViewModel: MessagesViewModel
-    
+
     @Binding var openOllamaLibraryModal:Bool
     @Binding var openGroqApiKeyConfigModal:Bool
     @Binding var openDeepSeekApiKeyConfigModal:Bool
@@ -48,7 +48,7 @@ struct RightTopBarView: View {
     }
     
     private func emptyModelListText() -> some View {
-        Text("No models found")
+        Text(NSLocalizedString("righttopbar.no_models_found", comment: ""))
             .foregroundColor(.gray)
             .font(.subheadline)
     }
@@ -62,12 +62,12 @@ struct RightTopBarView: View {
         case ApiHostList[2].name:
             return commonViewModel.selectedDeepSeekModel
         default:
-            return "Unknown Model"
+            return NSLocalizedString("righttopbar.unknown_model", comment: "")
         }
     }
     
     private var library: some View {
-        Text("Library")
+        Text(NSLocalizedString("righttopbar.library", comment: ""))
             .font(.subheadline)
             .padding(.leading, 5)
             .onTapGesture {
@@ -167,8 +167,10 @@ struct RightTopBarView: View {
             .padding(.leading, 20)
     }
     
+
+    
     private var responseLanguageMenu: some View {
-        Menu("Response Language") {
+        Menu(NSLocalizedString("righttopbar.response_language", comment: "")) {
             ForEach(PreferredLangList) { lang in
                 Button(role: .destructive, action: {
                     commonViewModel.updateSelectedResponseLang(lang: lang.lang)
@@ -193,7 +195,7 @@ struct RightTopBarView: View {
     }
     
     private var apiHostMenu: some View {
-        Menu("API Host") {
+        Menu(NSLocalizedString("righttopbar.api_host", comment: "")) {
             ForEach(ApiHostList) { host in
                 
                 Button(role: .destructive, action: {
@@ -240,7 +242,7 @@ struct RightTopBarView: View {
                 self.openGroqApiKeyConfigModal.toggle()
             }) {
                 HStack {
-                    Text("Groq API Key Config")
+                    Text(NSLocalizedString("righttopbar.groq_api_key_config", comment: ""))
                         .font(.subheadline)
                 }
             }
@@ -249,7 +251,7 @@ struct RightTopBarView: View {
                 self.openOllamaHostConfigModal.toggle()
             }) {
                 HStack {
-                    Text("Ollama HTTP Host Config")
+                    Text(NSLocalizedString("righttopbar.ollama_http_host_config", comment: ""))
                         .font(.subheadline)
                 }
             }
@@ -258,7 +260,7 @@ struct RightTopBarView: View {
                 self.openDeepSeekApiKeyConfigModal.toggle()
             }) {
                 HStack {
-                    Text("DeepSeek API Key Config")
+                    Text(NSLocalizedString("righttopbar.deepseek_api_key_config", comment: ""))
                         .font(.subheadline)
                 }
             }
@@ -270,7 +272,7 @@ struct RightTopBarView: View {
     }
     
     private var streamingText: some View {
-        Text("Streaming")
+        Text(NSLocalizedString("righttopbar.streaming", comment: ""))
             .font(.subheadline)
             .foregroundColor(.gray)
             .padding(.trailing, 5)
@@ -297,10 +299,12 @@ struct RightTopBarView: View {
             /// alert message for groq streaming output
             /// current groq api not support streaming
             Alert(
-                title: Text("Notice"),
-                message: Text("Groq not support Streaming Output"),
-                dismissButton: .default(Text("Confirm"))
+                title: Text(NSLocalizedString("righttopbar.notice", comment: "")),
+                message: Text(NSLocalizedString("righttopbar.groq_no_streaming", comment: "")),
+                dismissButton: .default(Text(NSLocalizedString("righttopbar.confirm", comment: "")))
             )
         }
     }
+    
+
 }

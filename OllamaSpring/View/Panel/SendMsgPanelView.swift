@@ -57,7 +57,7 @@ struct SendMsgPanelView: View {
                         .padding(.leading, 10)
                     
                     HStack(spacing: 0) {
-                        Text("Revoke")
+                        Text(NSLocalizedString("sendmsg.revoke", comment: ""))
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .padding(.top, 10)
@@ -102,7 +102,7 @@ struct SendMsgPanelView: View {
                         .padding(.vertical, 5)
                     
                     HStack(spacing: 0) {
-                        Text("Revoke")
+                        Text(NSLocalizedString("sendmsg.revoke", comment: ""))
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.75))
                             .padding(.top, 10)
@@ -163,7 +163,7 @@ struct SendMsgPanelView: View {
                         }
                         .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
                             VStack {
-                                Text("Voice-to-text is not available currently")
+                                Text(NSLocalizedString("sendmsg.voice_not_available", comment: ""))
                                     .padding()
                                     .foregroundColor(.yellow)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -181,7 +181,7 @@ struct SendMsgPanelView: View {
                         }
                         .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
                             VStack {
-                                Text("File upload for DeepSeek is coming soon")
+                                Text(NSLocalizedString("sendmsg.deepseek_upload_coming", comment: ""))
                                     .padding()
                                     .foregroundColor(.yellow)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -214,7 +214,7 @@ struct SendMsgPanelView: View {
                     // no ollama model found. disable send msg.
                     if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == "Ollama" {
                         HStack {
-                            Text("You need select a model on top bar first or download a model first")
+                            Text(NSLocalizedString("sendmsg.select_model_first", comment: ""))
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)
@@ -226,7 +226,7 @@ struct SendMsgPanelView: View {
                         HStack {}.frame(maxWidth: .infinity)
                     } else if (chatListViewModel.ChatList.count == 0) {
                         HStack {
-                            Text("You need create a new conversation on left top bar first.")
+                            Text(NSLocalizedString("sendmsg.create_conversation_first", comment: ""))
                                 .font(.subheadline)
                                 .foregroundColor(.yellow)
                                 .opacity(0.9)

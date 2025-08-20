@@ -19,7 +19,7 @@ struct DeepSeekApiKeyConfigModalView: View {
         VStack(spacing:0) {
             
             HStack {
-                Text("DeepSeek API")
+                Text(NSLocalizedString("deepseek.api_title", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -31,7 +31,7 @@ struct DeepSeekApiKeyConfigModalView: View {
             }
             
             HStack {
-                TextField(self.deepSeekApiKeyText == "" ? "ENTER SECRET KEY" : self.deepSeekApiKeyText, text: $deepSeekApiKeyText)
+                TextField(self.deepSeekApiKeyText == "" ? NSLocalizedString("deepseek.enter_secret_key", comment: "") : self.deepSeekApiKeyText, text: $deepSeekApiKeyText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .frame(width: 300, height: 25)
                     .padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 12))
@@ -49,13 +49,13 @@ struct DeepSeekApiKeyConfigModalView: View {
                     .imageScale(.medium)
                     .foregroundColor(.gray)
                 
-                Text("How to apply a DeepSeek API key?")
+                Text(NSLocalizedString("deepseek.how_to_apply", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .opacity(0.6)
                     .padding(.leading, 5)
                 
-                Text("click here")
+                Text(NSLocalizedString("deepseek.click_here", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.orange)
                     .padding(.leading, 15)
@@ -71,7 +71,7 @@ struct DeepSeekApiKeyConfigModalView: View {
             HStack {
                 Spacer()
                 
-                Text("Save")
+                Text(NSLocalizedString("proxy.save", comment: ""))
                     .font(.subheadline)
                     .padding(.horizontal, 2)
                     .padding(.vertical, 3)
@@ -86,16 +86,16 @@ struct DeepSeekApiKeyConfigModalView: View {
                                 await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKeyText)
                             } else {
                                 let alert = NSAlert()
-                                alert.messageText = "Connection Failed"
-                                alert.informativeText = "Failed to connect to DeepSeek host. Please verify your apiKey or HTTP Proxy Config."
+                                alert.messageText = NSLocalizedString("deepseek.connection_failed", comment: "")
+                                alert.informativeText = NSLocalizedString("deepseek.connection_failed_desc", comment: "")
                                 alert.alertStyle = .warning
-                                alert.addButton(withTitle: "OK")
+                                alert.addButton(withTitle: NSLocalizedString("deepseek.ok", comment: ""))
                                 alert.runModal()
                             }
                         }
                     }
                 
-                Text("Cancel")
+                Text(NSLocalizedString("modal.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 2)
@@ -112,7 +112,7 @@ struct DeepSeekApiKeyConfigModalView: View {
             .padding(.top, 15)
             
             HStack(spacing:0) {
-                Text("DeepSeek achieves a significant breakthrough in inference speed over previous models. It tops the leaderboard among open-source models and rivals the most advanced closed-source models globally.")
+                Text(NSLocalizedString("deepseek.description", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .lineLimit(4)

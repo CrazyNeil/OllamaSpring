@@ -34,7 +34,7 @@ struct ConfirmModalView: View {
                     .padding(.horizontal, 20)
                 
                 HStack {
-                    Text("Cancel")
+                    Text(NSLocalizedString("modal.cancel", comment: ""))
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .padding(5)
@@ -47,7 +47,7 @@ struct ConfirmModalView: View {
                             cancelAction()
                         }
                     
-                    Text("Confirm")
+                    Text(NSLocalizedString("modal.confirm", comment: ""))
                         .font(.subheadline)
                         .foregroundColor(.white)
                         .padding(5)

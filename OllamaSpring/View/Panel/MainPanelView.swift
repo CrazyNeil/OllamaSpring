@@ -114,7 +114,7 @@ struct MainPanelView: View {
                         .frame(width: 60, height: 60)
                         .cornerRadius(4)
                     HStack {
-                        Text("Welcome To OllamaSpring")
+                        Text(NSLocalizedString("main.welcome", comment: ""))
                             .font(.system(size: 26))
                             .padding()
                             .foregroundColor(.white)
@@ -122,8 +122,7 @@ struct MainPanelView: View {
                     .frame(maxWidth: 600)
                     
                     HStack {
-  
-                        Text("Start Without Ollama")
+                        Text(NSLocalizedString("main.start_without_ollama", comment: ""))
                             .font(.system(size: 20))
                             .foregroundColor(.green)
                             .padding(14)
@@ -141,7 +140,7 @@ struct MainPanelView: View {
                     .frame(maxWidth: 600)
 
                     HStack {
-                        Text("Ollama API service is not available on your Mac. If you want to run Ollama models locally on your Mac, follow these steps to install and set up Ollama first. If you host Ollama api service on specific host, you should just enter your own Ollama host below.")
+                        Text(NSLocalizedString("main.ollama_not_available", comment: ""))
                             .font(.system(size: 12))
                             .padding()
                             .foregroundColor(.red)
@@ -150,7 +149,7 @@ struct MainPanelView: View {
                     .padding(.top, 20)
 
                     HStack {
-                        Text("Step 1: Install Ollama")
+                        Text(NSLocalizedString("main.step1_install", comment: ""))
                             .font(.system(size: 10))
                             .foregroundColor(.gray)
                             .padding(8)
@@ -162,7 +161,7 @@ struct MainPanelView: View {
                                 openURL(ollamaWebUrl)
                             }
                         
-                        Text("Step 2: Refresh")
+                        Text(NSLocalizedString("main.step2_refresh", comment: ""))
                             .font(.system(size: 10))
                             .foregroundColor(.gray)
                             .padding(8)
@@ -174,7 +173,7 @@ struct MainPanelView: View {
                                 commonViewModel.ollamaApiServiceStatusCheck()
                             }
                         
-                        Text("Enter your own Ollama host")
+                        Text(NSLocalizedString("main.enter_ollama_host", comment: ""))
                             .font(.system(size: 10))
                             .foregroundColor(.blue)
                             .padding(8)
@@ -206,11 +205,6 @@ struct MainPanelView: View {
                 await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)
             }
         }
+        
     }
-    
-    
 }
-
-
-
-

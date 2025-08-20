@@ -22,7 +22,7 @@ struct CheckForUpdatesView: View {
     
     
     var body: some View {
-        Button("Check for Updates…", action: updater.checkForUpdates)
+        Button(NSLocalizedString("menu.check_for_updates", comment: ""), action: updater.checkForUpdates)
             .disabled(!checkForUpdatesViewModel.canCheckForUpdates)
     }
 }
