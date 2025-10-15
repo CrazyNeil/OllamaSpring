@@ -1,0 +1,150 @@
+//
+//  Localizable.strings
+//  OllamaSpring
+//
+//  Created by NeilStudio on 2025/6/17.
+//
+
+"Welcome to OllamaSpring" = "مرحباً بك في OllamaSpring";
+"welcome.help_today" = "كيف يمكنني مساعدتك اليوم؟";
+"welcome.no_model_message" = "عذراً، تحتاج أولاً إلى تحميل نموذج Ollama. يمكنك العثور على زر التحميل في أسفل اليسار. استمتع!";
+"welcome.description" = "OllamaSpring هو عميل Mac شامل لإدارة النماذج المختلفة التي تقدمها مجتمع ollama وإنشاء تجارب الذكاء الاصطناعي المحادثة.";
+
+// SendMsgPanel
+"sendmsg.revoke" = "إلغاء";
+"sendmsg.voice_not_available" = "تحويل الصوت إلى نص غير متاح حالياً";
+"sendmsg.deepseek_upload_coming" = "رفع الملفات لـ DeepSeek قريباً";
+"sendmsg.select_model_first" = "تحتاج أولاً إلى اختيار نموذج في الشريط العلوي أو تحميل نموذج";
+"sendmsg.create_conversation_first" = "تحتاج أولاً إلى إنشاء محادثة جديدة في الشريط العلوي الأيسر.";
+
+// MainPanel
+"main.welcome" = "مرحباً بك في OllamaSpring";
+"main.start_without_ollama" = "بدء بدون Ollama";
+"main.ollama_not_available" = "خدمة API Ollama غير متاحة على جهاز Mac الخاص بك. إذا كنت تريد تشغيل نماذج Ollama محلياً على جهاز Mac الخاص بك، اتبع هذه الخطوات لتثبيت وإعداد Ollama أولاً. إذا كنت تستضيف خدمة API Ollama على خادم محدد، ما عليك سوى إدخال خادم Ollama الخاص بك أدناه.";
+"main.step1_install" = "الخطوة 1: تثبيت Ollama";
+"main.step2_refresh" = "الخطوة 2: تحديث";
+"main.enter_ollama_host" = "أدخل خادم Ollama الخاص بك";
+
+// MessagesPanel
+"messages.assistant" = "المساعد";
+"messages.text" = "نص";
+"messages.waiting" = "في الانتظار...";
+
+// ChatListPanel
+"chatlist.conversation" = "محادثة";
+"chatlist.model" = "النموذج";
+"chatlist.download_first" = "يجب عليك أولاً تحميل نموذج واختيار نموذج مفضل قبل إنشاء محادثة جديدة";
+"chatlist.remove" = "إزالة";
+"chatlist.downloads" = "التحميلات";
+"chatlist.reset_all" = "إعادة تعيين الكل";
+"chatlist.temperature" = "درجة الحرارة";
+"chatlist.temperature_desc" = "درجة حرارة النموذج. زيادة درجة الحرارة ستجعل إجابات النموذج أكثر إبداعاً. (افتراضي: 0.8)";
+"chatlist.seed" = "البذرة";
+"chatlist.seed_desc" = "يحدد بذرة الأرقام العشوائية المستخدمة في التوليد. تعيين هذا إلى رقم محدد سيجعل النموذج يولد نفس النص لنفس الـ prompt. (افتراضي: 0)";
+"chatlist.context_tokens" = "رموز السياق";
+"chatlist.context_tokens_desc" = "يحدد حجم نافذة السياق المستخدمة لتوليد الرمز التالي. (افتراضي: 2048)";
+"chatlist.top_k" = "أعلى K";
+"chatlist.top_k_desc" = "يقلل من احتمالية توليد الهراء. القيمة الأعلى (مثل 100) ستعطي إجابات أكثر تنوعاً، بينما القيمة الأقل (مثل 10) ستكون أكثر تحفظاً. (افتراضي: 40)";
+"chatlist.top_p" = "أعلى P";
+"chatlist.top_p_desc" = "يعمل مع top-k. القيمة الأعلى (مثل 0.95) ستؤدي إلى نص أكثر تنوعاً، بينما القيمة الأقل (مثل 0.5) ستولد نصاً أكثر تركيزاً وتحفظاً. (افتراضي: 0.9)";
+"chatlist.delete_success" = "تم حذف النموذج بنجاح. قد تحتاج إلى إعادة تشغيل OllamaSpring.";
+"chatlist.close" = "إغلاق";
+"chatlist.restart_now" = "إعادة التشغيل الآن";
+"chatlist.download_process" = "عملية التحميل";
+"chatlist.warning" = "تحذير";
+"chatlist.delete_confirm" = "هل أنت متأكد من أنك تريد حذف %@؟";
+"chatlist.download_confirm_title" = "تحميل: %@";
+"chatlist.download_confirm_content" = "سيستغرق هذا بضع دقائق، هل تريد المتابعة؟";
+"chatlist.model_not_exist" = "النموذج غير موجود. قد تحتاج إلى إعادة تشغيل OllamaSpring.";
+"chatlist.later" = "لاحقاً";
+"chatlist.installed" = "مثبت";
+"chatlist.download" = "تحميل";
+
+// HttpProxyConfig
+"proxy.enable" = "تفعيل الوكيل HTTP";
+"proxy.disable" = "إلغاء تفعيل الوكيل HTTP";
+"proxy.host_name" = "اسم المضيف";
+"proxy.port_number" = "رقم المنفذ";
+"proxy.enable_auth" = "تفعيل مصادقة الوكيل";
+"proxy.disable_auth" = "إلغاء تفعيل مصادقة الوكيل";
+"proxy.login" = "تسجيل الدخول";
+"proxy.password" = "كلمة المرور";
+"proxy.save" = "حفظ";
+"proxy.cancel" = "إلغاء";
+
+// Modal
+"modal.cancel" = "إلغاء";
+"modal.confirm" = "تأكيد";
+
+// DeepSeek API Config
+"deepseek.api_title" = "API DeepSeek";
+"deepseek.enter_secret_key" = "أدخل المفتاح السري";
+"deepseek.how_to_apply" = "كيفية التقدم بطلب للحصول على مفتاح API DeepSeek؟";
+"deepseek.click_here" = "انقر هنا";
+"deepseek.connection_failed" = "فشل الاتصال";
+"deepseek.connection_failed_desc" = "فشل الاتصال بخادم DeepSeek. يرجى التحقق من مفتاح API أو إعدادات الوكيل HTTP.";
+"deepseek.ok" = "موافق";
+"deepseek.description" = "يحقق DeepSeek اختراقاً كبيراً في سرعة الاستدلال مقارنة بالنماذج السابقة. يتصدر قائمة التصنيف بين النماذج مفتوحة المصدر ويتنافس مع أكثر النماذج المغلقة المصدر تقدماً في العالم.";
+
+// Groq API Config
+"groq.api_title" = "API Groq السريع";
+"groq.enter_secret_key" = "أدخل المفتاح السري";
+"groq.how_to_apply" = "كيفية التقدم بطلب للحصول على مفتاح API Groq؟";
+"groq.click_here" = "انقر هنا";
+"groq.description" = "Groq هو استدلال ذكاء اصطناعي سريع، مدعوم بتقنية الاستدلال LPU™ التي توفر ذكاء اصطناعي سريع وميسور التكلفة وفعال من حيث الطاقة.";
+
+// Ollama Host Config
+"ollama.host_config_title" = "تكوين خادم HTTP Ollama";
+"ollama.connection_failed" = "فشل الاتصال";
+"ollama.connection_failed_desc" = "فشل الاتصال بخادم Ollama. يرجى التحقق من التكوين والمحاولة مرة أخرى.";
+"ollama.ok" = "موافق";
+
+// StatusBar
+"statusbar.option_1" = "الخيار 1";
+"statusbar.option_2" = "الخيار 2";
+"statusbar.quit" = "خروج";
+
+// Messages
+"messages.code_block_text" = "نص";
+"messages.share_preview" = "مشاركة رسالة OllamaSpring";
+"messages.copied" = "تم النسخ";
+
+// Menu
+"menu.check_for_updates" = "البحث عن التحديثات…";
+
+// Ollama Library
+"ollama.library.install_title" = "تثبيت نموذج Ollama";
+"ollama.library.enter_model_name" = "أدخل اسم النموذج";
+"ollama.library.what_is_model_name" = "ما هو اسم النموذج؟ مثل llama3:70b";
+"ollama.library.click_here" = "انقر هنا";
+"ollama.library.warning" = "تحذير! لا تدعم جميع نماذج مكتبة ollama محادثات الدردشة. تماماً مثل CodeGemma يعمل كنموذج fill-in-the-middle لإكمال الكود.";
+
+// Ollama Host Config
+"ollama.description" = "قم بتكوين خادم ومنفذ HTTP Ollama. افتراضياً، يتم تعيين الخادم على 127.0.0.1 والمنفذ على 11434 في بيئتك المحلية. يمكنك الاتصال فقط بالخوادم البعيدة التي لا تتطلب مصادقة.";
+
+// Quick Completion
+"quick.prompt" = "الـ prompt";
+"quick.text" = "نص";
+"quick.waiting" = "في الانتظار...";
+"quick.copied" = "تم النسخ";
+"quick.empty_input" = "أخبرني فقط ما هو سؤالك.";
+"quick.no_model" = "لم يتم العثور على نموذج. قد تحتاج إلى تحميل نموذج وإعادة تشغيل OllamaSpring أولاً.";
+"quick.ollama_not_available" = "يجب عليك بدء Ollama أو تثبيته أولاً.";
+"quick.shortcut_hint" = "يمكنك فتح الإكمال السريع باستخدام الاختصار cmd + shift + h";
+
+// Right Top Bar
+"righttopbar.api_host" = "مضيف API";
+"righttopbar.confirm" = "تأكيد";
+"righttopbar.deepseek_api_key_config" = "تكوين مفتاح API DeepSeek";
+"righttopbar.groq_api_key_config" = "تكوين مفتاح API Groq";
+"righttopbar.groq_no_streaming" = "Groq لا يدعم الإخراج المتدفق";
+"righttopbar.library" = "السوق";
+"righttopbar.no_models_found" = "لم يتم العثور على نماذج";
+"righttopbar.notice" = "إشعار";
+"righttopbar.ollama_http_host_config" = "تكوين خادم HTTP Ollama";
+"righttopbar.response_language" = "لغة الاستجابة";
+"righttopbar.streaming" = "التدفق";
+"righttopbar.unknown_model" = "نموذج غير معروف";
+"messages.assistant" = "المساعد";
+
+

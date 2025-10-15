@@ -61,6 +61,30 @@
 		FBD459452C855FBD000BE5C1 /* ApiHostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD459442C855FBD000BE5C1 /* ApiHostModel.swift */; };
 		FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD459462C86B680000BE5C1 /* GroqApi.swift */; };
 		FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */; };
+		FBD936FB2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F62E9F416700E48A16 /* Localizable.strings */; };
+		FBD936FC2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F32E9F416700E48A16 /* Localizable.strings */; };
+		FBD936FD2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936E72E9F416700E48A16 /* Localizable.strings */; };
+		FBD936FE2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F92E9F416700E48A16 /* Localizable.strings */; };
+		FBD936FF2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936E42E9F416700E48A16 /* Localizable.strings */; };
+		FBD937002E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F02E9F416700E48A16 /* Localizable.strings */; };
+		FBD937012E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936ED2E9F416700E48A16 /* Localizable.strings */; };
+		FBD937022E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936EA2E9F416700E48A16 /* Localizable.strings */; };
+		FBD937032E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F62E9F416700E48A16 /* Localizable.strings */; };
+		FBD937042E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F32E9F416700E48A16 /* Localizable.strings */; };
+		FBD937052E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936E72E9F416700E48A16 /* Localizable.strings */; };
+		FBD937062E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F92E9F416700E48A16 /* Localizable.strings */; };
+		FBD937072E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936E42E9F416700E48A16 /* Localizable.strings */; };
+		FBD937082E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F02E9F416700E48A16 /* Localizable.strings */; };
+		FBD937092E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936ED2E9F416700E48A16 /* Localizable.strings */; };
+		FBD9370A2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936EA2E9F416700E48A16 /* Localizable.strings */; };
+		FBD9370B2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F62E9F416700E48A16 /* Localizable.strings */; };
+		FBD9370C2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F32E9F416700E48A16 /* Localizable.strings */; };
+		FBD9370D2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936E72E9F416700E48A16 /* Localizable.strings */; };
+		FBD9370E2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F92E9F416700E48A16 /* Localizable.strings */; };
+		FBD9370F2E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936E42E9F416700E48A16 /* Localizable.strings */; };
+		FBD937102E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936F02E9F416700E48A16 /* Localizable.strings */; };
+		FBD937112E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936ED2E9F416700E48A16 /* Localizable.strings */; };
+		FBD937122E9F416700E48A16 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FBD936EA2E9F416700E48A16 /* Localizable.strings */; };
 		FBDF8C532C0775DC00BED237 /* OllamaLibraryModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */; };
 		FBEF6E4F2D431812001C9AB6 /* OllamaHostConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEF6E4E2D431807001C9AB6 /* OllamaHostConfigModalView.swift */; };
 		FBEFBE512C9D077600B93648 /* HttpProxyConfigPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */; };
@@ -151,6 +175,14 @@
 		FBD459442C855FBD000BE5C1 /* ApiHostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiHostModel.swift; sourceTree = "<group>"; };
 		FBD459462C86B680000BE5C1 /* GroqApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqApi.swift; sourceTree = "<group>"; };
 		FBD4948D2BFD92CA009AFAC1 /* RightTopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightTopBarView.swift; sourceTree = "<group>"; };
+		FBD936E32E9F416700E48A16 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936E62E9F416700E48A16 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936E92E9F416700E48A16 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936EC2E9F416700E48A16 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936EF2E9F416700E48A16 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936F22E9F416700E48A16 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936F52E9F416700E48A16 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = Localizable.strings; sourceTree = "<group>"; };
+		FBD936F82E9F416700E48A16 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = Localizable.strings; sourceTree = "<group>"; };
 		FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaLibraryModalView.swift; sourceTree = "<group>"; };
 		FBEF6E4E2D431807001C9AB6 /* OllamaHostConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaHostConfigModalView.swift; sourceTree = "<group>"; };
 		FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpProxyConfigPanelView.swift; sourceTree = "<group>"; };
@@ -195,6 +227,14 @@
 		FB0FC7D82BEF1657007E4EB9 = {
 			isa = PBXGroup;
 			children = (
+				FBD936E52E9F416700E48A16 /* ar.lproj */,
+				FBD936E82E9F416700E48A16 /* de.lproj */,
+				FBD936EB2E9F416700E48A16 /* en.lproj */,
+				FBD936EE2E9F416700E48A16 /* es.lproj */,
+				FBD936F12E9F416700E48A16 /* fr.lproj */,
+				FBD936F42E9F416700E48A16 /* ja.lproj */,
+				FBD936F72E9F416700E48A16 /* ko.lproj */,
+				FBD936FA2E9F416700E48A16 /* zh-Hans.lproj */,
 				FB0FC7E32BEF1657007E4EB9 /* OllamaSpring */,
 				FB0FC7F52BEF165A007E4EB9 /* OllamaSpringTests */,
 				FB0FC7FF2BEF165A007E4EB9 /* OllamaSpringUITests */,
@@ -382,6 +422,70 @@
 			path = Menu;
 			sourceTree = "<group>";
 		};
+		FBD936E52E9F416700E48A16 /* ar.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936E42E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = ar.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936E82E9F416700E48A16 /* de.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936E72E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = de.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936EB2E9F416700E48A16 /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936EA2E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936EE2E9F416700E48A16 /* es.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936ED2E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = es.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936F12E9F416700E48A16 /* fr.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936F02E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = fr.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936F42E9F416700E48A16 /* ja.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936F32E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = ja.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936F72E9F416700E48A16 /* ko.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936F62E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = ko.lproj;
+			sourceTree = "<group>";
+		};
+		FBD936FA2E9F416700E48A16 /* zh-Hans.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				FBD936F92E9F416700E48A16 /* Localizable.strings */,
+			);
+			path = "zh-Hans.lproj";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -512,6 +616,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB0FC7EC2BEF165A007E4EB9 /* Preview Assets.xcassets in Resources */,
+				FBD936FB2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD936FC2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD936FD2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD936FE2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD936FF2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937002E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937012E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937022E9F416700E48A16 /* Localizable.strings in Resources */,
 				FB0FC7E92BEF165A007E4EB9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -520,6 +632,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD937032E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937042E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937052E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937062E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937072E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937082E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937092E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD9370A2E9F416700E48A16 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,6 +647,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD9370B2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD9370C2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD9370D2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD9370E2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD9370F2E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937102E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937112E9F416700E48A16 /* Localizable.strings in Resources */,
+				FBD937122E9F416700E48A16 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,6 +743,73 @@
 			targetProxy = FB0FC7FD2BEF165A007E4EB9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FBD936E42E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936E32E9F416700E48A16 /* ar */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936E72E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936E62E9F416700E48A16 /* de */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936EA2E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936E92E9F416700E48A16 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936ED2E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936EC2E9F416700E48A16 /* es */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936F02E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936EF2E9F416700E48A16 /* fr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936F32E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936F22E9F416700E48A16 /* ja */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936F62E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936F52E9F416700E48A16 /* ko */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		FBD936F92E9F416700E48A16 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FBD936F82E9F416700E48A16 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		FB0FC8042BEF165A007E4EB9 /* Debug */ = {
@@ -750,7 +945,7 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 36;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				ENABLE_APP_SANDBOX = NO;
@@ -767,7 +962,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -785,7 +980,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 36;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
@@ -803,7 +998,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

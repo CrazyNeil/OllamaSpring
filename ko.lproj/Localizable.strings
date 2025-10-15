@@ -1,0 +1,150 @@
+//
+//  Localizable.strings
+//  OllamaSpring
+//
+//  Created by NeilStudio on 2025/6/17.
+//
+
+"Welcome to OllamaSpring" = "OllamaSpring에 오신 것을 환영합니다";
+"welcome.help_today" = "오늘 무엇을 도와드릴까요?";
+"welcome.no_model_message" = "죄송합니다. 먼저 Ollama 모델을 다운로드해야 합니다. 왼쪽 하단에 다운로드 버튼이 있습니다. 즐거운 시간 보내세요!";
+"welcome.description" = "OllamaSpring은 ollama 커뮤니티가 제공하는 다양한 모델을 관리하고 대화형 AI 경험을 만들기 위한 포괄적인 Mac 클라이언트입니다.";
+
+// SendMsgPanel
+"sendmsg.revoke" = "취소";
+"sendmsg.voice_not_available" = "음성-텍스트 변환은 현재 사용할 수 없습니다";
+"sendmsg.deepseek_upload_coming" = "DeepSeek 파일 업로드 기능이 곧 출시됩니다";
+"sendmsg.select_model_first" = "먼저 상단 바에서 모델을 선택하거나 모델을 다운로드해야 합니다";
+"sendmsg.create_conversation_first" = "먼저 왼쪽 상단 바에서 새 대화를 만들어야 합니다.";
+
+// MainPanel
+"main.welcome" = "OllamaSpring에 오신 것을 환영합니다";
+"main.start_without_ollama" = "Ollama 없이 시작";
+"main.ollama_not_available" = "Mac에서 Ollama API 서비스를 사용할 수 없습니다. Mac에서 Ollama 모델을 로컬로 실행하려면 먼저 Ollama를 설치하고 설정하는 다음 단계를 따르세요. 특정 호스트에서 Ollama API 서비스를 호스팅하는 경우 아래에 자체 Ollama 호스트를 입력하세요.";
+"main.step1_install" = "1단계: Ollama 설치";
+"main.step2_refresh" = "2단계: 새로 고침";
+"main.enter_ollama_host" = "자체 Ollama 호스트 입력";
+
+// MessagesPanel
+"messages.assistant" = "어시스턴트";
+"messages.text" = "텍스트";
+"messages.waiting" = "대기 중...";
+
+// ChatListPanel
+"chatlist.conversation" = "대화";
+"chatlist.model" = "모델";
+"chatlist.download_first" = "새 채팅을 만들기 전에 먼저 모델을 다운로드하고 선호하는 모델을 선택해야 합니다";
+"chatlist.remove" = "제거";
+"chatlist.downloads" = "다운로드";
+"chatlist.reset_all" = "모두 재설정";
+"chatlist.temperature" = "온도";
+"chatlist.temperature_desc" = "모델의 온도. 온도를 높이면 모델의 답변이 더 창의적이 됩니다. (기본값: 0.8)";
+"chatlist.seed" = "시드";
+"chatlist.seed_desc" = "생성에 사용할 난수 시드를 설정합니다. 특정 숫자로 설정하면 모델이 같은 프롬프트에 대해 같은 텍스트를 생성합니다. (기본값: 0)";
+"chatlist.context_tokens" = "컨텍스트 토큰";
+"chatlist.context_tokens_desc" = "다음 토큰을 생성하는 데 사용되는 컨텍스트 창의 크기를 설정합니다. (기본값: 2048)";
+"chatlist.top_k" = "Top K";
+"chatlist.top_k_desc" = "무의미한 내용 생성 확률을 줄입니다. 높은 값(예: 100)은 더 다양한 답변을 제공하고, 낮은 값(예: 10)은 더 보수적입니다. (기본값: 40)";
+"chatlist.top_p" = "Top P";
+"chatlist.top_p_desc" = "top-k와 함께 작동합니다. 높은 값(예: 0.95)은 더 다양한 텍스트를 생성하고, 낮은 값(예: 0.5)은 더 집중되고 보수적인 텍스트를 생성합니다. (기본값: 0.9)";
+"chatlist.delete_success" = "모델이 성공적으로 삭제되었습니다. OllamaSpring을 재시작해야 할 수도 있습니다.";
+"chatlist.close" = "닫기";
+"chatlist.restart_now" = "지금 재시작";
+"chatlist.download_process" = "다운로드 진행 상황";
+"chatlist.warning" = "경고";
+"chatlist.delete_confirm" = "%@을(를) 삭제하시겠습니까?";
+"chatlist.download_confirm_title" = "다운로드: %@";
+"chatlist.download_confirm_content" = "몇 분 정도 소요됩니다. 계속하시겠습니까?";
+"chatlist.model_not_exist" = "모델이 존재하지 않습니다. OllamaSpring을 재시작해야 할 수도 있습니다.";
+"chatlist.later" = "나중에";
+"chatlist.installed" = "설치됨";
+"chatlist.download" = "다운로드";
+
+// HttpProxyConfig
+"proxy.enable" = "HTTP 프록시 활성화";
+"proxy.disable" = "HTTP 프록시 비활성화";
+"proxy.host_name" = "호스트 이름";
+"proxy.port_number" = "포트 번호";
+"proxy.enable_auth" = "프록시 인증 활성화";
+"proxy.disable_auth" = "프록시 인증 비활성화";
+"proxy.login" = "로그인";
+"proxy.password" = "비밀번호";
+"proxy.save" = "저장";
+"proxy.cancel" = "취소";
+
+// Modal
+"modal.cancel" = "취소";
+"modal.confirm" = "확인";
+
+// DeepSeek API Config
+"deepseek.api_title" = "DeepSeek API";
+"deepseek.enter_secret_key" = "시크릿 키 입력";
+"deepseek.how_to_apply" = "DeepSeek API 키를 신청하는 방법은?";
+"deepseek.click_here" = "여기를 클릭";
+"deepseek.connection_failed" = "연결 실패";
+"deepseek.connection_failed_desc" = "DeepSeek 호스트에 연결할 수 없습니다. API 키 또는 HTTP 프록시 설정을 확인하세요.";
+"deepseek.ok" = "확인";
+"deepseek.description" = "DeepSeek는 이전 모델 대비 추론 속도에서 중요한 돌파구를 달성했습니다. 오픈소스 모델 중 리더보드 1위를 차지하며 전 세계에서 가장 진보된 클로즈드소스 모델과 경쟁합니다.";
+
+// Groq API Config
+"groq.api_title" = "Groq Fast API";
+"groq.enter_secret_key" = "시크릿 키 입력";
+"groq.how_to_apply" = "Groq API 키를 신청하는 방법은?";
+"groq.click_here" = "여기를 클릭";
+"groq.description" = "Groq는 LPU™ AI 추론 기술로 구동되는 빠른 AI 추론으로, 빠르고 저렴하며 에너지 효율적인 AI를 제공합니다.";
+
+// Ollama Host Config
+"ollama.host_config_title" = "Ollama HTTP 호스트 구성";
+"ollama.connection_failed" = "연결 실패";
+"ollama.connection_failed_desc" = "Ollama 호스트에 연결할 수 없습니다. 구성을 확인하고 다시 시도하세요.";
+"ollama.ok" = "확인";
+
+// StatusBar
+"statusbar.option_1" = "옵션 1";
+"statusbar.option_2" = "옵션 2";
+"statusbar.quit" = "종료";
+
+// Messages
+"messages.code_block_text" = "텍스트";
+"messages.share_preview" = "OllamaSpring 메시지 공유";
+"messages.copied" = "복사됨";
+
+// Menu
+"menu.check_for_updates" = "업데이트 확인…";
+
+// Ollama Library
+"ollama.library.install_title" = "Ollama 모델 설치";
+"ollama.library.enter_model_name" = "모델 이름 입력";
+"ollama.library.what_is_model_name" = "모델 이름이란? 예: llama3:70b";
+"ollama.library.click_here" = "여기를 클릭";
+"ollama.library.warning" = "경고! 모든 ollama 라이브러리 모델이 채팅 대화를 지원하지는 않습니다. CodeGemma가 코드 완성을 위한 fill-in-the-middle 모델로 작동하는 것과 같습니다.";
+
+// Ollama Host Config
+"ollama.description" = "Ollama HTTP 호스트와 포트를 구성합니다. 기본적으로 로컬 환경에서 호스트는 127.0.0.1, 포트는 11434로 설정됩니다. 인증이 필요하지 않은 원격 호스트에만 연결할 수 있습니다.";
+
+// Quick Completion
+"quick.prompt" = "프롬프트";
+"quick.text" = "텍스트";
+"quick.waiting" = "대기 중...";
+"quick.copied" = "복사됨";
+"quick.empty_input" = "질문이 무엇인지 말씀해 주세요.";
+"quick.no_model" = "모델을 찾을 수 없습니다. 먼저 모델을 다운로드하고 OllamaSpring을 재시작해야 할 수도 있습니다.";
+"quick.ollama_not_available" = "먼저 Ollama를 시작하거나 설치해야 합니다.";
+"quick.shortcut_hint" = "단축키 cmd + shift + h로 빠른 완성을 열 수 있습니다";
+
+// Right Top Bar
+"righttopbar.api_host" = "API 호스트";
+"righttopbar.confirm" = "확인";
+"righttopbar.deepseek_api_key_config" = "DeepSeek API 키 구성";
+"righttopbar.groq_api_key_config" = "Groq API 키 구성";
+"righttopbar.groq_no_streaming" = "Groq는 스트리밍 출력을 지원하지 않습니다";
+"righttopbar.library" = "마켓";
+"righttopbar.no_models_found" = "모델을 찾을 수 없습니다";
+"righttopbar.notice" = "알림";
+"righttopbar.ollama_http_host_config" = "Ollama HTTP 호스트 구성";
+"righttopbar.response_language" = "응답 언어";
+"righttopbar.streaming" = "스트리밍";
+"righttopbar.unknown_model" = "알 수 없는 모델";
+"messages.assistant" = "어시스턴트";
+
+
