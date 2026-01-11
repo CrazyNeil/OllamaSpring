@@ -30,11 +30,13 @@ struct ChatListPanelView: View {
     @State private var modelToBeDownloaded:String?
     
     @State private var showNewChatAlert = false
+    @State private var showClearAllAlert = false
     
     @Binding var openOllamaLibraryModal:Bool
     @Binding var openGroqApiKeyConfigModal:Bool
     @Binding var openOllamaHostConfigModal:Bool
     @Binding var openDeepSeekApiKeyConfigModal:Bool
+    @Binding var openOllamaCloudApiKeyConfigModal:Bool
     
     @State private var isShowingTemperatureDesc = false
     @State private var isShowingSeedDesc = false
@@ -62,12 +64,9 @@ struct ChatListPanelView: View {
                         .background(Color.clear)
                     
                     Spacer()
-                    Image(systemName: "plus.circle")
-                        .font(.subheadline)
-                        .imageScale(.large)
-                        .foregroundColor(.gray)
-                        .padding(.trailing, 10)
-                        .onTapGesture {
+
+                    Menu {
+                        Button(action: {
                             // alert: no allama model found
                             if commonViewModel.ollamaLocalModelList.isEmpty && commonViewModel.selectedApiHost == ApiHostList[0].name{
                                 showNewChatAlert.toggle()
@@ -77,7 +76,24 @@ struct ChatListPanelView: View {
                                 // init messages list
                                 messagesViewModel.loadMessagesFromDatabase(selectedChat: chatListViewModel.selectedChat!)
                             }
+                        }) {
+                            Label(NSLocalizedString("chatlist.new_conversation", comment: "New Conversation"), systemImage: "plus")
                         }
+
+                        Button(action: {
+                            showClearAllAlert = true
+                        }) {
+                            Label(NSLocalizedString("chatlist.clear_all_conversations", comment: "Clear All Conversations"), systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .font(.subheadline)
+                            .imageScale(.large)
+                            .foregroundColor(.gray)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
+                    .padding(.trailing, 10)
                 }
                 .frame(height: 30)
                 .background(Color(red: 34/255, green: 35/255, blue: 41/255))
@@ -102,7 +118,7 @@ struct ChatListPanelView: View {
                 // conversation list
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0){
-                        ForEach(chatListViewModel.ChatList.indices.reversed(), id: \.self) { index in
+                        ForEach(chatListViewModel.ChatList.indices, id: \.self) { index in
                             ChatListRowView(chat: chatListViewModel.ChatList[index], chatListViewModel: chatListViewModel) { newChatName in
                                 chatListViewModel.ChatList[index].name = newChatName
                             }
@@ -112,11 +128,14 @@ struct ChatListPanelView: View {
                                     // delete conversation
                                     chatListViewModel.removeChat(at: index)
                                     // update selected conversation
-                                    if (index - 1) >= 0 {
-                                        chatListViewModel.selectedChat = chatListViewModel.ChatList[(index - 1) > 0 ? (index - 1) : 0].id
+                                    if chatListViewModel.ChatList.count > 0 {
+                                        let newIndex = min(index, chatListViewModel.ChatList.count - 1)
+                                        chatListViewModel.selectedChat = chatListViewModel.ChatList[newIndex].id
                                     }
                                     // load selected conversation history messages
-                                    messagesViewModel.loadMessagesFromDatabase(selectedChat: chatListViewModel.selectedChat!)
+                                    if let selectedChatUUID = chatListViewModel.selectedChat {
+                                        messagesViewModel.loadMessagesFromDatabase(selectedChat: selectedChatUUID)
+                                    }
                                 }) {
                                     Text(NSLocalizedString("chatlist.remove", comment: ""))
                                     Image(systemName: "trash")
@@ -199,22 +218,21 @@ struct ChatListPanelView: View {
                         openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal
                     )
                 }
+                .sheet(isPresented:$openOllamaCloudApiKeyConfigModal) {
+                    OllamaCloudApiKeyConfigModalView(
+                        commonViewModel: commonViewModel,
+                        openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal
+                    )
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.clear)
             .onAppear() {
-                DispatchQueue.main.async {
-                    // load all conversation from database
-                    chatListViewModel.loadChatsFromDatabase()
-                    // default conversation
-                    if chatListViewModel.ChatList.count > 0 {
-                        chatListViewModel.selectedChat = chatListViewModel.ChatList[0].id
-                    }
-                    // load history messages
-                    if let selectedChatUUID = chatListViewModel.selectedChat {
-                        messagesViewModel.loadMessagesFromDatabase(selectedChat: selectedChatUUID)
-                    }
-                }
+                // Load chats from database (will skip if already loaded)
+                chatListViewModel.loadChatsFromDatabase()
+                
+                // Note: selectedChat and messages loading are now handled in loadChatsFromDatabase()
+                // after sorting completes, to ensure the latest chat is selected
             }
             
             // ollama models management
@@ -680,20 +698,46 @@ struct ChatListPanelView: View {
             }
             .padding(.bottom, 30)
             .frame(maxHeight: 300)
-            .alert(isPresented: $modelNotExistAlert) {
-                // delete a none exsit model
-                Alert(
-                    title: Text(NSLocalizedString("chatlist.warning", comment: "")),
-                    message: Text(NSLocalizedString("chatlist.model_not_exist", comment: "")),
-                    primaryButton: .default(Text(NSLocalizedString("chatlist.restart_now", comment: "")), action: {
-                        restartApp()
-                    }),
-                    secondaryButton: .cancel(Text(NSLocalizedString("chatlist.later", comment: "")))
-                )
-            }
+                .alert(isPresented: $modelNotExistAlert) {
+                    // delete a none exsit model
+                    Alert(
+                        title: Text(NSLocalizedString("chatlist.warning", comment: "")),
+                        message: Text(NSLocalizedString("chatlist.model_not_exist", comment: "")),
+                        primaryButton: .default(Text(NSLocalizedString("chatlist.restart_now", comment: "")), action: {
+                            restartApp()
+                        }),
+                        secondaryButton: .cancel(Text(NSLocalizedString("chatlist.later", comment: "")))
+                    )
+                }
+                .alert(isPresented: $showClearAllAlert) {
+                    Alert(
+                        title: Text(NSLocalizedString("chatlist.clear_all_warning", comment: "Warning")),
+                        message: Text(NSLocalizedString("chatlist.clear_all_message", comment: "This will delete all conversations and their messages. This action cannot be undone.")),
+                        primaryButton: .destructive(Text(NSLocalizedString("chatlist.clear_all_confirm", comment: "Clear All")), action: {
+                            clearAllConversations()
+                        }),
+                        secondaryButton: .cancel()
+                    )
+                }
             
         }
-        
+    }
+
+    private func clearAllConversations() {
+        // Clear all chats from the view model
+        chatListViewModel.ChatList.removeAll()
+
+        // Clear all messages by clearing the current selection and messages
+        messagesViewModel.messages.removeAll()
+
+        // Delete all chats and messages from database
+        chatListViewModel.chatManager.deleteAllChats()
+        messagesViewModel.msgManager.deleteAllMessages()
+
+        // Reset selected chat
+        chatListViewModel.selectedChat = nil
+
+        NSLog("All conversations and messages have been cleared")
     }
 }
 

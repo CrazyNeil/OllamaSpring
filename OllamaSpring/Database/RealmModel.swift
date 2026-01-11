@@ -183,8 +183,15 @@ class PreferenceManager {
 }
 
 class MessageManager {
-    
-    
+
+    func deleteAllMessages() {
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
+        let allMessages = realm.objects(RealmMessage.self)
+        try! realm.write {
+            realm.delete(allMessages)
+        }
+    }
+
     func getMessagesByChatId(chatId: String) -> Results<RealmMessage> {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
@@ -194,6 +201,49 @@ class MessageManager {
         }
 
         return messages
+    }
+    
+    /// Get latest message date for each chat ID in a single optimized query
+    /// Returns a dictionary mapping chatId to latest message createdAt string
+    func getLatestMessageDatesForChats(chatIds: [String]) -> [String: String] {
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
+        
+        // Filter messages for the given chat IDs in a single query
+        let allMessages = realm.objects(RealmMessage.self)
+        let filteredMessages = allMessages.where {
+            $0.chatId.in(chatIds)
+        }
+        
+        // Group messages by chatId and find the latest for each
+        var latestDates: [String: String] = [:]
+        
+        // Convert to array and process in memory for better performance
+        let messagesArray = Array(filteredMessages)
+        
+        // Group by chatId
+        let groupedMessages = Dictionary(grouping: messagesArray) { $0.chatId }
+        
+        // Date formatter for parsing dates
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        
+        // Find latest message for each chat by comparing parsed dates
+        for (chatId, messages) in groupedMessages {
+            // Parse dates and find the latest one
+            let latestMessage = messages.max { msg1, msg2 in
+                let date1 = formatter.date(from: msg1.createdAt) ?? Date.distantPast
+                let date2 = formatter.date(from: msg2.createdAt) ?? Date.distantPast
+                return date1 < date2
+            }
+            
+            if let latestMessage = latestMessage {
+                latestDates[chatId] = latestMessage.createdAt
+            }
+        }
+        
+        return latestDates
     }
     
     func deleteMessagesByChatId(chatId: String) {
@@ -290,7 +340,7 @@ class ChatManager {
     
     func updateChatName(withId id: UUID, newName: String) -> Bool {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
-        
+
         do {
             if let record = realm.objects(RealmChat.self).filter("chatId == %@", id.uuidString).first {
                 try realm.write {
@@ -304,6 +354,14 @@ class ChatManager {
         } catch {
             NSLog("Failed to update chat name: \(error.localizedDescription)")
             return false
+        }
+    }
+
+    func deleteAllChats() {
+        let realm = try! Realm(configuration: RealmConfiguration.shared.config)
+        let allChats = realm.objects(RealmChat.self)
+        try! realm.write {
+            realm.delete(allChats)
         }
     }
     

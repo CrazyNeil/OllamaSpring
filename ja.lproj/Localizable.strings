@@ -99,6 +99,16 @@
 "ollama.connection_failed_desc" = "Ollamaホストへの接続に失敗しました。設定を確認して再試行してください。";
 "ollama.ok" = "OK";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API";
+"ollamacloud.enter_secret_key" = "シークレットキーを入力";
+"ollamacloud.how_to_apply" = "Ollama Cloud APIキーの申請方法は？";
+"ollamacloud.click_here" = "ここをクリック";
+"ollamacloud.connection_failed" = "接続に失敗しました";
+"ollamacloud.connection_failed_desc" = "Ollama Cloudへの接続に失敗しました。APIキーまたはHTTPプロキシ設定を確認してください。";
+"ollamacloud.ok" = "OK";
+"ollamacloud.description" = "Ollama CloudはOllamaモデルの管理ホスティングを提供し、クラウドでスケーラブルで信頼性の高いAI推論サービスを提供します。";
+
 // StatusBar
 "statusbar.option_1" = "オプション1";
 "statusbar.option_2" = "オプション2";
@@ -130,13 +140,14 @@
 "quick.empty_input" = "質問内容を教えてください。";
 "quick.no_model" = "モデルが見つかりません。まずモデルをダウンロードしてOllamaSpringを再起動する必要があるかもしれません。";
 "quick.ollama_not_available" = "まずOllamaを開始またはインストールする必要があります。";
-"quick.shortcut_hint" = "ショートカットcmd + shift + hでクイック補完を開くことができます";
+"quick.shortcut_hint" = "ショートカット cmd + shift + h を使用して、クイック補完ダイアログを開いたり非表示にしたりできます";
 
 // Right Top Bar
 "righttopbar.api_host" = "APIホスト";
 "righttopbar.confirm" = "確認";
 "righttopbar.deepseek_api_key_config" = "DeepSeek APIキー設定";
 "righttopbar.groq_api_key_config" = "Groq APIキー設定";
+"righttopbar.ollamacloud_api_key_config" = "Ollama Cloud APIキー設定";
 "righttopbar.groq_no_streaming" = "Groqはストリーミング出力をサポートしていません";
 "righttopbar.library" = "マーケット";
 "righttopbar.no_models_found" = "モデルが見つかりません";
@@ -148,3 +159,8 @@
 "messages.assistant" = "アシスタント";
 
 
+"chatlist.new_conversation" = "新しい会話";
+"chatlist.clear_all_conversations" = "すべての会話をクリア";
+"chatlist.clear_all_warning" = "警告";
+"chatlist.clear_all_message" = "これによりすべての会話とメッセージが削除されます。この操作は元に戻せません。";
+"chatlist.clear_all_confirm" = "すべてクリア";

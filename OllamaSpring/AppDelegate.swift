@@ -187,17 +187,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func showQuickCompletion() {
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        
-        // Hide the mainWindow if it exists
-        if let mainWindow = mainWindow {
-            mainWindow.orderOut(nil)
+        // Toggle window visibility: if visible, close it; otherwise, show it
+        if quickCompletionWindowController.window?.isVisible ?? false {
+            // Close window without activating the app
+            quickCompletionWindowController.close()
+            stopQuickCompletionMonitoring()
+        } else {
+            // Activate app only when showing the window
+            NSApplication.shared.activate(ignoringOtherApps: true)
+            
+            // Hide the mainWindow if it exists
+            if let mainWindow = mainWindow {
+                mainWindow.orderOut(nil)
+            }
+            
+            quickCompletionWindowController.showWindow(self)
+            quickCompletionWindow.makeKeyAndOrderFront(nil)
+            // Focus will be handled by SwiftUI @FocusState in onAppear
+            startQuickCompletionMonitoring()
         }
-        
-        quickCompletionWindowController.showWindow(self)
-        quickCompletionWindow.makeKeyAndOrderFront(nil)
-        quickCompletionWindow.makeFirstResponder(quickCompletionWindow.contentView)
-        startQuickCompletionMonitoring()
     }
     
     @objc func showHttpProxy() {

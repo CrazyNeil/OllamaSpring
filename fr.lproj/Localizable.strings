@@ -99,6 +99,16 @@
 "ollama.connection_failed_desc" = "Impossible de se connecter à l'hôte Ollama. Veuillez vérifier votre configuration et réessayer.";
 "ollama.ok" = "OK";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API";
+"ollamacloud.enter_secret_key" = "ENTRER LA CLÉ SECRÈTE";
+"ollamacloud.how_to_apply" = "Comment demander une clé API Ollama Cloud ?";
+"ollamacloud.click_here" = "cliquez ici";
+"ollamacloud.connection_failed" = "Échec de la connexion";
+"ollamacloud.connection_failed_desc" = "Impossible de se connecter à Ollama Cloud. Veuillez vérifier votre clé API ou la configuration du proxy HTTP.";
+"ollamacloud.ok" = "OK";
+"ollamacloud.description" = "Ollama Cloud fournit un hébergement géré pour les modèles Ollama, offrant des services d'inférence IA évolutifs et fiables dans le cloud.";
+
 // StatusBar
 "statusbar.option_1" = "Option 1";
 "statusbar.option_2" = "Option 2";
@@ -130,13 +140,14 @@
 "quick.empty_input" = "Dites-moi simplement quelle est votre question.";
 "quick.no_model" = "Aucun modèle trouvé. Vous devrez peut-être d'abord télécharger un modèle et redémarrer OllamaSpring.";
 "quick.ollama_not_available" = "Vous devez d'abord démarrer Ollama ou l'installer.";
-"quick.shortcut_hint" = "Vous pouvez ouvrir la complétion rapide avec le raccourci cmd + shift + h";
+"quick.shortcut_hint" = "Vous pouvez utiliser le raccourci cmd + shift + h pour ouvrir ou masquer la boîte de dialogue de complétion rapide";
 
 // Right Top Bar
 "righttopbar.api_host" = "Hôte API";
 "righttopbar.confirm" = "Confirmer";
 "righttopbar.deepseek_api_key_config" = "Configuration de la clé API DeepSeek";
 "righttopbar.groq_api_key_config" = "Configuration de la clé API Groq";
+"righttopbar.ollamacloud_api_key_config" = "Configuration de la clé API Ollama Cloud";
 "righttopbar.groq_no_streaming" = "Groq ne prend pas en charge la sortie en streaming";
 "righttopbar.library" = "Marché";
 "righttopbar.no_models_found" = "Aucun modèle trouvé";
@@ -148,3 +159,8 @@
 "messages.assistant" = "Assistant";
 
 
+"chatlist.new_conversation" = "Nouvelle conversation";
+"chatlist.clear_all_conversations" = "Effacer toutes les conversations";
+"chatlist.clear_all_warning" = "Avertissement";
+"chatlist.clear_all_message" = "Cela supprimera toutes les conversations et leurs messages. Cette action ne peut pas être annulée.";
+"chatlist.clear_all_confirm" = "Tout effacer";

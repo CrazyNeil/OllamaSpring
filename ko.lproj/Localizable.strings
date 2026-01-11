@@ -99,6 +99,16 @@
 "ollama.connection_failed_desc" = "Ollama 호스트에 연결할 수 없습니다. 구성을 확인하고 다시 시도하세요.";
 "ollama.ok" = "확인";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API";
+"ollamacloud.enter_secret_key" = "시크릿 키 입력";
+"ollamacloud.how_to_apply" = "Ollama Cloud API 키를 어떻게 신청하나요?";
+"ollamacloud.click_here" = "여기를 클릭";
+"ollamacloud.connection_failed" = "연결 실패";
+"ollamacloud.connection_failed_desc" = "Ollama Cloud에 연결할 수 없습니다. API 키 또는 HTTP 프록시 구성을 확인하세요.";
+"ollamacloud.ok" = "확인";
+"ollamacloud.description" = "Ollama Cloud는 Ollama 모델을 위한 관리형 호스팅을 제공하며, 클라우드에서 확장 가능하고 안정적인 AI 추론 서비스를 제공합니다.";
+
 // StatusBar
 "statusbar.option_1" = "옵션 1";
 "statusbar.option_2" = "옵션 2";
@@ -130,13 +140,14 @@
 "quick.empty_input" = "질문이 무엇인지 말씀해 주세요.";
 "quick.no_model" = "모델을 찾을 수 없습니다. 먼저 모델을 다운로드하고 OllamaSpring을 재시작해야 할 수도 있습니다.";
 "quick.ollama_not_available" = "먼저 Ollama를 시작하거나 설치해야 합니다.";
-"quick.shortcut_hint" = "단축키 cmd + shift + h로 빠른 완성을 열 수 있습니다";
+"quick.shortcut_hint" = "단축키 cmd + shift + h를 사용하여 빠른 완성 대화 상자를 열거나 숨길 수 있습니다";
 
 // Right Top Bar
 "righttopbar.api_host" = "API 호스트";
 "righttopbar.confirm" = "확인";
 "righttopbar.deepseek_api_key_config" = "DeepSeek API 키 구성";
 "righttopbar.groq_api_key_config" = "Groq API 키 구성";
+"righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API 키 구성";
 "righttopbar.groq_no_streaming" = "Groq는 스트리밍 출력을 지원하지 않습니다";
 "righttopbar.library" = "마켓";
 "righttopbar.no_models_found" = "모델을 찾을 수 없습니다";
@@ -148,3 +159,8 @@
 "messages.assistant" = "어시스턴트";
 
 
+"chatlist.new_conversation" = "새 대화";
+"chatlist.clear_all_conversations" = "모든 대화 지우기";
+"chatlist.clear_all_warning" = "경고";
+"chatlist.clear_all_message" = "모든 대화와 메시지가 삭제됩니다. 이 작업은 취소할 수 없습니다.";
+"chatlist.clear_all_confirm" = "모두 지우기";

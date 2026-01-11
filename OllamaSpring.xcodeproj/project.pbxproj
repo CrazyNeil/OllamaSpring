@@ -39,6 +39,9 @@
 		FB9871742C281814000A4808 /* extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9871732C281814000A4808 /* extension.swift */; };
 		FB9871762C281881000A4808 /* custom.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9871752C281881000A4808 /* custom.swift */; };
 		FB9871782C293877000A4808 /* QuickCompletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9871772C293877000A4808 /* QuickCompletionViewModel.swift */; };
+		FB9ED47A2D4705CB00D59411 /* OllamaCloudApiKeyConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9ED4792D4705BC00D59411 /* OllamaCloudApiKeyConfigModalView.swift */; };
+		FB9ED47B2D4705BC00D59412 /* OllamaCloudModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9ED47A2D4705BC00D59412 /* OllamaCloudModel.swift */; };
+		FB9ED47C2D4705BC00D59413 /* OllamaCloudApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9ED47B2D4705BC00D59413 /* OllamaCloudApi.swift */; };
 		FBA45BC42BF0D6E5007E0935 /* WelcomePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */; };
 		FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BC62BF19115007E0935 /* ChatModel.swift */; };
 		FBA45BCB2BF196D0007E0935 /* ChatListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */; };
@@ -157,6 +160,9 @@
 		FB9871732C281814000A4808 /* extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extension.swift; sourceTree = "<group>"; };
 		FB9871752C281881000A4808 /* custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = custom.swift; sourceTree = "<group>"; };
 		FB9871772C293877000A4808 /* QuickCompletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCompletionViewModel.swift; sourceTree = "<group>"; };
+		FB9ED4792D4705BC00D59411 /* OllamaCloudApiKeyConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaCloudApiKeyConfigModalView.swift; sourceTree = "<group>"; };
+		FB9ED47A2D4705BC00D59412 /* OllamaCloudModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaCloudModel.swift; sourceTree = "<group>"; };
+		FB9ED47B2D4705BC00D59413 /* OllamaCloudApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaCloudApi.swift; sourceTree = "<group>"; };
 		FBA45BC32BF0D6E5007E0935 /* WelcomePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePanelView.swift; sourceTree = "<group>"; };
 		FBA45BC62BF19115007E0935 /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
 		FBA45BCA2BF196D0007E0935 /* ChatListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListRowView.swift; sourceTree = "<group>"; };
@@ -321,6 +327,7 @@
 				FB65CFE92BF9851900E1EA88 /* ConfirmModalView.swift */,
 				FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */,
 				FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */,
+				FB9ED4792D4705BC00D59411 /* OllamaCloudApiKeyConfigModalView.swift */,
 			);
 			path = Modal;
 			sourceTree = "<group>";
@@ -329,6 +336,7 @@
 			isa = PBXGroup;
 			children = (
 				FB8ED47D2D4A44E500D59410 /* DeepSeekModel.swift */,
+				FB9ED47A2D4705BC00D59412 /* OllamaCloudModel.swift */,
 				FBA45BC62BF19115007E0935 /* ChatModel.swift */,
 				FBA45BCE2BF1AC51007E0935 /* MessageModel.swift */,
 				FBA45BF62BF58DC6007E0935 /* PreferredResponseLangModel.swift */,
@@ -368,6 +376,7 @@
 			isa = PBXGroup;
 			children = (
 				FB8ED47B2D470E4C00D59410 /* DeepSeekApi.swift */,
+				FB9ED47B2D4705BC00D59413 /* OllamaCloudApi.swift */,
 				FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */,
 				FBA45BD52BF20B48007E0935 /* OllamaApi.swift */,
 				FBD459462C86B680000BE5C1 /* GroqApi.swift */,
@@ -561,7 +570,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					FB0FC7E02BEF1657007E4EB9 = {
 						CreatedOnToolsVersion = 15.3;
@@ -676,6 +685,7 @@
 				FBD459472C86B680000BE5C1 /* GroqApi.swift in Sources */,
 				FB0FC8122BEF487F007E4EB9 /* MainPanelView.swift in Sources */,
 				FB8ED47C2D470E5200D59410 /* DeepSeekApi.swift in Sources */,
+				FB9ED47C2D4705BC00D59413 /* OllamaCloudApi.swift in Sources */,
 				FBF304822C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift in Sources */,
 				FBA45BE32BF3334D007E0935 /* ChatListViewModel.swift in Sources */,
 				FBA45BF52BF58D05007E0935 /* CommonViewModel.swift in Sources */,
@@ -684,6 +694,7 @@
 				FBF304842C8EAB9A00C91CB4 /* GroqModel.swift in Sources */,
 				FBD4948E2BFD92CA009AFAC1 /* RightTopBarView.swift in Sources */,
 				FB8ED47A2D4705CB00D59410 /* DeepSeekApiKeyConfigModalView.swift in Sources */,
+				FB9ED47A2D4705CB00D59411 /* OllamaCloudApiKeyConfigModalView.swift in Sources */,
 				FBD459452C855FBD000BE5C1 /* ApiHostModel.swift in Sources */,
 				FBA45BD62BF20B48007E0935 /* OllamaApi.swift in Sources */,
 				FBA45BF72BF58DC6007E0935 /* PreferredResponseLangModel.swift in Sources */,
@@ -709,6 +720,7 @@
 				FB2FB9FD2C061B1300621595 /* CheckForUpdatesView.swift in Sources */,
 				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
 				FB8ED47E2D4A44EA00D59410 /* DeepSeekModel.swift in Sources */,
+				FB9ED47B2D4705BC00D59412 /* OllamaCloudModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -873,6 +885,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -932,6 +945,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -945,13 +959,16 @@
 				CODE_SIGN_ENTITLEMENTS = OllamaSpring/OllamaSpring.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
-				ENABLE_APP_SANDBOX = NO;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OllamaSpring/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OllamaSpring;
@@ -962,7 +979,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.1;
+				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -980,14 +997,17 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"OllamaSpring/Preview Content\"";
 				DEVELOPMENT_TEAM = C5C6Y7S9E3;
-				ENABLE_APP_SANDBOX = NO;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OllamaSpring/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OllamaSpring;
@@ -998,7 +1018,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.1;
+				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.neil.dev.studio.OllamaSpring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

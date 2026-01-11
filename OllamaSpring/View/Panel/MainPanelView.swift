@@ -10,6 +10,7 @@ struct MainPanelView: View {
     @State private var openGroqApiKeyConfigModal = false
     @State private var openOllamaHostConfigModal = false
     @State private var openDeepSeekApiKeyConfigModal = false
+    @State private var openOllamaCloudApiKeyConfigModal = false
     
     @State private var isLeftPanelVisible: Bool = true
     @State private var leftPanelWidth: CGFloat = 280
@@ -25,7 +26,6 @@ struct MainPanelView: View {
     var body: some View {
         ZStack {
             HSplitView {
-                if isLeftPanelVisible {
                     ChatListPanelView(
                         chatListViewModel: chatListViewModel,
                         messagesViewModel: messagesViewModel,
@@ -33,18 +33,22 @@ struct MainPanelView: View {
                         openOllamaLibraryModal: $openOllamaLibraryModal,
                         openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
                         openOllamaHostConfigModal: $openOllamaHostConfigModal,
-                        openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal
+                    openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal,
+                    openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal
                     )
-                    .frame(minWidth: 240,  idealWidth: 280, maxWidth: 300)
-                    .animation(.easeInOut, value: isLeftPanelVisible)
-                }
+                .frame(
+                    minWidth: isLeftPanelVisible ? 240 : 0,
+                    idealWidth: isLeftPanelVisible ? 280 : 0,
+                    maxWidth: isLeftPanelVisible ? 300 : 0
+                )
+                .opacity(isLeftPanelVisible ? 1 : 0)
+                .allowsHitTesting(isLeftPanelVisible) // Disable interaction when hidden
+                .clipped() // Clip content when width is 0
                 
                 VStack {
                     HStack {
                         Button(action: {
-                            withAnimation {
                                 isLeftPanelVisible.toggle()
-                            }
                         }) {
                             Image(systemName: isLeftPanelVisible ? "sidebar.left" : "sidebar.right")
                                 .foregroundColor(.gray)
@@ -59,7 +63,8 @@ struct MainPanelView: View {
                             openOllamaLibraryModal: $openOllamaLibraryModal,
                             openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
                             openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal,
-                            openOllamaHostConfigModal: $openOllamaHostConfigModal
+                            openOllamaHostConfigModal: $openOllamaHostConfigModal,
+                            openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal
                         )
                     }
                     .padding(.horizontal, 8)
@@ -134,7 +139,7 @@ struct MainPanelView: View {
                                 commonViewModel.isOllamaApiServiceAvailable = true
                                 commonViewModel.hasLocalModelInstalled = true
                                 commonViewModel.updateSelectedApiHost(name: "Groq Fast AI")
-                                messagesViewModel.streamingOutput = false
+                                messagesViewModel.streamingOutput = true
                             }
                     }
                     .frame(maxWidth: 600)

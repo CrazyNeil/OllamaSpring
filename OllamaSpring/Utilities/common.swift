@@ -174,3 +174,90 @@ func removeProtocolPrefix(from urlString: String) -> String {
                               .replacingOccurrences(of: "ws://", with: "")
     return trimmedUrl
 }
+
+/// Filter out redacted_reasoning tags and think tags from markdown content
+/// These tags (like <think>...</think> or <think>...</think>) are not standard markdown
+/// and should be removed before rendering to avoid display issues
+/// Filter out thinking tags for display purposes (keeps other content)
+func filterRedactedReasoningTagsForDisplay(_ content: String) -> String {
+    var filteredContent = content
+
+    // Remove all types of thinking tags: <think>, <redacted_reasoning>, etc.
+    // Apply multiple times to handle nested or overlapping tags
+    var previousLength = filteredContent.count
+    var iterations = 0
+    while iterations < 10 { // Prevent infinite loop
+        let patterns = [
+            "<think>.*?</think>",           // <think>...</think>
+            "<redacted_reasoning>.*?</redacted_reasoning>", // <redacted_reasoning>...</redacted_reasoning>
+            "<thinking>.*?</thinking>",     // <thinking>...</thinking>
+            "<reasoning>.*?</reasoning>"    // <reasoning>...</reasoning>
+        ]
+
+        var changed = false
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators, .caseInsensitive]) {
+                let range = NSRange(filteredContent.startIndex..<filteredContent.endIndex, in: filteredContent)
+                let newContent = regex.stringByReplacingMatches(in: filteredContent, options: [], range: range, withTemplate: "")
+                if newContent != filteredContent {
+                    filteredContent = newContent
+                    changed = true
+                }
+            }
+        }
+
+        // Check if we made any changes
+        if !changed && filteredContent.count == previousLength {
+            break
+        }
+        previousLength = filteredContent.count
+        iterations += 1
+    }
+
+    return filteredContent
+}
+
+/// Filter out thinking tags for title generation (removes everything after thinking tags)
+func filterRedactedReasoningTagsForTitle(_ content: String) -> String {
+    var filteredContent = content
+
+    // First, try to extract content after thinking tags
+    let patterns = [
+        "<think>(.*?)</think>",           // Extract content between <think> and </think>
+        "<redacted_reasoning>(.*?)</redacted_reasoning>",
+        "<thinking>(.*?)</thinking>",
+        "<reasoning>(.*?)</reasoning>"
+    ]
+
+    for pattern in patterns {
+        if let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators, .caseInsensitive]) {
+            let range = NSRange(filteredContent.startIndex..<filteredContent.endIndex, in: filteredContent)
+            if let match = regex.firstMatch(in: filteredContent, options: [], range: range),
+               match.numberOfRanges > 1 {
+                let extractedRange = match.range(at: 1)
+                if let extractedContent = Range(extractedRange, in: filteredContent) {
+                    let extracted = String(filteredContent[extractedContent])
+                    if !extracted.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        return extracted.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                }
+            }
+        }
+    }
+
+    // If no content found after thinking tags, remove thinking tags and use the rest
+    filteredContent = filterRedactedReasoningTagsForDisplay(filteredContent)
+
+    // If after filtering we have content, return it
+    if !filteredContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        return filteredContent.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // If everything is filtered out, return empty string (let the title generation handle it)
+    return ""
+}
+
+// Backward compatibility - use display filtering by default
+func filterRedactedReasoningTags(_ content: String) -> String {
+    return filterRedactedReasoningTagsForDisplay(content)
+}

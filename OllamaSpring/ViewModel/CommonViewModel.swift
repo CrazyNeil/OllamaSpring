@@ -19,15 +19,19 @@ class CommonViewModel: ObservableObject {
     @Published var isHttpProxyAuthEnabled:Bool = httpProxyAuthDefaultStatus
     @Published var groqApiKey:String = defaultGroqApiKey
     @Published var deepSeekApiKey:String = defaultDeepSeekApiKey
+    @Published var ollamaCloudApiKey:String = defaultOllamaCloudApiKey
     @Published var isOllamaApiServiceAvailable:Bool = false
     @Published var hasLocalModelInstalled:Bool = false
     @Published var selectedOllamaModel:String = ""
     @Published var selectedGroqModel:String = ""
     @Published var selectedDeepSeekModel:String = ""
+    @Published var selectedOllamaCloudModel:String = ""
     @Published var ollamaLocalModelList:[OllamaModel] = []
     @Published var ollamaRemoteModelList:[OllamaModel] = []
     @Published var deepSeekModelList:[DeepSeekModel] = []
     @Published var groqModelList:[GroqModel] = []
+    @Published var ollamaCloudModelList:[OllamaCloudModel] = []
+    @Published var isLoadingOllamaCloudModels: Bool = false
     
     @Published var ollamaHostName: String = ollamaApiDefaultBaseUrl
     @Published var ollamaHostPort: String = ollamaApiDefaultPort
@@ -114,13 +118,45 @@ class CommonViewModel: ObservableObject {
     }
     
     func fetchGroqModels() async {
-        do {
-            let apiModels = try await ollamaSpringModelsApi.fetchGroqModels()
-            let customModels = apiModels.map { apiModel in
+        // First, try to fetch models from Groq API directly
+        let groqApiKey = loadGroqApiKeyFromDatabase()
+        if !groqApiKey.isEmpty {
+            let httpProxy = loadHttpProxyHostFromDatabase()
+            let httpProxyAuth = loadHttpProxyAuthFromDatabase()
+            let groqApi = GroqApi(
+                proxyUrl: httpProxy.name,
+                proxyPort: Int(httpProxy.port) ?? 0,
+                authorizationToken: groqApiKey,
+                isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+                isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase(),
+                login: httpProxyAuth.login,
+                password: httpProxyAuth.password
+            )
+            
+            do {
+                NSLog("Groq API - Attempting to fetch models from Groq API endpoint: openai/v1/models")
+                let response = try await groqApi.models()
+                
+                // Check if response contains error
+                if let errorResponse = response as? [String: Any],
+                   let error = errorResponse["error"] as? [String: Any],
+                   let errorMessage = error["message"] as? String {
+                    NSLog("Groq API - Error response: \(errorMessage)")
+                    DispatchQueue.main.async {
+                        self.groqModelList = []
+                        self.selectedGroqModel = "Groq Fast AI"
+                    }
+                    return
+                } else if let modelResponse = response as? [String: Any],
+                          let modelsData = modelResponse["data"] as? [[String: Any]] {
+                    NSLog("Groq API - Successfully fetched \(modelsData.count) models from Groq API")
+                    
+                    let customModels = modelsData.map { modelData in
+                        let modelId = modelData["id"] as? String ?? ""
                 return GroqModel(
-                    modelName: apiModel.modelName,
-                    name: apiModel.name,
-                    isDefault: apiModel.isDefault
+                            modelName: modelId,
+                            name: modelId,
+                            isDefault: modelId.contains("llama3-70b") || modelId.contains("mixtral-8x7b")
                 )
             }
 
@@ -135,10 +171,29 @@ class CommonViewModel: ObservableObject {
                         self.selectedGroqModel = self.groqModelList.first?.name ?? "Groq Model"
                     }
                     self.updateSelectedGroqModel(name: self.selectedGroqModel)
+                        }
+                    }
+                    return // Successfully fetched from Groq API, exit early
+                } else {
+                    NSLog("Groq API - Response format is not OpenAI-compatible")
+                    DispatchQueue.main.async {
+                        self.groqModelList = []
+                        self.selectedGroqModel = "Groq Fast AI"
                 }
             }
         } catch {
-            NSLog("Failed to fetch Groq models: \(error)")
+                NSLog("Groq API - Failed to fetch models from Groq API: \(error)")
+                DispatchQueue.main.async {
+                    self.groqModelList = []
+                    self.selectedGroqModel = "Groq Fast AI"
+                }
+            }
+        } else {
+            NSLog("Groq API - No API key configured")
+            DispatchQueue.main.async {
+                self.groqModelList = []
+                self.selectedGroqModel = "Groq Fast AI"
+            }
         }
     }
     
@@ -227,12 +282,21 @@ class CommonViewModel: ObservableObject {
         self.selectedDeepSeekModel = name
     }
     
+    func updateSelectedOllamaCloudModel(name:String) {
+        preference.updatePreference(preferenceKey: "selectedOllamaCloudModelName", preferenceValue: name)
+        self.selectedOllamaCloudModel = name
+    }
+    
     func loadSelectedGroqModelFromDatabase() {
         self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: selectedGroqModel)
     }
     
     func loadSelectedDeepSeekModelFromDatabase() {
         self.selectedDeepSeekModel = loadPreference(forKey: "selectedDeepSeekModelName", defaultValue: selectedDeepSeekModel)
+    }
+    
+    func loadSelectedOllamaCloudModelFromDatabase() {
+        self.selectedOllamaCloudModel = loadPreference(forKey: "selectedOllamaCloudModelName", defaultValue: selectedOllamaCloudModel)
     }
     
     /// groq api key config
@@ -278,6 +342,172 @@ class CommonViewModel: ObservableObject {
             return false
         } catch {
             return false
+        }
+    }
+    
+    /// Ollama Cloud api key config
+    func loadOllamaCloudApiKeyFromDatabase() -> String {
+        self.ollamaCloudApiKey = loadPreference(forKey: "ollamaCloudApiKey", defaultValue: defaultOllamaCloudApiKey)
+        
+        return self.ollamaCloudApiKey
+    }
+    
+    func updateOllamaCloudApiKey(key: String) {
+        preference.updatePreference(preferenceKey: "ollamaCloudApiKey", preferenceValue: key)
+        self.ollamaCloudApiKey = key
+    }
+    
+    func verifyOllamaCloudApiKey(key: String) async -> Bool {
+        // Check if API key is empty
+        if key.isEmpty || key.trimmingCharacters(in: .whitespaces).isEmpty {
+            return false
+        }
+        
+        // Use /api/chat endpoint to verify API key since /api/tags doesn't require authentication
+        let httpProxy = loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = loadHttpProxyAuthFromDatabase()
+        let ollamaCloudApi = OllamaCloudApi(
+            apiBaseUrl: "https://ollama.com",
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: key,
+            isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase(),
+            login: httpProxyAuth.login,
+            password: httpProxyAuth.password
+        )
+        
+        do {
+            // Try to make a minimal chat request to verify API key
+            // Use a simple test message with a small model to minimize API usage
+            let response = try await ollamaCloudApi.chat(
+                modelName: "gemma3:4b", // Use a small model for verification
+                role: "user",
+                content: "test",
+                stream: false,
+                responseLang: "English",
+                messages: [],
+                temperature: 0.1,
+                seed: 0,
+                num_ctx: 100,
+                top_k: 1,
+                top_p: 0.1
+            )
+            
+            // Check if response contains error message
+            if let errorMsg = response["msg"] as? String {
+                NSLog("Ollama Cloud API key verification failed: \(errorMsg)")
+                return false
+            }
+            
+            // If we get a valid response (even if it's an error about the model), the API key is valid
+            // The API key is valid if we don't get a 401 or 403 error
+            return true
+        } catch {
+            NSLog("Ollama Cloud API key verification error: \(error)")
+            return false
+        }
+    }
+    
+    func fetchOllamaCloudModels(apiKey: String) async {
+        // Set loading state to true and clear existing models immediately
+        DispatchQueue.main.async {
+            self.isLoadingOllamaCloudModels = true
+            self.ollamaCloudModelList = []
+            self.selectedOllamaCloudModel = "Ollama Cloud"
+        }
+        
+        // Check if API key is empty or invalid
+        if apiKey.isEmpty || apiKey.trimmingCharacters(in: .whitespaces).isEmpty {
+            NSLog("Ollama Cloud API key is empty")
+            DispatchQueue.main.async {
+                self.ollamaCloudModelList = []
+                self.selectedOllamaCloudModel = "Ollama Cloud"
+                self.isLoadingOllamaCloudModels = false
+            }
+            return
+        }
+        
+        // Verify API key first since /api/tags doesn't require authentication
+        // Only fetch models if API key is valid
+        let isApiKeyValid = await verifyOllamaCloudApiKey(key: apiKey)
+        if !isApiKeyValid {
+            NSLog("Ollama Cloud API key is invalid")
+            DispatchQueue.main.async {
+                self.ollamaCloudModelList = []
+                self.selectedOllamaCloudModel = "Ollama Cloud"
+                self.isLoadingOllamaCloudModels = false
+            }
+            return
+        }
+        
+        do {
+            let httpProxy = loadHttpProxyHostFromDatabase()
+            let httpProxyAuth = loadHttpProxyAuthFromDatabase()
+            let ollamaCloudApi = OllamaCloudApi(
+                apiBaseUrl: "https://ollama.com",
+                proxyUrl: httpProxy.name,
+                proxyPort: Int(httpProxy.port) ?? 0,
+                authorizationToken: apiKey,
+                isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+                isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase(),
+                login: httpProxyAuth.login,
+                password: httpProxyAuth.password
+            )
+            
+            let response = try await ollamaCloudApi.tags()
+            
+            // Check if response contains error message
+            if let errorMsg = response["msg"] as? String {
+                NSLog("Ollama Cloud API error: \(errorMsg)")
+                DispatchQueue.main.async {
+                    self.ollamaCloudModelList = []
+                    self.selectedOllamaCloudModel = "Ollama Cloud"
+                    self.isLoadingOllamaCloudModels = false
+                }
+                return
+            }
+            
+            if let modelResponse = response as? [String: Any],
+               let modelsData = modelResponse["models"] as? [[String: Any]] {
+                
+                let customModels = modelsData.map { modelData in
+                    let modelName = modelData["name"] as? String ?? (modelData["model"] as? String ?? "")
+                    return OllamaCloudModel(
+                        modelName: modelName,
+                        name: modelName,
+                        isDefault: false
+                    )
+                }
+                
+                DispatchQueue.main.async {
+                    self.ollamaCloudModelList = customModels
+                    if self.ollamaCloudModelList.isEmpty {
+                        self.selectedOllamaCloudModel = "Ollama Cloud"
+                    } else {
+                        self.selectedOllamaCloudModel = self.ollamaCloudModelList.first?.name ?? "Ollama Cloud Model"
+                        self.loadSelectedOllamaCloudModelFromDatabase()
+                        if self.selectedOllamaCloudModel.isEmpty {
+                            self.selectedOllamaCloudModel = self.ollamaCloudModelList.first?.name ?? "Ollama Cloud Model"
+                        }
+                    }
+                    self.isLoadingOllamaCloudModels = false
+                }
+            } else {
+                NSLog("Ollama Cloud API response format is invalid")
+                DispatchQueue.main.async {
+                    self.ollamaCloudModelList = []
+                    self.selectedOllamaCloudModel = "Ollama Cloud"
+                    self.isLoadingOllamaCloudModels = false
+                }
+            }
+        } catch {
+            NSLog("Failed to fetch Ollama Cloud models: \(error)")
+            DispatchQueue.main.async {
+                self.ollamaCloudModelList = []
+                self.selectedOllamaCloudModel = "Ollama Cloud"
+                self.isLoadingOllamaCloudModels = false
+            }
         }
     }
     

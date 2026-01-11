@@ -1,25 +1,25 @@
 //
-//  MarketModalView.swift
+//  OllamaCloudApiKeyConfigModalView.swift
 //  OllamaSpring
 //
-//  Created by NeilStudio on 2024/9/7.
+//  Created by NeilStudio on 2025/1/27.
 //
 
 import SwiftUI
 
-struct GroqApiKeyConfigModalView: View {
+struct OllamaCloudApiKeyConfigModalView: View {
     @ObservedObject var commonViewModel: CommonViewModel
     
-    @Binding var openGroqApiKeyConfigModal:Bool
+    @Binding var openOllamaCloudApiKeyConfigModal:Bool
     
-    @State private var groqApiKeyText = ""
+    @State private var ollamaCloudApiKeyText = ""
     
     var body: some View {
         
         VStack(spacing:0) {
             
             HStack {
-                Text(NSLocalizedString("groq.api_title", comment: ""))
+                Text(NSLocalizedString("ollamacloud.api_title", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -27,11 +27,11 @@ struct GroqApiKeyConfigModalView: View {
             }
             .padding(.leading, 45)
             .onAppear(){
-                self.groqApiKeyText = commonViewModel.loadGroqApiKeyFromDatabase()
+                self.ollamaCloudApiKeyText = commonViewModel.loadOllamaCloudApiKeyFromDatabase()
             }
             
             HStack {
-                TextField(self.groqApiKeyText == "" ? NSLocalizedString("groq.enter_secret_key", comment: "") : self.groqApiKeyText, text: $groqApiKeyText)
+                TextField(self.ollamaCloudApiKeyText == "" ? NSLocalizedString("ollamacloud.enter_secret_key", comment: "") : self.ollamaCloudApiKeyText, text: $ollamaCloudApiKeyText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .frame(width: 300, height: 25)
                     .padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 12))
@@ -49,18 +49,18 @@ struct GroqApiKeyConfigModalView: View {
                     .imageScale(.medium)
                     .foregroundColor(.gray)
                 
-                Text(NSLocalizedString("groq.how_to_apply", comment: ""))
+                Text(NSLocalizedString("ollamacloud.how_to_apply", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .opacity(0.6)
                     .padding(.leading, 5)
                 
-                Text(NSLocalizedString("groq.click_here", comment: ""))
+                Text(NSLocalizedString("ollamacloud.click_here", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.orange)
                     .padding(.leading, 15)
                     .onTapGesture {
-                        openURL(groqWebUrl)
+                        openURL(ollamaCloudWebUrl)
                     }
                 
                 Spacer()
@@ -79,14 +79,32 @@ struct GroqApiKeyConfigModalView: View {
                     .background(Color.blue)
                     .cornerRadius(4)
                     .onTapGesture {
-                        commonViewModel.updateGroqApiKey(key: groqApiKeyText)
-                        // Refresh model list after saving API key
                         Task {
-                            await commonViewModel.fetchGroqModels()
+                            // Save API key first
+                            commonViewModel.updateOllamaCloudApiKey(key: ollamaCloudApiKeyText)
+                            
+                            // Verify API key
+                            let isValid = await commonViewModel.verifyOllamaCloudApiKey(key: ollamaCloudApiKeyText)
+                            
+                            if isValid {
+                                // Close modal and refresh model list
+                                self.openOllamaCloudApiKeyConfigModal = false
+                                await commonViewModel.fetchOllamaCloudModels(apiKey: ollamaCloudApiKeyText)
+                            } else {
+                                // Show warning but still refresh model list
+                                let alert = NSAlert()
+                                alert.messageText = NSLocalizedString("ollamacloud.connection_failed", comment: "")
+                                alert.informativeText = NSLocalizedString("ollamacloud.connection_failed_desc", comment: "")
+                                alert.alertStyle = .warning
+                                alert.addButton(withTitle: NSLocalizedString("ollamacloud.ok", comment: ""))
+                                alert.runModal()
+                                
+                                // Refresh model list even if verification failed
+                                await commonViewModel.fetchOllamaCloudModels(apiKey: ollamaCloudApiKeyText)
+                            }
                         }
-                        self.openGroqApiKeyConfigModal = false
                     }
-
+                
                 Text(NSLocalizedString("modal.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
@@ -96,18 +114,18 @@ struct GroqApiKeyConfigModalView: View {
                     .background(Color.white)
                     .cornerRadius(4)
                     .onTapGesture {
-                        self.openGroqApiKeyConfigModal.toggle()
+                        self.openOllamaCloudApiKeyConfigModal.toggle()
                     }
             }
             .padding(.trailing, 40)
             .padding(.leading, 75)
             .padding(.top, 15)
-
+            
             HStack(spacing:0) {
-                Text(NSLocalizedString("groq.description", comment: ""))
+                Text(NSLocalizedString("ollamacloud.description", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                    .lineLimit(3)
+                    .lineLimit(4)
                     .opacity(0.9)
                     .padding(8)
                     .overlay(
@@ -124,4 +142,3 @@ struct GroqApiKeyConfigModalView: View {
         .frame(width: 400, height: 250)
     }
 }
-

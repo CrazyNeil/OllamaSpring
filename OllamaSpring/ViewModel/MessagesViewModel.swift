@@ -160,16 +160,45 @@ class DeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard let text = String(data: data, encoding: .utf8) else { return }
+        guard let response = dataTask.response as? HTTPURLResponse else {
+            NSLog("DeepSeek Streaming - No HTTP response received")
+            return
+        }
+        
+        NSLog("DeepSeek Streaming - Received data: \(data.count) bytes, Status code: \(response.statusCode)")
+        
+        if response.statusCode != 200 {
+            let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+            NSLog("DeepSeek Streaming - HTTP error \(response.statusCode): \(responseBody)")
+            handleError("DeepSeek API Error \(response.statusCode): \(responseBody)")
+            return
+        }
+        
+        guard let text = String(data: data, encoding: .utf8) else {
+            NSLog("DeepSeek Streaming - Failed to convert data to string")
+            return
+        }
+        
         buffer += text
+        NSLog("DeepSeek Streaming - Buffer updated, total length: \(buffer.count)")
         
         // Split and process data line by line
+        var lineCount = 0
         while let newlineIndex = buffer.firstIndex(of: "\n") {
             let line = String(buffer[..<newlineIndex])
             buffer = String(buffer[buffer.index(after: newlineIndex)...])
             
+            lineCount += 1
+            if !line.isEmpty {
+                NSLog("DeepSeek Streaming - Processing line \(lineCount): \(line.prefix(200))")
+            }
+            
             // Process single line data
             processLine(line)
+        }
+        
+        if lineCount > 0 {
+            NSLog("DeepSeek Streaming - Processed \(lineCount) lines")
         }
     }
     
@@ -208,26 +237,39 @@ class DeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
         let cleanedLine = line.trimmingPrefix("data: ").trimmingCharacters(in: .whitespaces)
         
         // Skip empty lines or special markers
-        if cleanedLine.isEmpty || cleanedLine == "[DONE]" {
+        if cleanedLine.isEmpty {
+            return
+        }
+        
+        if cleanedLine == "[DONE]" {
+            NSLog("DeepSeek Streaming - Received [DONE] marker")
+            saveResponse()
             return
         }
         
         // Try to parse JSON
-        guard let jsonData = cleanedLine.data(using: .utf8) else { return }
+        guard let jsonData = cleanedLine.data(using: .utf8) else {
+            NSLog("DeepSeek Streaming - Failed to convert line to data: \(line.prefix(100))")
+            return
+        }
         
         do {
             // First try to parse error response
             if let errorDict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
                let error = errorDict["error"] as? [String: Any],
                let errorMessage = error["message"] as? String {
+                NSLog("DeepSeek Streaming - Error in response: \(errorMessage)")
                 handleError("DeepSeek API Error: \(errorMessage)")
                 return
             }
             
             // Try to parse normal response
             guard let jsonObject = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+                NSLog("DeepSeek Streaming - Failed to parse JSON object from line: \(cleanedLine.prefix(200))")
                 return
             }
+            
+            NSLog("DeepSeek Streaming - Parsed JSON object successfully")
             
             DispatchQueue.main.async {
                 if let choices = jsonObject["choices"] as? [[String: Any]],
@@ -238,28 +280,43 @@ class DeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
                     var content: String? = nil
                     if let reasoningContent = delta["reasoning_content"] as? String {
                         content = reasoningContent
+                        NSLog("DeepSeek Streaming - Found reasoning_content: \(reasoningContent.prefix(100))...")
                     } else if let normalContent = delta["content"] as? String {
                         content = normalContent
+                        NSLog("DeepSeek Streaming - Found content: \(normalContent.prefix(100))...")
                     }
                     
                     if let content = content {
-                        self.messagesViewModel.tmpResponse = (self.messagesViewModel.tmpResponse ?? "") + content
+                        // Update tmpResponse on main thread
+                        DispatchQueue.main.async {
+                            self.messagesViewModel.tmpResponse = (self.messagesViewModel.tmpResponse ?? "") + content
+                            NSLog("DeepSeek Streaming - Updated tmpResponse, total length: \(self.messagesViewModel.tmpResponse?.count ?? 0)")
+                        }
+                    } else {
+                        NSLog("DeepSeek Streaming - No content found in delta, delta keys: \(delta.keys)")
                     }
+                } else {
+                    NSLog("DeepSeek Streaming - No choices or delta found in response, keys: \(jsonObject.keys)")
                 }
                 
                 // Check if stream is complete
                 if let choices = jsonObject["choices"] as? [[String: Any]],
                    let firstChoice = choices.first,
-                   let finishReason = firstChoice["finish_reason"] as? String,
-                   finishReason == "stop" {
-                    self.saveResponse()
+                   let finishReason = firstChoice["finish_reason"] as? String {
+                    NSLog("DeepSeek Streaming - Finish reason: \(finishReason)")
+                    if finishReason == "stop" {
+                        NSLog("DeepSeek Streaming - Stream complete, saving response")
+                        self.saveResponse()
+                    }
                 }
             }
         } catch {
-            NSLog("Error parsing JSON line: \(error)")
+            NSLog("DeepSeek Streaming - Error parsing JSON line: \(error)")
+            NSLog("DeepSeek Streaming - Line content: \(cleanedLine.prefix(200))")
             // Only report errors after multiple consecutive failures or when encountering critical errors
             if error.localizedDescription.contains("JSON text did not start with array or object") {
                 // Might be incomplete stream data, continue waiting for more
+                NSLog("DeepSeek Streaming - Incomplete JSON, continuing...")
                 return
             }
             handleError("Error processing response: \(error.localizedDescription)")
@@ -275,39 +332,52 @@ class DeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
     }
     
     private func saveResponse() {
-        self.messagesViewModel.waitingModelResponse = false
-        let msg = Message(
-            chatId: self.messagesViewModel.tmpChatId!,
-            model: self.messagesViewModel.tmpModelName!,
-            createdAt: strDatetime(),
-            messageRole: "assistant",
-            messageContent: self.messagesViewModel.tmpResponse ?? "",
-            image: [],
-            messageFileName: "",
-            messageFileType: "",
-            messageFileText: ""
-        )
-        if(self.messagesViewModel.msgManager.saveMessage(message: msg)) {
-            self.messagesViewModel.messages.append(msg)
-            // Check if it's the first assistant response to generate title
-            if self.messagesViewModel.messages.count == 2 {
-                self.messagesViewModel.triggerChatTitleGeneration(
-                    chatId: msg.chatId,
-                    userPrompt: self.messagesViewModel.messages[0].messageContent, // Assuming first message is user
-                    assistantResponse: msg.messageContent,
-                    modelName: msg.model,
-                    apiType: .deepseek // Indicate API type
-                )
+        // Update UI state on main thread
+        DispatchQueue.main.async {
+            self.messagesViewModel.waitingModelResponse = false
+            let responseToSave = self.messagesViewModel.tmpResponse ?? ""
+            let msg = Message(
+                chatId: self.messagesViewModel.tmpChatId!,
+                model: self.messagesViewModel.tmpModelName!,
+                createdAt: strDatetime(),
+                messageRole: "assistant",
+                messageContent: responseToSave,
+                image: [],
+                messageFileName: "",
+                messageFileType: "",
+                messageFileText: ""
+            )
+            if(self.messagesViewModel.msgManager.saveMessage(message: msg)) {
+                self.messagesViewModel.messages.append(msg)
+                // Check if it's the first assistant response to generate title
+                if self.messagesViewModel.messages.count == 2 {
+                    let apiType: ApiType = {
+                        switch self.messagesViewModel.commonViewModel.selectedApiHost {
+                        case ApiHostList[0].name: return .ollama
+                        case ApiHostList[1].name: return .groq
+                        case ApiHostList[2].name: return .deepseek
+                        case ApiHostList[3].name: return .ollamacloud
+                        default: return .ollama
+                        }
+                    }()
+                    self.messagesViewModel.triggerChatTitleGeneration(
+                        chatId: msg.chatId,
+                        userPrompt: self.messagesViewModel.messages[0].messageContent, // Assuming first message is user
+                        assistantResponse: msg.messageContent,
+                        modelName: msg.model,
+                        apiType: apiType
+                    )
+                }
             }
+            // Clear tmp response after saving
+            self.messagesViewModel.tmpResponse = ""
         }
-        // Clear tmp response after saving
-        self.messagesViewModel.tmpResponse = ""
     }
 }
 
 // Enum to represent API type
 enum ApiType {
-    case ollama, groq, deepseek
+    case ollama, groq, deepseek, ollamacloud
 }
 
 class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
@@ -501,10 +571,37 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             }
         }
         
+        /// transfer user input text into a context prompt
+        var userPrompt = content
+        if !messageFileText.isEmpty {
+            let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+            userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+        }
+        
+        NSLog("DeepSeek Streaming - Image count: \(image.count), Content length: \(content.count), File text length: \(messageFileText.count)")
+        
+        /// DeepSeek API does not support image uploads in chat/completions endpoint
+        /// Only text content is supported, so we'll use plain text format
+        /// If images are provided, we'll inform the user that images are not supported
+        var userContent: Any
+        if image.count > 0 {
+            NSLog("DeepSeek Streaming - Images detected but DeepSeek does not support image uploads")
+            // DeepSeek doesn't support images, so we'll just use text content
+            // Add a note that images cannot be processed
+            let textPrompt = userPrompt.isEmpty ? "I tried to send an image, but DeepSeek API does not support image uploads. Please use text only." : userPrompt + " (Note: Images are not supported by DeepSeek API)"
+            userContent = textPrompt
+            NSLog("DeepSeek Streaming - Using text-only content due to API limitation")
+        } else {
+            // Plain text content
+            userContent = userPrompt.isEmpty ? "tell me something" : userPrompt
+            NSLog("DeepSeek Streaming - Using plain text content: \(String(describing: userContent).prefix(100))...")
+        }
+        
         /// init api params
         var mutableMessages = [
-            ["role": "user", "content": content] as [String: String]
+            ["role": "user", "content": userContent] as [String: Any]
         ]
+        NSLog("DeepSeek Streaming - Initial message created")
         
         // deepseek reasoner not support history msg
         if !historyMessages.isEmpty && modelName != "deepseek-reasoner" {
@@ -512,7 +609,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 mutableMessages.insert([
                     "role": historyMessage.messageRole,
                     "content": historyMessage.messageContent
-                ] as [String: String], at: 0)
+                ] as [String: Any], at: 0)
             }
         }
         
@@ -520,7 +617,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             let sysRolePrompt = [
                 "role": "system",
                 "content": "you are a help assistant and answer the question in \(responseLang)"
-            ] as [String: String]
+            ] as [String: Any]
             mutableMessages.insert(sysRolePrompt, at: 0)
         }
         
@@ -542,21 +639,32 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             "top_logprobs": NSNull()
         ]
         
+        NSLog("DeepSeek Streaming - Model: \(modelName), Messages count: \(mutableMessages.count)")
+        
         // send request
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
+            NSLog("DeepSeek Streaming - Request body size: \(jsonData.count) bytes")
+            
+            // Log request details (without full base64 to avoid spam)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                let truncatedJson = jsonString.count > 1000 ? String(jsonString.prefix(1000)) + "..." : jsonString
+                NSLog("DeepSeek Streaming - Request JSON (truncated): \(truncatedJson)")
+            }
         } catch {
-            NSLog("Error serializing JSON: \(error)")
+            NSLog("DeepSeek Streaming - Error serializing JSON: \(error)")
             return
         }
         
         // start a session data task
+        NSLog("DeepSeek Streaming - Starting URLSession data task")
         let deepSeekDelegate = DeepSeekStreamDelegate(messagesViewModel: self)
         let session = URLSession(configuration: configuration, delegate: deepSeekDelegate, delegateQueue: nil)
         let task = session.dataTask(with: request)
         task.resume()
         
+        NSLog("DeepSeek Streaming - Task resumed, waiting for response")
         self.waitingModelResponse = true
         self.tmpResponse = ""
     }
@@ -608,10 +716,57 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     }
                 }
                 
+                /// transfer user input text into a context prompt
+                var userPrompt = content
+                if !messageFileText.isEmpty {
+                    let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+                    userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+                }
+                
+                NSLog("DeepSeek Non-Streaming - Image count: \(image.count), Content length: \(content.count), File text length: \(messageFileText.count)")
+                
+                /// Build user message content - support OpenAI vision format for images
+                var userContent: Any
+                if image.count > 0 {
+                    NSLog("DeepSeek Non-Streaming - Building vision format with \(image.count) image(s)")
+                    // Use OpenAI vision format for images
+                    var contentArray: [[String: Any]] = []
+                    
+                    // Add text content if available
+                    let textPrompt = userPrompt.isEmpty ? "tell me something about this pic" : userPrompt
+                    if !textPrompt.isEmpty {
+                        contentArray.append([
+                            "type": "text",
+                            "text": textPrompt
+                        ])
+                        NSLog("DeepSeek Non-Streaming - Added text content: \(textPrompt.prefix(100))...")
+                    }
+                    
+                    // Add image(s) in OpenAI vision format
+                    for (index, imgBase64) in image.enumerated() {
+                        let imageUrl = "data:image/png;base64,\(imgBase64)"
+                        contentArray.append([
+                            "type": "image_url",
+                            "image_url": [
+                                "url": imageUrl
+                            ]
+                        ])
+                        NSLog("DeepSeek Non-Streaming - Added image \(index + 1), base64 length: \(imgBase64.count), URL length: \(imageUrl.count)")
+                    }
+                    
+                    userContent = contentArray
+                    NSLog("DeepSeek Non-Streaming - Content array count: \(contentArray.count)")
+                } else {
+                    // Plain text content
+                    userContent = userPrompt.isEmpty ? "tell me something about this pic" : userPrompt
+                    NSLog("DeepSeek Non-Streaming - Using plain text content: \(String(describing: userContent).prefix(100))...")
+                }
+                
                 /// user prompt
                 let messages = [
-                    ["role": "user", "content": content]
+                    ["role": "user", "content": userContent] as [String: Any]
                 ]
+                NSLog("DeepSeek Non-Streaming - Messages prepared, calling API")
                 
                 var historyMsg: [Message]
                 
@@ -627,6 +782,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 }
                 
                 /// deepseek response
+                NSLog("DeepSeek Non-Streaming - Calling API with model: \(modelName)")
                 let response = try await deepSeek.chat(
                     modelName: modelName,
                     responseLang: responseLang,
@@ -637,22 +793,28 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                     top_p: self.modelOptions.topP
                 )
                 
+                NSLog("DeepSeek Non-Streaming - API response received, type: \(type(of: response))")
                 let jsonResponse = JSON(response)
+                NSLog("DeepSeek Non-Streaming - JSON response parsed")
                 
                 /// parse deepseek message content
                 let errorMessage = jsonResponse["msg"].string
+                NSLog("DeepSeek Non-Streaming - Error message: \(errorMessage ?? "nil")")
                 
                 let content: String
                 let reasoningContent: String
                 if let errorMessage = errorMessage {
+                    NSLog("DeepSeek Non-Streaming - API returned error: \(errorMessage)")
                     content = errorMessage
                     reasoningContent = ""
                 } else {
                     content = jsonResponse["choices"].array?.first?["message"]["content"].string ?? ""
                     reasoningContent = jsonResponse["choices"].array?.first?["message"]["reasoning_content"].string ?? ""
+                    NSLog("DeepSeek Non-Streaming - Content length: \(content.count), Reasoning content length: \(reasoningContent.count)")
                 }
                 
                 let finalContent = (content.isEmpty || content == "\n") ? "No Response from \(modelName)" : reasoningContent + content
+                NSLog("DeepSeek Non-Streaming - Final content: \(finalContent.prefix(200))...")
                 
                 let msg = Message(
                     chatId: chatId,
@@ -725,9 +887,24 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                         self.waitingModelResponse = true
                     }
                 }
+                /// transfer user input text into a context prompt
+                var userPrompt = content
+                if !messageFileText.isEmpty {
+                    let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+                    userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+                }
+                
+                /// Groq API does not support image uploads
+                /// Only text content is supported, so we'll use plain text format
+                /// If images are provided, we'll inform the user that images are not supported
+                if image.count > 0 {
+                    NSLog("Groq Non-Streaming - Images detected but Groq does not support image uploads")
+                    userPrompt = userPrompt.isEmpty ? "I tried to send an image, but Groq API does not support image uploads. Please use text only." : userPrompt + " (Note: Images are not supported by Groq API)"
+                }
+                
                 /// user prompt
                 let messages = [
-                    ["role": "user", "content": content]
+                    ["role": "user", "content": userPrompt]
                 ]
                 
                 var historyMsg: [Message]
@@ -889,6 +1066,160 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         
     }
     
+    @MainActor func ollamaCloudSendMsg(
+        chatId: UUID,
+        modelName: String,
+        responseLang: String,
+        content: String,
+        historyMessages: [Message],
+        image: [String] = [],
+        messageFileName: String = "",
+        messageFileType: String = "",
+        messageFileText: String = ""
+    ) {
+        let ollamaCloudAuthKey = commonViewModel.loadOllamaCloudApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let isHttpProxyEnabled = commonViewModel.loadHttpProxyStatusFromDatabase()
+        let isHttpProxyAuthEnabled = commonViewModel.loadHttpProxyAuthStatusFromDatabase()
+        
+        // question handler
+        let userMsg = Message(
+            chatId: chatId,
+            model: modelName,
+            createdAt: strDatetime(),
+            messageRole: "user",
+            messageContent: content,
+            image: image,
+            messageFileName: messageFileName,
+            messageFileType: messageFileType,
+            messageFileText: messageFileText
+        )
+        
+        DispatchQueue.main.async {
+            if(self.msgManager.saveMessage(message: userMsg)) {
+                self.messages.append(userMsg)
+                self.waitingModelResponse = true
+            }
+        }
+        
+        Task {
+            do {
+                let ollamaCloudApi = OllamaCloudApi(
+                    apiBaseUrl: "https://ollama.com",
+                    proxyUrl: httpProxy.name,
+                    proxyPort: Int(httpProxy.port) ?? 0,
+                    authorizationToken: ollamaCloudAuthKey,
+                    isHttpProxyEnabled: isHttpProxyEnabled,
+                    isHttpProxyAuthEnabled: isHttpProxyAuthEnabled,
+                    login: httpProxyAuth.login,
+                    password: httpProxyAuth.password
+                )
+                
+                var historyMsg: [Message]
+                if image.count > 0 {
+                    historyMsg = []
+                } else {
+                    historyMsg = historyMessages
+                }
+                
+                var userPrompt = content
+                if !messageFileText.isEmpty {
+                    let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+                    userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+                }
+                
+                if image.count > 0 {
+                    userPrompt = content.isEmpty ? "tell me something about this pic" : "give response for the following prompt:\n\(content)\n"
+                }
+                
+                let response = try await ollamaCloudApi.chat(
+                    modelName: modelName,
+                    role: "user",
+                    content: userPrompt,
+                    stream: false,
+                    responseLang: responseLang,
+                    messages: historyMsg,
+                    image: image,
+                    temperature: self.modelOptions.temperature,
+                    seed: Int(self.modelOptions.seed),
+                    num_ctx: Int(self.modelOptions.numContext),
+                    top_k: Int(self.modelOptions.topK),
+                    top_p: self.modelOptions.topP
+                )
+                
+                if let contentDict = response["message"] as? [String: Any], var content = contentDict["content"] as? String {
+                    if content == "" || content == "\n" {
+                        content = "No Response from \(modelName)"
+                    }
+                    let msg = Message(chatId: chatId, model: modelName, createdAt: strDatetime(), messageRole: "assistant", messageContent: content, image: image, messageFileName: messageFileName, messageFileType: messageFileType, messageFileText: messageFileText)
+                    DispatchQueue.main.async {
+                        if(self.msgManager.saveMessage(message: msg)) {
+                            self.messages.append(msg)
+                            self.waitingModelResponse = false
+                            if self.messages.count == 2 {
+                                self.triggerChatTitleGeneration(
+                                    chatId: msg.chatId,
+                                    userPrompt: self.messages[0].messageContent,
+                                    assistantResponse: msg.messageContent,
+                                    modelName: msg.model,
+                                    apiType: .ollamacloud
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.waitingModelResponse = false
+                    }
+                }
+            } catch {
+                let errorMessage: String
+                if let urlError = error as? URLError {
+                    switch urlError.code {
+                    case .timedOut:
+                        errorMessage = "Error: Request timed out. Please check your network connection."
+                    case .cannotConnectToHost:
+                        errorMessage = "Error: Could not connect to Ollama Cloud server. Please check your API key and network settings."
+                    case .notConnectedToInternet:
+                        errorMessage = "Error: No internet connection. Please check your network settings."
+                    case .badServerResponse:
+                        errorMessage = "Error: Invalid server response. Please check your API key and try again."
+                    case .cannotParseResponse:
+                        errorMessage = "Error: Unable to parse server response. The data format may be incorrect."
+                    default:
+                        errorMessage = "Error: Network error occurred. Please check your connection and API key."
+                    }
+                } else if error is DecodingError {
+                    errorMessage = "Error: Unable to parse server response. The data format may be incorrect."
+                } else {
+                    errorMessage = "Error: Failed to send message to Ollama Cloud. Please check your API key and network connection."
+                }
+                
+                NSLog(errorMessage)
+                DispatchQueue.main.async {
+                    self.waitingModelResponse = false
+                    
+                    // Save error message to dialog
+                    let msg = Message(
+                        chatId: chatId,
+                        model: modelName,
+                        createdAt: strDatetime(),
+                        messageRole: "assistant",
+                        messageContent: errorMessage,
+                        image: [],
+                        messageFileName: messageFileName,
+                        messageFileType: messageFileType,
+                        messageFileText: messageFileText
+                    )
+                    if(self.msgManager.saveMessage(message: msg)) {
+                        self.messages.append(msg)
+                    }
+                }
+            }
+        }
+    }
+    
     @MainActor func groqSendMsgWithStreamingOn(
         chatId: UUID,
         modelName: String,
@@ -994,9 +1325,24 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             }
         }
         
+        /// transfer user input text into a context prompt
+        var userPrompt = content
+        if !messageFileText.isEmpty {
+            let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+            userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+        }
+        
+        /// Groq API does not support image uploads
+        /// Only text content is supported, so we'll use plain text format
+        /// If images are provided, we'll inform the user that images are not supported
+        if image.count > 0 {
+            NSLog("Groq Streaming - Images detected but Groq does not support image uploads")
+            userPrompt = userPrompt.isEmpty ? "I tried to send an image, but Groq API does not support image uploads. Please use text only." : userPrompt + " (Note: Images are not supported by Groq API)"
+        }
+        
         /// init api params
         var mutableMessages = [
-            ["role": "user", "content": content] as [String: String]
+            ["role": "user", "content": userPrompt] as [String: String]
         ]
         
         // Add history messages (last 5 messages)
@@ -1163,6 +1509,166 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         self.tmpResponse = ""
     }
     
+    @MainActor func ollamaCloudSendMsgWithStreamingOn(
+        chatId: UUID,
+        modelName: String,
+        responseLang: String,
+        content: String,
+        historyMessages: [Message],
+        image: [String] = [],
+        messageFileName: String = "",
+        messageFileType: String = "",
+        messageFileText: String = ""
+    ) {
+        let ollamaCloudAuthKey = commonViewModel.loadOllamaCloudApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let isHttpProxyEnabled = commonViewModel.loadHttpProxyStatusFromDatabase()
+        let isHttpProxyAuthEnabled = commonViewModel.loadHttpProxyAuthStatusFromDatabase()
+        
+        self.tmpChatId = chatId
+        self.tmpModelName = modelName
+        
+        // question handler
+        let userMsg = Message(
+            chatId: chatId,
+            model: modelName,
+            createdAt: strDatetime(),
+            messageRole: "user",
+            messageContent: content,
+            image: image,
+            messageFileName: messageFileName,
+            messageFileType: messageFileType,
+            messageFileText: messageFileText
+        )
+        
+        DispatchQueue.main.async {
+            if(self.msgManager.saveMessage(message: userMsg)) {
+                self.messages.append(userMsg)
+                self.waitingModelResponse = true
+            }
+        }
+        
+        // answer handler
+        let endpoint = "/api/chat"
+        guard let url = URL(string: "https://ollama.com\(endpoint)") else {
+            return
+        }
+        
+        /// transfer user input text into a context prompt
+        var userPrompt = content
+        if !messageFileText.isEmpty {
+            let contextPrompt = "please read the following context from a text file first:\n\(messageFileText)\n"
+            userPrompt = content.isEmpty ? contextPrompt + "then tell me what is this about" : contextPrompt + "then give response for the following prompt:\n\(content)\n"
+        }
+        
+        if image.count > 0 {
+            userPrompt = content.isEmpty ? "tell me something about this pic" : "give response for the following prompt:\n\(content)\n"
+        }
+        
+        // init request
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("Bearer \(ollamaCloudAuthKey)", forHTTPHeaderField: "Authorization")
+        
+        // setup proxy configuration
+        let configuration = URLSessionConfiguration.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 300
+        
+        if isHttpProxyEnabled {
+            var proxyDict: [String: Any] = [
+                kCFNetworkProxiesHTTPEnable as String: true,
+                kCFNetworkProxiesHTTPProxy as String: httpProxy.name,
+                kCFNetworkProxiesHTTPPort as String: Int(httpProxy.port) ?? 0,
+                kCFNetworkProxiesHTTPSEnable as String: true,
+                kCFNetworkProxiesHTTPSProxy as String: httpProxy.name,
+                kCFNetworkProxiesHTTPSPort as String: Int(httpProxy.port) ?? 0,
+            ]
+            
+            if isHttpProxyAuthEnabled {
+                let authString = "\(httpProxyAuth.login):\(httpProxyAuth.password)"
+                if let authData = authString.data(using: .utf8) {
+                    let base64AuthString = authData.base64EncodedString()
+                    proxyDict[kCFProxyUsernameKey as String] = httpProxyAuth.login
+                    proxyDict[kCFProxyPasswordKey as String] = httpProxyAuth.password
+                    request.addValue("Basic \(base64AuthString)", forHTTPHeaderField: "Proxy-Authorization")
+                }
+            }
+            
+            configuration.connectionProxyDictionary = proxyDict
+        } else {
+            configuration.connectionProxyDictionary = [:]
+        }
+        
+        // options
+        let options: [String: Any] = [
+            "temperature": self.modelOptions.temperature,
+            "seed": self.modelOptions.seed,
+            "num_ctx": self.modelOptions.numContext,
+            "top_k": self.modelOptions.topK,
+            "top_p": self.modelOptions.topP,
+        ]
+        
+        // params
+        var params: [String: Any] = [
+            "model": modelName,
+            "stream": true,
+            "options": options
+        ]
+        
+        let newPrompt = [
+            "role": "user",
+            "content": userPrompt,
+            "images": image
+        ] as [String: Any]
+        
+        var context: [[String: Any?]] = []
+        
+        if image.count == 0 {
+            // add history context if no image
+            for message in historyMessages.suffix(5) {
+                context.append([
+                    "role": message.messageRole,
+                    "content": message.messageContent
+                ])
+            }
+        }
+        
+        context.append(newPrompt)
+        
+        /// system role config
+        if responseLang != "Auto" {
+            let sysRolePrompt = [
+                "role": "system",
+                "content": "you are a help assistant and answer the question in \(responseLang)",
+            ] as [String: Any]
+            context.insert(sysRolePrompt, at: 0)
+        }
+        
+        params["messages"] = context
+        
+        // send request
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
+            request.httpBody = jsonData
+        } catch {
+            NSLog("Error serializing JSON: \(error)")
+            return
+        }
+        
+        // start a session data task
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        let task = session.dataTask(with: request)
+        task.resume()
+        
+        self.waitingModelResponse = true
+        self.tmpResponse = ""
+    }
+    
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         receivedData.append(data)
         
@@ -1178,12 +1684,60 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 }
                 
                 DispatchQueue.main.async {
-                    if let messageDict = jsonObject["message"] as? [String: Any],
+                    // Check for error in response
+                    if let errorDict = jsonObject["error"] as? [String: Any],
+                       let errorMessage = errorDict["message"] as? String {
+                        let errorMsg = "Error: Ollama Cloud API error - \(errorMessage)"
+                        NSLog(errorMsg)
+                        self.tmpResponse = errorMsg
+                        self.waitingModelResponse = false
+                        
+                        // Save error message to dialog
+                        let msg = Message(
+                            chatId: self.tmpChatId!,
+                            model: self.tmpModelName!,
+                            createdAt: strDatetime(),
+                            messageRole: "assistant",
+                            messageContent: errorMsg,
+                            image: [],
+                            messageFileName: "",
+                            messageFileType: "",
+                            messageFileText: ""
+                        )
+                        if(self.msgManager.saveMessage(message: msg)) {
+                            self.messages.append(msg)
+                        }
+                        self.tmpResponse = ""
+                    } else if let messageDict = jsonObject["message"] as? [String: Any],
                        let content = messageDict["content"] as? String {
                         self.tmpResponse = (self.tmpResponse ?? "") + content
                     } else {
+                        // Check if this is a done message without content (which is normal)
+                        if let done = jsonObject["done"] as? Int, done == 1 {
+                            // This is normal completion, continue processing
+                            return
+                        }
                         NSLog("Error: Missing message content")
-                        self.tmpResponse = "Error: Unable to get feedback from the selected model. Please select an available model and try again."
+                        let errorMsg = "Error: Unable to get feedback from the selected model. Please select an available model and try again."
+                        self.tmpResponse = errorMsg
+                        self.waitingModelResponse = false
+                        
+                        // Save error message to dialog
+                        let msg = Message(
+                            chatId: self.tmpChatId!,
+                            model: self.tmpModelName!,
+                            createdAt: strDatetime(),
+                            messageRole: "assistant",
+                            messageContent: errorMsg,
+                            image: [],
+                            messageFileName: "",
+                            messageFileType: "",
+                            messageFileText: ""
+                        )
+                        if(self.msgManager.saveMessage(message: msg)) {
+                            self.messages.append(msg)
+                        }
+                        self.tmpResponse = ""
                     }
                     
                     // after streaming done
@@ -1204,12 +1758,21 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                             self.messages.append(msg)
                             // Check if it's the first assistant response to generate title
                             if self.messages.count == 2 {
+                                let apiType: ApiType = {
+                                    switch self.commonViewModel.selectedApiHost {
+                                    case ApiHostList[0].name: return .ollama
+                                    case ApiHostList[1].name: return .groq
+                                    case ApiHostList[2].name: return .deepseek
+                                    case ApiHostList[3].name: return .ollamacloud
+                                    default: return .ollama
+                                    }
+                                }()
                                 self.triggerChatTitleGeneration(
                                     chatId: msg.chatId,
                                     userPrompt: self.messages[0].messageContent, // Assuming first message is user
                                     assistantResponse: msg.messageContent,
                                     modelName: msg.model,
-                                    apiType: .ollama // Indicate API type for Ollama stream
+                                    apiType: apiType
                                 )
                             }
                         }
@@ -1219,8 +1782,46 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    NSLog("Error: API service not available.")
-                    // Also clear tmpResponse on error if stream fails mid-way before 'done'
+                    let errorMessage: String
+                    if let urlError = error as? URLError {
+                        switch urlError.code {
+                        case .timedOut:
+                            errorMessage = "Error: Request timed out. Please check your network connection."
+                        case .cannotConnectToHost:
+                            errorMessage = "Error: Could not connect to Ollama Cloud server. Please check your API key and network settings."
+                        case .notConnectedToInternet:
+                            errorMessage = "Error: No internet connection. Please check your network settings."
+                        case .badServerResponse:
+                            errorMessage = "Error: Invalid server response. Please check your API key and try again."
+                        case .cannotParseResponse:
+                            errorMessage = "Error: Unable to parse server response. The data format may be incorrect."
+                        default:
+                            errorMessage = "Error: Network error occurred. Please check your connection and API key."
+                        }
+                    } else if error is DecodingError {
+                        errorMessage = "Error: Unable to parse server response. The data format may be incorrect."
+                    } else {
+                        errorMessage = "Error: API service not available. Please check your API key and network connection."
+                    }
+                    NSLog(errorMessage)
+                    self.tmpResponse = errorMessage
+                    self.waitingModelResponse = false
+                    
+                    // Save error message to dialog
+                    let msg = Message(
+                        chatId: self.tmpChatId!,
+                        model: self.tmpModelName!,
+                        createdAt: strDatetime(),
+                        messageRole: "assistant",
+                        messageContent: errorMessage,
+                        image: [],
+                        messageFileName: "",
+                        messageFileType: "",
+                        messageFileText: ""
+                    )
+                    if(self.msgManager.saveMessage(message: msg)) {
+                        self.messages.append(msg)
+                    }
                     self.tmpResponse = ""
                 }
             }
@@ -1233,31 +1834,132 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
             NSLog("Task completed with error: \(error)")
+            
+                DispatchQueue.main.async {
+                    var errorMessage = "Error: API service not available."
+                    
+                    // Handle specific error types
+                    if let urlError = error as? URLError {
+                        switch urlError.code {
+                        case .timedOut:
+                            errorMessage = "Error: Request timed out. Please check your network connection."
+                        case .cannotConnectToHost:
+                            errorMessage = "Error: Could not connect to Ollama Cloud server. Please check your API key and network settings."
+                        case .notConnectedToInternet:
+                            errorMessage = "Error: No internet connection. Please check your network settings."
+                        case .badServerResponse:
+                            if let httpResponse = urlError.userInfo[NSURLErrorFailingURLErrorKey] as? HTTPURLResponse {
+                                errorMessage = "Error: Server returned status code \(httpResponse.statusCode). Please check your API key."
+                            } else {
+                                errorMessage = "Error: Invalid server response. Please check your API key and try again."
+                            }
+                        case .cannotParseResponse:
+                            errorMessage = "Error: Unable to parse server response. The data format may be incorrect."
+                        default:
+                            errorMessage = "Error: Network error occurred. Please check your connection and API key."
+                        }
+                    } else if error is DecodingError {
+                        errorMessage = "Error: Unable to parse server response. The data format may be incorrect."
+                    } else {
+                        errorMessage = "Error: API service not available. Please check your API key and network connection."
+                    }
+                
+                self.tmpResponse = errorMessage
+                self.waitingModelResponse = false
+                
+                // Save error message to dialog
+                if let chatId = self.tmpChatId, let modelName = self.tmpModelName {
+                    let msg = Message(
+                        chatId: chatId,
+                        model: modelName,
+                        createdAt: strDatetime(),
+                        messageRole: "assistant",
+                        messageContent: errorMessage,
+                        image: [],
+                        messageFileName: "",
+                        messageFileType: "",
+                        messageFileText: ""
+                    )
+                    if(self.msgManager.saveMessage(message: msg)) {
+                        self.messages.append(msg)
+                    }
+                }
+                self.tmpResponse = ""
+            }
         }
     }
 
     // Function to trigger title generation
     func triggerChatTitleGeneration(chatId: UUID, userPrompt: String, assistantResponse: String, modelName: String, apiType: ApiType) {
         Task {
-             await generateAndSaveChatTitle(
+            let generatedTitle = await generateAndSaveChatTitle(
                 chatId: chatId,
                 userPrompt: userPrompt,
                 assistantResponse: assistantResponse,
                 modelName: modelName,
                 apiType: apiType
             )
+
+            // For now, just log the result since we can't access chatListViewModel directly
+            if generatedTitle != "Chat" && !generatedTitle.isEmpty {
+                NSLog("Generated title for chat \(chatId): \(generatedTitle)")
+            } else {
+                NSLog("Generated title was empty or default for chat \(chatId). Skipping update.")
+            }
         }
     }
 
     // New function to generate and save chat title
-    private func generateAndSaveChatTitle(chatId: UUID, userPrompt: String, assistantResponse: String, modelName: String, apiType: ApiType) async {
-        // Updated prompt to explicitly ask for a maximum of 8 words
+    private func generateAndSaveChatTitle(chatId: UUID, userPrompt: String, assistantResponse: String, modelName: String, apiType: ApiType) async -> String {
+        // For title generation, use the original content (including thinking tags)
+        // The AI will summarize the full conversation including any thinking process
+        let filteredUserPrompt = userPrompt
+        let filteredAssistantResponse = assistantResponse
+        
+        // Detect conversation language using filtered content
+        let conversationLanguage = detectConversationLanguage(userPrompt: filteredUserPrompt, assistantResponse: filteredAssistantResponse)
+        
+        // Build language-specific prompt
+        let languageInstruction: String
+        if conversationLanguage == "Chinese" {
+            languageInstruction = "请用中文生成标题"
+        } else if conversationLanguage == "Japanese" {
+            languageInstruction = "日本語でタイトルを生成してください"
+        } else if conversationLanguage == "Korean" {
+            languageInstruction = "한국어로 제목을 생성하세요"
+        } else if conversationLanguage == "Spanish" {
+            languageInstruction = "Genera el título en español"
+        } else if conversationLanguage == "French" {
+            languageInstruction = "Générez le titre en français"
+        } else if conversationLanguage == "Arabic" {
+            languageInstruction = "قم بإنشاء العنوان بالعربية"
+        } else if conversationLanguage == "Vietnamese" {
+            languageInstruction = "Tạo tiêu đề bằng tiếng Việt"
+        } else if conversationLanguage == "Indonesian" {
+            languageInstruction = "Buat judul dalam bahasa Indonesia"
+        } else {
+            // Default to English
+            languageInstruction = "Generate the title in English"
+        }
+        
+        // Enhanced prompt for better title generation
         let titlePrompt = """
-        Based on the following conversation, generate a very short title (max 8 words) that summarizes the main topic.
-        IMPORTANT: Respond with ONLY the title text on a single line, no explanations, no quotes, no formatting, no line breaks.
+        TASK: Generate a very short, descriptive title (max 20 words) that summarizes what this conversation is about.
 
-        User: \(userPrompt)
-        Assistant: \(assistantResponse)
+        INSTRUCTIONS:
+        - Ignore ALL content within <think>, <redacted_reasoning>, <thinking>, or <reasoning> tags - these are internal AI reasoning, not part of the conversation
+        - Focus ONLY on the actual user question and assistant's final answer
+        - Create a title that describes the topic/subject of the conversation
+        - Keep it very brief and clear
+        - \(languageInstruction)
+
+        FORMAT: Respond with ONLY the title text, nothing else. No explanations, no quotes, no extra text.
+
+        CONVERSATION:
+        User: \(filteredUserPrompt)
+        Assistant: \(filteredAssistantResponse)
+
+        TITLE:
         """
 
         let titleMessages = [["role": "user", "content": titlePrompt]]
@@ -1273,6 +1975,7 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
              // Get API keys and proxy settings (similar to send message functions)
              let groqAuthKey = await commonViewModel.loadGroqApiKeyFromDatabase()
              let deepSeekAuthKey = await commonViewModel.loadDeepSeekApiKeyFromDatabase()
+             let ollamaCloudAuthKey = await commonViewModel.loadOllamaCloudApiKeyFromDatabase()
              let httpProxy = await commonViewModel.loadHttpProxyHostFromDatabase()
              let httpProxyAuth = await commonViewModel.loadHttpProxyAuthFromDatabase()
              let isHttpProxyEnabled = await commonViewModel.loadHttpProxyStatusFromDatabase()
@@ -1281,9 +1984,26 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
 
              switch apiType {
              case .ollama:
+                 // For local Ollama, try to use the same model that generated the response for title generation
+                 // If that fails, try the first available local model
+                 let localModels = await commonViewModel.ollamaLocalModelList
+                 var modelToUse = modelName
+
+                 // Check if the response model exists in local models
+                 if !localModels.contains(where: { $0.name == modelName }) {
+                     // If not, use the first available local model
+                     if let firstModel = localModels.first {
+                         modelToUse = firstModel.name
+                         NSLog("Ollama title generation: Using local model '\(modelToUse)' instead of '\(modelName)'")
+                     } else {
+                         NSLog("Ollama title generation failed: No local models available")
+                         return "Chat"
+                     }
+                 }
+
                  let ollama = OllamaApi()
                  response = try await ollama.chat(
-                     modelName: modelName,
+                     modelName: modelToUse,
                      role: "user",
                      content: titlePrompt,
                      stream: false,
@@ -1351,6 +2071,40 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                  } else if let errorMsg = jsonResponse["msg"].string {
                     NSLog("DeepSeek title generation error: \(errorMsg)")
                  }
+             
+            case .ollamacloud:
+                // Use Ollama Cloud API
+                let ollamaCloud = OllamaCloudApi(
+                     apiBaseUrl: "https://ollama.com",
+                     proxyUrl: httpProxy.name,
+                     proxyPort: Int(httpProxy.port) ?? 0,
+                     authorizationToken: ollamaCloudAuthKey,
+                     isHttpProxyEnabled: isHttpProxyEnabled,
+                     isHttpProxyAuthEnabled: isHttpProxyAuthEnabled,
+                     login: httpProxyAuth.login,
+                     password: httpProxyAuth.password
+                 )
+                 response = try await ollamaCloud.chat(
+                     modelName: modelName,
+                     role: "user",
+                     content: titlePrompt,
+                     stream: false,
+                     responseLang: "English",
+                     messages: [],
+                     temperature: 0.5,
+                     seed: Int(self.modelOptions.seed),
+                     num_ctx: Int(self.modelOptions.numContext),
+                     top_k: Int(self.modelOptions.topK),
+                     top_p: self.modelOptions.topP
+                 )
+                 if let responseDict = response as? [String: Any] {
+                     if let messageDict = responseDict["message"] as? [String: Any],
+                        let titleContent = messageDict["content"] as? String {
+                         generatedTitle = cleanGeneratedTitle(titleContent)
+                     } else if let errorMsg = responseDict["msg"] as? String {
+                         NSLog("Ollama Cloud title generation error: \(errorMsg)")
+                     }
+                 }
              }
 
              // --- Update Chat Title ---
@@ -1359,7 +2113,18 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                  DispatchQueue.main.async {
                     let success = self.chatManager.updateChatName(withId: chatId, newName: generatedTitle)
                     if success {
+                         // Get host name for logging
+                         let hostName: String = {
+                             switch apiType {
+                             case .ollama: return "Ollama (Local)"
+                             case .groq: return "Groq"
+                             case .deepseek: return "DeepSeek"
+                             case .ollamacloud: return "Ollama Cloud"
+                             }
+                         }()
+
                          NSLog("Successfully updated chat \(chatId) title to: \(generatedTitle)")
+                         NSLog("Title generated using: Host=\(hostName), Model=\(modelName), API=\(apiType)")
                          // Notify listener (ChatListViewModel)
                          self.chatTitleUpdated.send((chatId, generatedTitle))
                     } else {
@@ -1374,6 +2139,8 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             NSLog("Error generating chat title for \(chatId) using \(modelName): \(error)")
             // Handle error appropriately, maybe retry or log
         }
+
+        return generatedTitle
     }
     
     private func cleanGeneratedTitle(_ titleContent: String) -> String {
@@ -1405,8 +2172,9 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
         let maxEffectiveLength = 30 // Maximum length for English characters
         var currentLength = 0
         var truncatedTitle = ""
+        var lastWordBoundaryIndex = 0
         
-        for char in cleanedTitle {
+        for (_, char) in cleanedTitle.enumerated() {
             // Check if character is CJK (Chinese, Japanese, Korean)
             let isCJK = char.unicodeScalars.contains { scalar in
                 let value = scalar.value
@@ -1419,14 +2187,96 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
             // Add character length (2 for CJK, 1 for others)
             let charLength = isCJK ? 2 : 1
             
+            // Check if this is a word boundary (space, punctuation, or CJK character)
+            // CJK characters are considered word boundaries themselves
+            let isWordBoundary = char.isWhitespace || char.isPunctuation || isCJK
+            
             if currentLength + charLength <= maxEffectiveLength {
                 truncatedTitle.append(char)
                 currentLength += charLength
+                
+                // Update last word boundary if we hit one
+                if isWordBoundary {
+                    lastWordBoundaryIndex = truncatedTitle.count
+                }
             } else {
+                // We've exceeded the limit
+                // If we're in the middle of a word, truncate at the last word boundary
+                if !isWordBoundary && lastWordBoundaryIndex > 0 {
+                    // Remove characters after the last word boundary
+                    let endIndex = truncatedTitle.index(truncatedTitle.startIndex, offsetBy: lastWordBoundaryIndex)
+                    truncatedTitle = String(truncatedTitle[..<endIndex]).trimmingCharacters(in: .whitespaces)
+                }
                 break
             }
         }
         
         return truncatedTitle
+    }
+    
+    /// Detect conversation language based on user prompt and assistant response
+    private func detectConversationLanguage(userPrompt: String, assistantResponse: String) -> String {
+        let combinedText = (userPrompt + " " + assistantResponse).lowercased()
+        
+        // Check for CJK characters (Chinese, Japanese, Korean)
+        let hasCJK = combinedText.unicodeScalars.contains { scalar in
+            let value = scalar.value
+            return (value >= 0x4E00 && value <= 0x9FFF) || // CJK Unified Ideographs (Chinese)
+                   (value >= 0x3040 && value <= 0x309F) || // Hiragana (Japanese)
+                   (value >= 0x30A0 && value <= 0x30FF) || // Katakana (Japanese)
+                   (value >= 0xAC00 && value <= 0xD7AF)    // Hangul (Korean)
+        }
+        
+        if hasCJK {
+            // Distinguish between Chinese, Japanese, and Korean
+            let hasHiragana = combinedText.unicodeScalars.contains { scalar in
+                let value = scalar.value
+                return value >= 0x3040 && value <= 0x309F
+            }
+            let hasKatakana = combinedText.unicodeScalars.contains { scalar in
+                let value = scalar.value
+                return value >= 0x30A0 && value <= 0x30FF
+            }
+            let hasHangul = combinedText.unicodeScalars.contains { scalar in
+                let value = scalar.value
+                return value >= 0xAC00 && value <= 0xD7AF
+            }
+            
+            if hasHiragana || hasKatakana {
+                return "Japanese"
+            } else if hasHangul {
+                return "Korean"
+            } else {
+                return "Chinese"
+            }
+        }
+        
+        // Check for other languages using common words/patterns
+        let spanishWords = ["el", "la", "de", "que", "y", "en", "un", "es", "se", "no", "te", "lo", "le", "da", "su", "por", "son", "con", "para", "como"]
+        let frenchWords = ["le", "de", "et", "à", "un", "il", "être", "et", "en", "avoir", "que", "pour", "dans", "ce", "son", "une", "sur", "avec", "ne", "se"]
+        let arabicPattern = "[\u{0600}-\u{06FF}]"
+        let vietnamesePattern = "[\u{1EA0}-\u{1EF9}]"
+        let indonesianWords = ["yang", "dan", "di", "dari", "untuk", "dengan", "adalah", "atau", "pada", "ini", "itu", "dalam", "akan", "tidak", "dapat"]
+        
+        let spanishCount = spanishWords.filter { combinedText.contains($0) }.count
+        let frenchCount = frenchWords.filter { combinedText.contains($0) }.count
+        let hasArabic = combinedText.range(of: arabicPattern, options: .regularExpression) != nil
+        let hasVietnamese = combinedText.range(of: vietnamesePattern, options: .regularExpression) != nil
+        let indonesianCount = indonesianWords.filter { combinedText.contains($0) }.count
+        
+        if hasArabic {
+            return "Arabic"
+        } else if hasVietnamese {
+            return "Vietnamese"
+        } else if indonesianCount >= 3 {
+            return "Indonesian"
+        } else if spanishCount >= 3 {
+            return "Spanish"
+        } else if frenchCount >= 3 {
+            return "French"
+        }
+        
+        // Default to English
+        return "English"
     }
 }

@@ -242,6 +242,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
     @Published var showResponsePanel = false
     @Published var showGroqResponsePanel = false
     @Published var showDeepSeekResponsePanel = false
+    @Published var showOllamaCloudResponsePanel = false
     @Published var showMsgPanel = false
     
     init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel(), tmpModelName: String) {
@@ -459,6 +460,117 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         self.showGroqResponsePanel = true
     }
     
+    @MainActor func ollamaCloudSendMsgWithStreamingOn(
+        modelName: String,
+        content: String,
+        responseLang: String
+    ) {
+        self.tmpModelName = modelName
+        
+        let ollamaCloudAuthKey = commonViewModel.loadOllamaCloudApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let isHttpProxyEnabled = commonViewModel.loadHttpProxyStatusFromDatabase()
+        let isHttpProxyAuthEnabled = commonViewModel.loadHttpProxyAuthStatusFromDatabase()
+        
+        // answer handler
+        let endpoint = "/api/chat"
+        guard let url = URL(string: "https://ollama.com\(endpoint)") else {
+            return
+        }
+        
+        // init request
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("Bearer \(ollamaCloudAuthKey)", forHTTPHeaderField: "Authorization")
+        
+        // setup proxy configuration
+        let configuration = URLSessionConfiguration.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 300
+        
+        if isHttpProxyEnabled {
+            var proxyDict: [String: Any] = [
+                kCFNetworkProxiesHTTPEnable as String: true,
+                kCFNetworkProxiesHTTPProxy as String: httpProxy.name,
+                kCFNetworkProxiesHTTPPort as String: Int(httpProxy.port) ?? 0,
+                kCFNetworkProxiesHTTPSEnable as String: true,
+                kCFNetworkProxiesHTTPSProxy as String: httpProxy.name,
+                kCFNetworkProxiesHTTPSPort as String: Int(httpProxy.port) ?? 0,
+            ]
+            
+            if isHttpProxyAuthEnabled {
+                let authString = "\(httpProxyAuth.login):\(httpProxyAuth.password)"
+                if let authData = authString.data(using: .utf8) {
+                    let base64AuthString = authData.base64EncodedString()
+                    proxyDict[kCFProxyUsernameKey as String] = httpProxyAuth.login
+                    proxyDict[kCFProxyPasswordKey as String] = httpProxyAuth.password
+                    request.addValue("Basic \(base64AuthString)", forHTTPHeaderField: "Proxy-Authorization")
+                }
+            }
+            
+            configuration.connectionProxyDictionary = proxyDict
+        } else {
+            configuration.connectionProxyDictionary = [:]
+        }
+        
+        // options
+        let options: [String: Any] = [
+            "temperature": self.modelOptions.temperature,
+            "seed": self.modelOptions.seed,
+            "num_ctx": self.modelOptions.numContext,
+            "top_k": self.modelOptions.topK,
+            "top_p": self.modelOptions.topP,
+        ]
+        
+        // params
+        var params: [String: Any] = [
+            "model": modelName,
+            "stream": true,
+            "options": options
+        ]
+        
+        let newPrompt = [
+            "role": "user",
+            "content": content
+        ] as [String: Any]
+        
+        var context: [[String: Any?]] = []
+        context.append(newPrompt)
+        
+        /// system role config
+        if responseLang != "Auto" {
+            let sysRolePrompt = [
+                "role": "system",
+                "content": "you are a help assistant and answer the question in \(responseLang)",
+            ] as [String: Any]
+            context.insert(sysRolePrompt, at: 0)
+        }
+        
+        params["messages"] = context
+        
+        // send request
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
+            request.httpBody = jsonData
+        } catch {
+            NSLog("Error serializing JSON: \(error)")
+            return
+        }
+        
+        // start a session data task
+        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        let task = session.dataTask(with: request)
+        task.resume()
+        
+        self.waitingModelResponse = true
+        self.tmpResponse = ""
+        self.showOllamaCloudResponsePanel = true
+    }
+    
     func sendMsgWithStreamingOn(
         modelName: String,
         content: String,
@@ -614,10 +726,28 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                 }
                 
                 DispatchQueue.main.async {
+                    // Check for error in response (Ollama Cloud format)
+                    if let errorDict = jsonObject["error"] as? [String: Any],
+                       let errorMessage = errorDict["message"] as? String {
+                        let errorMsg = "Error: Ollama Cloud API error - \(errorMessage)"
+                        NSLog(errorMsg)
+                        self.tmpResponse = errorMsg
+                        self.waitingModelResponse = false
+                        self.showResponsePanel = false
+                        self.showOllamaCloudResponsePanel = false
+                        self.responseErrorMsg = errorMsg
+                        return
+                    }
+                    
                     if let messageDict = jsonObject["message"] as? [String: Any],
                        let content = messageDict["content"] as? String {
                         self.tmpResponse = (self.tmpResponse) + content
                     } else {
+                        // Check if this is a done message without content (which is normal)
+                        if let done = jsonObject["done"] as? Int, done == 1 {
+                            // This is normal completion, continue processing
+                            return
+                        }
                         NSLog("Error: Missing message content")
                     }
                     
@@ -627,9 +757,13 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                             self.waitingModelResponse = false
                         }
                     } else {
-                        self.waitingModelResponse = false
-                        self.showResponsePanel = false
-                        self.responseErrorMsg = "Response error, please make sure the model exists or restart OllamaSpring."
+                        // Only set error if we haven't already processed a done message
+                        if jsonObject["done"] == nil {
+                            self.waitingModelResponse = false
+                            self.showResponsePanel = false
+                            self.showOllamaCloudResponsePanel = false
+                            self.responseErrorMsg = "Response error, please make sure the model exists or restart OllamaSpring."
+                        }
                     }
                 }
             } catch {

@@ -100,6 +100,16 @@
 "ollama.ok" = "确定";
 "ollama.description" = "配置 Ollama HTTP 主机和端口。在本地环境中，主机默认设置为 127.0.0.1，端口设置为 11434。您只能连接到不需要身份验证的远程主机。";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API 配置";
+"ollamacloud.enter_secret_key" = "输入密钥";
+"ollamacloud.how_to_apply" = "如何申请 Ollama Cloud API 密钥？";
+"ollamacloud.click_here" = "点击这里";
+"ollamacloud.connection_failed" = "连接失败";
+"ollamacloud.connection_failed_desc" = "无法连接到 Ollama Cloud 服务器。请验证您的 API 密钥或 HTTP 代理配置。";
+"ollamacloud.ok" = "确定";
+"ollamacloud.description" = "Ollama Cloud 为 Ollama 模型提供托管服务，在云端提供可扩展且可靠的 AI 推理服务。";
+
 // Ollama Library
 "ollama.library.install_title" = "安装 Ollama 模型";
 "ollama.library.enter_model_name" = "输入模型名称";
@@ -120,6 +130,7 @@
 "righttopbar.groq_api_key_config" = "Groq API 密钥配置";
 "righttopbar.ollama_http_host_config" = "Ollama HTTP 主机配置";
 "righttopbar.deepseek_api_key_config" = "DeepSeek API 密钥配置";
+"righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API 密钥配置";
 "righttopbar.notice" = "提示";
 "righttopbar.groq_no_streaming" = "Groq 不支持流式输出";
 "righttopbar.confirm" = "确认";
@@ -131,7 +142,7 @@
 
 // QuickCompletion
 "quick.prompt" = "请输入";
-"quick.shortcut_hint" = "您可以使用快捷键 cmd + shift + h 打开快速完成";
+"quick.shortcut_hint" = "您可以使用快捷键 cmd + shift + h 开启或隐藏便捷对话框";
 "quick.ollama_not_available" = "您需要先启动 Ollama 或安装它。";
 "quick.no_model" = "未找到模型。您可能需要下载一个模型并重启 OllamaSpring。";
 "quick.empty_input" = "请告诉我您的问题。";
@@ -146,3 +157,13 @@
 "messages.share_preview" = "分享 OllamaSpring 消息";
 
 
+"chatlist.new_conversation" = "新建对话";
+"chatlist.clear_all_conversations" = "清空全部对话";
+"chatlist.clear_all_warning" = "警告";
+"chatlist.clear_all_message" = "这将删除所有对话及其消息。此操作无法撤销。";
+"chatlist.clear_all_confirm" = "清空全部";
+"ollama.library.error_empty_name" = "模型名称不能为空";
+"ollama.library.error_invalid_name" = "无效的模型名称格式。只允许使用字母、数字、连字符、下划线和冒号。";
+"ollama.library.error_already_installed" = "此模型已安装";
+"ollama.library.error_download_in_progress" = "另一个下载正在进行中。请稍候。";
+"ollama.library.error_service_unavailable" = "Ollama服务不可用。请检查Ollama是否正在运行。";

@@ -7,6 +7,8 @@ struct QuickCompletionPanelView: View {
     @State private var inputText = ""
     @State private var isCopied: Bool = false
     @State private var showShortcuts: Bool = false
+    @State private var scrollTask: Task<Void, Never>?
+    @FocusState private var isInputFocused: Bool
     
     init() {
         let commonVM = CommonViewModel()
@@ -27,10 +29,11 @@ struct QuickCompletionPanelView: View {
             sendPrompt()
         } else if commonViewModel.selectedApiHost == ApiHostList[1].name {
             sendGroqPrompt()
-        } else {
+        } else if commonViewModel.selectedApiHost == ApiHostList[2].name {
             sendDeepSeekPrompt()
+        } else if commonViewModel.selectedApiHost == ApiHostList[3].name {
+            sendOllamaCloudPrompt()
         }
-
     }
 
     private func isOllamaApiServiceAvailable() -> Bool {
@@ -99,12 +102,27 @@ struct QuickCompletionPanelView: View {
         quickCompletionViewModel.showDeepSeekResponsePanel = true
     }
     
+    private func sendOllamaCloudPrompt() {
+        commonViewModel.loadSelectedOllamaCloudModelFromDatabase()
+        quickCompletionViewModel.ollamaCloudSendMsgWithStreamingOn(
+            modelName: commonViewModel.selectedOllamaCloudModel,
+            content: inputText,
+            responseLang: commonViewModel.selectedResponseLang
+        )
+        quickCompletionViewModel.showResponsePanel = false
+        quickCompletionViewModel.showMsgPanel = false
+        quickCompletionViewModel.showGroqResponsePanel = false
+        quickCompletionViewModel.showDeepSeekResponsePanel = false
+        quickCompletionViewModel.showOllamaCloudResponsePanel = true
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             TextField(NSLocalizedString("quick.prompt", comment: ""), text: $inputText)
                 .textFieldStyle(PlainTextFieldStyle())
                 .font(.system(size: 30)) // Adjust font size
                 .padding(.horizontal)
+                .focused($isInputFocused)
                 .onSubmit {
                     fire()
                 }
@@ -143,6 +161,10 @@ struct QuickCompletionPanelView: View {
             /// init status value
             quickCompletionViewModel.showResponsePanel = false
             quickCompletionViewModel.showMsgPanel = false
+            /// focus on input field
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isInputFocused = true
+            }
         }
         .overlay(
             RoundedRectangle(cornerRadius: 8)
@@ -175,16 +197,20 @@ struct QuickCompletionPanelView: View {
             .cornerRadius(8)
         }
         
-        /// show groq response after user input
-        if quickCompletionViewModel.showGroqResponsePanel || quickCompletionViewModel.showDeepSeekResponsePanel {
+        /// show groq/deepseek/ollamacloud response after user input
+        if quickCompletionViewModel.showGroqResponsePanel || quickCompletionViewModel.showDeepSeekResponsePanel || quickCompletionViewModel.showOllamaCloudResponsePanel {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 0) {
-                            /// response bar
+                            /// response bar - fixed at top
                             HStack {
                                 /// display model name
-                                if commonViewModel.selectedApiHost == ApiHostList[2].name {
+                                if commonViewModel.selectedApiHost == ApiHostList[3].name {
+                                    Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedOllamaCloudModel)
+                                        .font(.body)
+                                        .foregroundColor(.orange)
+                                } else if commonViewModel.selectedApiHost == ApiHostList[2].name {
                                     Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedDeepSeekModel)
                                         .font(.body)
                                         .foregroundColor(.orange)
@@ -227,6 +253,7 @@ struct QuickCompletionPanelView: View {
                             .padding(.trailing,20)
                             .padding(.leading,20)
                             .padding(.top, 10)
+                            .id("TOP")
                             
                             /// waiting response
                             if quickCompletionViewModel.tmpResponse == "" {
@@ -249,7 +276,7 @@ struct QuickCompletionPanelView: View {
                             
                             /// response output
                             HStack {
-                                Markdown{quickCompletionViewModel.tmpResponse}
+                                Markdown{filterRedactedReasoningTags(quickCompletionViewModel.tmpResponse)}
                                     .padding(20)
                                     .font(.body)
                                     .textSelection(.enabled)
@@ -322,9 +349,44 @@ struct QuickCompletionPanelView: View {
                             .id("BOTTOM")
                         }
                     }
-                    .onChange(of: quickCompletionViewModel.tmpResponse) {
-                        withAnimation {
-                            proxy.scrollTo("BOTTOM", anchor: .bottom)  // Scroll to the bottom when tmpResponse changes
+                    .onAppear {
+                        // Initially scroll to top to show title
+                        proxy.scrollTo("TOP", anchor: .top)
+                    }
+                    .onChange(of: quickCompletionViewModel.tmpResponse, initial: false) { _, _ in
+                        // Only scroll if there's content to scroll to
+                        guard !quickCompletionViewModel.tmpResponse.isEmpty else {
+                            // If no content, scroll to top to show title
+                            scrollTask?.cancel()
+                            scrollTask = Task {
+                                try? await Task.sleep(nanoseconds: 8_000_000)
+                                guard !Task.isCancelled else { return }
+                                await MainActor.run {
+                                    withAnimation(.easeOut(duration: 0.05)) {
+                                        proxy.scrollTo("TOP", anchor: .top)
+                                    }
+                                }
+                            }
+                            return
+                        }
+                        
+                        // Cancel previous scroll task to throttle scrolling
+                        scrollTask?.cancel()
+                        
+                        // Create a new task with minimal delay for smooth real-time scrolling
+                        scrollTask = Task {
+                            // Wait a very short time (8ms) to batch rapid updates while keeping scrolling responsive
+                            try? await Task.sleep(nanoseconds: 8_000_000) // 8ms delay for responsive scrolling
+                            
+                            // Check if task was cancelled
+                            guard !Task.isCancelled else { return }
+                            
+                            await MainActor.run {
+                                // Use smooth animation for better UX
+                                withAnimation(.easeOut(duration: 0.05)) {
+                                    proxy.scrollTo("BOTTOM", anchor: .bottom)
+                                }
+                            }
                         }
                     }
                 }
@@ -375,6 +437,7 @@ struct QuickCompletionPanelView: View {
                             .padding(.trailing,20)
                             .padding(.leading,20)
                             .padding(.top, 10)
+                            .id("TOP")
                             
                             /// waiting response
                             if quickCompletionViewModel.tmpResponse == "" {
@@ -397,7 +460,7 @@ struct QuickCompletionPanelView: View {
                             
                             /// response output
                             HStack {
-                                Markdown{quickCompletionViewModel.tmpResponse}
+                                Markdown{filterRedactedReasoningTags(quickCompletionViewModel.tmpResponse)}
                                     .padding(20)
                                     .font(.body)
                                     .textSelection(.enabled)
@@ -471,9 +534,44 @@ struct QuickCompletionPanelView: View {
                             .id("BOTTOM")
                         }
                     }
-                    .onChange(of: quickCompletionViewModel.tmpResponse) {
-                        withAnimation {
-                            proxy.scrollTo("BOTTOM", anchor: .bottom)  // Scroll to the bottom when tmpResponse changes
+                    .onAppear {
+                        // Initially scroll to top to show title
+                        proxy.scrollTo("TOP", anchor: .top)
+                    }
+                    .onChange(of: quickCompletionViewModel.tmpResponse, initial: false) { _, _ in
+                        // Only scroll if there's content to scroll to
+                        guard !quickCompletionViewModel.tmpResponse.isEmpty else {
+                            // If no content, scroll to top to show title
+                            scrollTask?.cancel()
+                            scrollTask = Task {
+                                try? await Task.sleep(nanoseconds: 8_000_000)
+                                guard !Task.isCancelled else { return }
+                                await MainActor.run {
+                                    withAnimation(.easeOut(duration: 0.05)) {
+                                        proxy.scrollTo("TOP", anchor: .top)
+                                    }
+                                }
+                            }
+                            return
+                        }
+                        
+                        // Cancel previous scroll task to throttle scrolling
+                        scrollTask?.cancel()
+                        
+                        // Create a new task with minimal delay for smooth real-time scrolling
+                        scrollTask = Task {
+                            // Wait a very short time (8ms) to batch rapid updates while keeping scrolling responsive
+                            try? await Task.sleep(nanoseconds: 8_000_000) // 8ms delay for responsive scrolling
+                            
+                            // Check if task was cancelled
+                            guard !Task.isCancelled else { return }
+                            
+                            await MainActor.run {
+                                // Use smooth animation for better UX
+                                withAnimation(.easeOut(duration: 0.05)) {
+                                    proxy.scrollTo("BOTTOM", anchor: .bottom)
+                                }
+                            }
                         }
                     }
                 }

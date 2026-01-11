@@ -73,7 +73,7 @@ struct ChatListRowView: View {
                                     .font(.system(size: 12))
                                     .foregroundColor(.white)
                                     .lineSpacing(0)
-                                    .onTapGesture {
+                                    .onTapGesture(count: 2) {
                                         chatListViewModel.editingChatId = chat.id
                                     }
                             }

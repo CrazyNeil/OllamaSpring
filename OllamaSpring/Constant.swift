@@ -31,6 +31,7 @@ let ApiHostList = [
     ApiHost(baseUrl: "http://localhost", port: 11434, name: "Ollama"),
     ApiHost(baseUrl: "https://api.groq.com", port: 443, name: "Groq Fast AI"),
     ApiHost(baseUrl: "https://api.deepseek.com", port: 443, name: "DeepSeek"),
+    ApiHost(baseUrl: "https://ollama.com", port: 443, name: "Ollama Cloud"),
 ]
 let defaultApiHost = ApiHostList[0].name
 /// Groq
@@ -41,6 +42,9 @@ let groqApiBaseUrl = ApiHostList[1].baseUrl + ":" + String(ApiHostList[1].port)
 let defaultDeepSeekApiKey = ""
 let deepSeekWebUrl = "https://www.deepseek.com"
 let deepSeekApiBaseUrl = ApiHostList[2].baseUrl + ":" + String(ApiHostList[2].port)
+/// Ollama Cloud
+let defaultOllamaCloudApiKey = ""
+let ollamaCloudWebUrl = "https://ollama.com/cloud"
 /// Http Proxy
 let defaultHttpProxyHostName = "127.0.0.1"
 let defaultHttpProxyHostPort = "6152"
@@ -60,6 +64,5 @@ let ollamaApiDefaultBaseUrl = "localhost"
 let ollamaApiDefaultPort = "11434"
 /// models json url
 struct OllamaSpringModelsApiURL {
-    static let groqModels = "https://www.ollamaspring.com/groq-models.json"
     static let ollamaModels = "https://www.ollamaspring.com/ollama-models.json"
 }

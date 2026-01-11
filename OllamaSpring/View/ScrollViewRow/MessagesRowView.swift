@@ -12,6 +12,14 @@ struct MessagesRowView: View {
                     Text(NSLocalizedString("messages.assistant", comment: ""))
                         .font(.system(size: 12))
                         .foregroundColor(Color.gray)
+                    
+                    // Display model name if available
+                    if !message.model.isEmpty {
+                        Text("• \(message.model)")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.gray.opacity(0.7))
+                    }
+                    
                     Text(message.createdAt)
                         .font(.system(size: 12))
                         .foregroundColor(Color.gray)
@@ -56,7 +64,7 @@ struct MessagesRowView: View {
                 .padding(.leading, 20)
                 
                 HStack {
-                    Markdown(message.messageContent)
+                    Markdown(filterRedactedReasoningTags(message.messageContent))
                         .padding(.horizontal, 0)
                         .padding(.top, 5)
                         .textSelection(.enabled)
@@ -125,7 +133,7 @@ struct MessagesRowView: View {
                     if !message.messageContent.isEmpty {
                         HStack {
                             Spacer()
-                            Markdown(message.messageContent)
+                            Markdown(filterRedactedReasoningTags(message.messageContent))
                                 .padding(10)
                                 .textSelection(.enabled)
                                 .markdownTheme(.ollamaSpringUser)

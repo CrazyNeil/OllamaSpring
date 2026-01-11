@@ -8,6 +8,7 @@ struct RightTopBarView: View {
     @Binding var openGroqApiKeyConfigModal:Bool
     @Binding var openDeepSeekApiKeyConfigModal:Bool
     @Binding var openOllamaHostConfigModal:Bool
+    @Binding var openOllamaCloudApiKeyConfigModal:Bool
     
     @State private var streamingOutputToggleAlert = false
     
@@ -32,9 +33,41 @@ struct RightTopBarView: View {
         .onAppear(){
             commonViewModel.loadSelectedResponseLangFromDatabase()
             commonViewModel.loadSelectedApiHostFromDatabase()
-            /// groq disable streaming output
-            if commonViewModel.selectedApiHost == ApiHostList[1].name {
-                messagesViewModel.streamingOutput = false
+            
+            /// Initialize models based on selected API host
+            let selectedApiHost = commonViewModel.selectedApiHost
+            if selectedApiHost == ApiHostList[3].name {
+                // Ollama Cloud
+                commonViewModel.loadSelectedOllamaCloudModelFromDatabase()
+                // Set default value if empty
+                if commonViewModel.selectedOllamaCloudModel.isEmpty {
+                    commonViewModel.selectedOllamaCloudModel = "Ollama Cloud"
+                }
+                let ollamaCloudApiKey = commonViewModel.loadOllamaCloudApiKeyFromDatabase()
+                Task {
+                    await commonViewModel.fetchOllamaCloudModels(apiKey: ollamaCloudApiKey)
+                }
+                messagesViewModel.streamingOutput = true
+            } else if selectedApiHost == ApiHostList[2].name {
+                // DeepSeek
+                commonViewModel.loadSelectedDeepSeekModelFromDatabase()
+                let deepSeekApiKey = commonViewModel.loadDeepSeekApiKeyFromDatabase()
+                Task {
+                    await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)
+                }
+                messagesViewModel.streamingOutput = true
+            } else if selectedApiHost == ApiHostList[1].name {
+                // Groq
+                commonViewModel.loadSelectedGroqModelFromDatabase()
+                Task {
+                    await commonViewModel.fetchGroqModels()
+                }
+                messagesViewModel.streamingOutput = true
+            } else if selectedApiHost == ApiHostList[0].name {
+                // Ollama
+                commonViewModel.loadSelectedOllamaModelFromDatabase()
+                commonViewModel.loadAvailableLocalModels()
+                messagesViewModel.streamingOutput = true
             }
         }
     }
@@ -61,9 +94,23 @@ struct RightTopBarView: View {
             return commonViewModel.selectedGroqModel
         case ApiHostList[2].name:
             return commonViewModel.selectedDeepSeekModel
+        case ApiHostList[3].name:
+            return commonViewModel.selectedOllamaCloudModel
         default:
             return NSLocalizedString("righttopbar.unknown_model", comment: "")
         }
+    }
+    
+    /// Truncate model name for display in the top bar
+    /// - Parameter name: The full model name
+    /// - Parameter maxLength: Maximum length before truncation (default: 20)
+    /// - Returns: Truncated name with ellipsis if needed
+    private func truncateModelName(_ name: String, maxLength: Int = 20) -> String {
+        if name.count <= maxLength {
+            return name
+        }
+        let truncated = String(name.prefix(maxLength))
+        return truncated + "..."
     }
     
     private var library: some View {
@@ -76,8 +123,7 @@ struct RightTopBarView: View {
     }
     
     private var modelListMenu: some View {
-        Group {
-            Menu(getSelectedModel()) {
+        Menu(truncateModelName(getSelectedModel())) {
                 switch commonViewModel.selectedApiHost {
                 case ApiHostList[0].name:
                     ForEach(commonViewModel.ollamaLocalModelList) { model in
@@ -114,15 +160,27 @@ struct RightTopBarView: View {
                         }
                     }
                     
-                default:
+            case ApiHostList[3].name:
+                if commonViewModel.isLoadingOllamaCloudModels || commonViewModel.ollamaCloudModelList.isEmpty {
                     emptyModelListText()
+                } else {
+                    ForEach(commonViewModel.ollamaCloudModelList) { model in
+                        modelMenuItem(
+                            name: model.modelName,
+                            isSelected: commonViewModel.selectedOllamaCloudModel == model.name,
+                            action: { commonViewModel.updateSelectedOllamaCloudModel(name: model.name) }
+                        )
+                    }
+                }
+                
+            default:
+                emptyModelListText()
                 }
             }
             .font(.subheadline)
             .lineLimit(1)
             .buttonStyle(PlainButtonStyle())
             .padding(.leading, 5)
-        }
     }
     
     private var chevronDownImage: some View {
@@ -200,19 +258,32 @@ struct RightTopBarView: View {
                 
                 Button(role: .destructive, action: {
                     commonViewModel.updateSelectedApiHost(name: host.name)
-                    /// disable groq streaming output
-//                    if host.name == ApiHostList[1].name {
-//                        messagesViewModel.streamingOutput = false
-//                    }
                     
-                    /// disable deepSeek streaming output
+                    /// init groq api service
+                    if host.name == ApiHostList[1].name {
+                        commonViewModel.loadSelectedGroqModelFromDatabase()
+                        Task {
+                            await commonViewModel.fetchGroqModels()
+                        }
+                        messagesViewModel.streamingOutput = true
+                    }
+                    
+                    /// init deepSeek streaming output
                     if host.name == ApiHostList[2].name {
-//                        messagesViewModel.streamingOutput = false
                         let deepSeekApiKey = commonViewModel.loadDeepSeekApiKeyFromDatabase()
                         Task {
                             await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)
                         }
-                        
+                        messagesViewModel.streamingOutput = true
+                    }
+                    
+                    /// init ollama cloud api service
+                    if host.name == ApiHostList[3].name {
+                        let ollamaCloudApiKey = commonViewModel.loadOllamaCloudApiKeyFromDatabase()
+                        Task {
+                            await commonViewModel.fetchOllamaCloudModels(apiKey: ollamaCloudApiKey)
+                        }
+                        messagesViewModel.streamingOutput = true
                     }
                     
                     /// init ollama api service
@@ -246,21 +317,32 @@ struct RightTopBarView: View {
                         .font(.subheadline)
                 }
             }
-            /// ollama host config
-            Button(role: .destructive, action: {
-                self.openOllamaHostConfigModal.toggle()
-            }) {
-                HStack {
-                    Text(NSLocalizedString("righttopbar.ollama_http_host_config", comment: ""))
-                        .font(.subheadline)
-                }
-            }
             /// deepseek api key config
             Button(role: .destructive, action: {
                 self.openDeepSeekApiKeyConfigModal.toggle()
             }) {
                 HStack {
                     Text(NSLocalizedString("righttopbar.deepseek_api_key_config", comment: ""))
+                        .font(.subheadline)
+                }
+            }
+            /// ollama cloud api key config
+            Button(role: .destructive, action: {
+                self.openOllamaCloudApiKeyConfigModal.toggle()
+            }) {
+                HStack {
+                    Text(NSLocalizedString("righttopbar.ollamacloud_api_key_config", comment: ""))
+                        .font(.subheadline)
+                }
+            }
+            
+            Divider()
+            /// ollama host config
+            Button(role: .destructive, action: {
+                self.openOllamaHostConfigModal.toggle()
+            }) {
+                HStack {
+                    Text(NSLocalizedString("righttopbar.ollama_http_host_config", comment: ""))
                         .font(.subheadline)
                 }
             }

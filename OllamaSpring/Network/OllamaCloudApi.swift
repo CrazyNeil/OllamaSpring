@@ -1,7 +1,14 @@
+//
+//  OllamaCloudApi.swift
+//  OllamaSpring
+//
+//  Created by NeilStudio on 2025/1/10.
+//
+
 import Foundation
 import SwiftyJSON
 
-class GroqApi {
+class OllamaCloudApi {
     private var apiBaseUrl: String
     private var proxyUrl: String
     private var proxyPort: Int
@@ -12,7 +19,7 @@ class GroqApi {
     private var password: String?
     
     init(
-        apiBaseUrl: String = groqApiBaseUrl,
+        apiBaseUrl: String = "https://ollama.com",
         proxyUrl: String,
         proxyPort: Int,
         authorizationToken: String,
@@ -31,6 +38,72 @@ class GroqApi {
         self.password = password
     }
     
+    /// Fetch available models from Ollama Cloud
+    /// API endpoint: https://ollama.com/api/tags
+    public func tags() async throws -> AnyObject {
+        return try await makeRequest(method: "GET", endpoint: "api/tags")
+    }
+    
+    /// Send chat message to Ollama Cloud
+    /// API endpoint: https://ollama.com/api/chat
+    public func chat(
+        modelName: String,
+        role: String,
+        content: String,
+        stream: Bool = false,
+        responseLang: String = "English",
+        messages: [Message] = [],
+        image: [String] = [],
+        temperature: Double = 0.8,
+        seed: Int = 0,
+        num_ctx: Int = 2048,
+        top_k: Int = 40,
+        top_p: Double = 0.9
+    ) async throws -> AnyObject {
+        // options init
+        let options: [String: Any] = [
+            "temperature": temperature,
+            "seed": seed,
+            "num_ctx": num_ctx,
+            "top_k": top_k,
+            "top_p": top_p,
+        ]
+        
+        var params: [String: Any] = [
+            "model": modelName,
+            "stream": stream,
+            "options": options
+        ]
+        
+        let newPrompt = [
+            "role": role,
+            "content": content,
+            "images": image
+        ] as [String: Any]
+        
+        var context: [[String: Any?]] = []
+        for message in messages.suffix(5) {
+            context.append([
+                "role": message.messageRole,
+                "content": message.messageContent
+            ])
+        }
+        context.append(newPrompt)
+        
+        // system role config
+        if responseLang != "Auto" {
+            let sysRolePrompt = [
+                "role": "system",
+                "content": "you are a help assistant and answer the question in \(responseLang)",
+            ] as [String: Any]
+            
+            context.insert(sysRolePrompt, at: 0)
+        }
+        
+        params["messages"] = context
+        return try await makeRequest(method: "POST", endpoint: "api/chat", params: params)
+    }
+    
     private func makeRequest(
         method: String,
         endpoint: String,
@@ -44,13 +117,12 @@ class GroqApi {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("Bearer \(authorizationToken)", forHTTPHeaderField: "Authorization")
         request.addValue("curl/7.64.1", forHTTPHeaderField: "User-Agent")
-
+        
         if !params.isEmpty {
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
         }
-
-        /// Set up proxy configuration only if enabled
+        
         let configuration = URLSessionConfiguration.default
         if isHttpProxyEnabled {
             var proxyDict: [String: Any] = [
@@ -61,8 +133,7 @@ class GroqApi {
                 kCFNetworkProxiesHTTPSProxy as String: proxyUrl,
                 kCFNetworkProxiesHTTPSPort as String: proxyPort,
             ]
-
-            /// Add proxy authentication if enabled
+            
             if isHttpProxyAuthEnabled, let login = login, let password = password {
                 let authString = "\(login):\(password)"
                 if let authData = authString.data(using: .utf8) {
@@ -72,41 +143,35 @@ class GroqApi {
                     request.addValue("Basic \(base64AuthString)", forHTTPHeaderField: "Proxy-Authorization")
                 }
             }
-
+            
             configuration.connectionProxyDictionary = proxyDict
         } else {
             configuration.connectionProxyDictionary = [:]
         }
-
+        
         let session = URLSession(configuration: configuration)
-
+        
         do {
             let (data, response) = try await session.data(for: request)
             if let httpResponse = response as? HTTPURLResponse {
-                /// Try to parse response body first, even for non-200 status codes
-                if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                    // If status code is not 200, return the error response as-is
-                    if httpResponse.statusCode != 200 {
-                        return jsonObject as AnyObject
-                    }
-                    // Status code is 200, return the parsed response
-                    let apiResponse = JSON(data)
-                    return apiResponse.rawValue as AnyObject
-                } else {
-                    // Failed to parse JSON, return error message
-                if httpResponse.statusCode != 200 {
-                        let response = ["error": ["message": "Groq request failed. Response Status Code: \(httpResponse.statusCode)"]]
-                    return response as AnyObject
+                if !(200...299).contains(httpResponse.statusCode) {
+                    let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+                    // Handle specific error codes
+                    if httpResponse.statusCode == 401 {
+                        return ["msg": "Invalid API key. Please check your Ollama Cloud API key."] as AnyObject
+                    } else if httpResponse.statusCode == 403 {
+                        return ["msg": "Access forbidden. Please verify your API key permissions."] as AnyObject
+                    } else {
+                        return ["msg": "Ollama Cloud Error \(httpResponse.statusCode): \(responseBody)"] as AnyObject
                     }
                 }
             }
             
-            /// decode failed handler
             if ((try? JSONSerialization.jsonObject(with: data, options: []) is [String: Any]) == nil) {
-                let response = ["error": ["message": "Groq Response No JSON body or failed to decode."]]
+                let response = ["msg": "Ollama Cloud Response No JSON body or failed to decode."]
                 return response as AnyObject
             }
-
+            
             let apiResponse = JSON(data)
             return apiResponse.rawValue as AnyObject
         } catch {
@@ -114,9 +179,9 @@ class GroqApi {
                 let response: [String: String]
                 switch urlError.code {
                 case .cannotConnectToHost, .networkConnectionLost, .notConnectedToInternet:
-                    response = ["msg": "Could not connect to the Groq API server."]
+                    response = ["msg": "Could not connect to the Ollama Cloud API server."]
                 default:
-                    response = ["msg": "Groq API services not available."]
+                    response = ["msg": "Ollama Cloud API services not available."]
                 }
                 return response as AnyObject
             } else {
@@ -124,53 +189,5 @@ class GroqApi {
                 return response as AnyObject
             }
         }
-    }
-    
-    public func chat(
-        modelName: String,
-        responseLang: String = "English",
-        messages: [[String: Any]],
-        historyMessages:[Message] = [],
-        seed: Int = 0,
-        temperature: Double = 0.8,
-        top_p: Double = 0.9
-    ) async throws -> AnyObject {
-
-        var mutableMessages = messages
-        
-        /// parse history msg
-        if !historyMessages.isEmpty {
-            for historyMessage in historyMessages.suffix(5).reversed() {
-                mutableMessages.insert([
-                    "role": historyMessage.messageRole,
-                    "content": historyMessage.messageContent
-                ], at: 0)
-            }
-        }
-        
-        /// setup sys role for response language
-        if responseLang != "Auto" {
-            let sysRolePrompt = [
-                "role": "system",
-                "content": "you are a help assistant and answer the question in \(responseLang)"
-            ] as [String: Any]
-            mutableMessages.insert(sysRolePrompt, at: 0)
-        }
-
-        let params: [String: Any] = [
-            "model": modelName,
-            "messages": mutableMessages,
-            "seed": seed,
-            "temperature": temperature,
-            "top_p": top_p
-        ]
-
-        return try await makeRequest(method: "POST", endpoint: "openai/v1/chat/completions", params: params)
-    }
-    
-    /// Fetch available models from Groq API
-    /// Tests if Groq supports the OpenAI-compatible /models endpoint
-    public func models() async throws -> AnyObject {
-        return try await makeRequest(method: "GET", endpoint: "openai/v1/models", params: [:])
     }
 }

@@ -99,6 +99,16 @@
 "ollama.connection_failed_desc" = "Verbindung zum Ollama-Host fehlgeschlagen. Bitte überprüfen Sie Ihre Konfiguration und versuchen Sie es erneut.";
 "ollama.ok" = "OK";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API";
+"ollamacloud.enter_secret_key" = "GEHEIMSCHLÜSSEL EINGEBEN";
+"ollamacloud.how_to_apply" = "Wie beantrage ich einen Ollama Cloud API-Schlüssel?";
+"ollamacloud.click_here" = "hier klicken";
+"ollamacloud.connection_failed" = "Verbindung fehlgeschlagen";
+"ollamacloud.connection_failed_desc" = "Verbindung zu Ollama Cloud fehlgeschlagen. Bitte überprüfen Sie Ihren API-Schlüssel oder die HTTP-Proxy-Konfiguration.";
+"ollamacloud.ok" = "OK";
+"ollamacloud.description" = "Ollama Cloud bietet verwaltetes Hosting für Ollama-Modelle und bietet skalierbare und zuverlässige KI-Inferenzdienste in der Cloud.";
+
 // StatusBar
 "statusbar.option_1" = "Option 1";
 "statusbar.option_2" = "Option 2";
@@ -130,13 +140,14 @@
 "quick.empty_input" = "Sagen Sie mir einfach, was Ihre Frage ist.";
 "quick.no_model" = "Kein Modell gefunden. Sie müssen möglicherweise zuerst ein Modell herunterladen und OllamaSpring neu starten.";
 "quick.ollama_not_available" = "Sie sollten zuerst Ollama starten oder installieren.";
-"quick.shortcut_hint" = "Sie können die schnelle Vervollständigung mit der Tastenkombination cmd + shift + h öffnen";
+"quick.shortcut_hint" = "Sie können die Tastenkombination cmd + shift + h verwenden, um den Schnellabschluss-Dialog zu öffnen oder zu verbergen";
 
 // Right Top Bar
 "righttopbar.api_host" = "API-Host";
 "righttopbar.confirm" = "Bestätigen";
 "righttopbar.deepseek_api_key_config" = "DeepSeek API-Schlüssel-Konfiguration";
 "righttopbar.groq_api_key_config" = "Groq API-Schlüssel-Konfiguration";
+"righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API-Schlüssel-Konfiguration";
 "righttopbar.groq_no_streaming" = "Groq unterstützt kein Streaming-Output";
 "righttopbar.library" = "Markt";
 "righttopbar.no_models_found" = "Keine Modelle gefunden";
@@ -148,3 +159,8 @@
 "messages.assistant" = "Assistent";
 
 
+"chatlist.new_conversation" = "Neues Gespräch";
+"chatlist.clear_all_conversations" = "Alle Gespräche löschen";
+"chatlist.clear_all_warning" = "Warnung";
+"chatlist.clear_all_message" = "Dies löscht alle Gespräche und deren Nachrichten. Diese Aktion kann nicht rückgängig gemacht werden.";
+"chatlist.clear_all_confirm" = "Alle löschen";

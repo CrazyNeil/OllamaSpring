@@ -141,52 +141,29 @@ struct SendMsgPanelView: View {
                 })
             
             HStack {
-                if commonViewModel.selectedApiHost == ApiHostList[0].name {
+                // File attachments support varies by host
                     Image(systemName: "paperclip")
                         .font(.subheadline)
                         .imageScale(.large)
                         .foregroundColor(.gray)
                         .padding(.leading, 0)
                         .onTapGesture {
-                            if !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0 {
-                                showFilePicker.toggle()
-                            }
-                        }
-                } else if commonViewModel.selectedApiHost == ApiHostList[1].name {
-                    Image(systemName: "mic.circle")
-                        .font(.subheadline)
-                        .imageScale(.large)
-                        .foregroundColor(.gray)
-                        .padding(.leading, 0)
-                        .onTapGesture {
-                            self.isShowingVoiceRecorder.toggle()
-                        }
-                        .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
-                            VStack {
-                                Text(NSLocalizedString("sendmsg.voice_not_available", comment: ""))
-                                    .padding()
-                                    .foregroundColor(.yellow)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .frame(maxWidth: 500, maxHeight: 40, alignment: .leading)
-                            }
-                        }
+                        // Check if we can enable file picker based on host type
+                        let canOpenFilePicker: Bool
+                        if commonViewModel.selectedApiHost == ApiHostList[0].name {
+                            // Ollama: check if models are available
+                            canOpenFilePicker = !commonViewModel.ollamaLocalModelList.isEmpty && chatListViewModel.ChatList.count != 0
+                        } else if commonViewModel.selectedApiHost == ApiHostList[2].name {
+                            // DeepSeek: only support text files (PDF, TXT), not images
+                            // For now, allow file picker but we'll filter images in the handler
+                            canOpenFilePicker = chatListViewModel.ChatList.count != 0
                 } else {
-                    Image(systemName: "paperclip")
-                        .font(.subheadline)
-                        .imageScale(.large)
-                        .foregroundColor(.gray)
-                        .padding(.leading, 0)
-                        .onTapGesture {
-                            self.isShowingVoiceRecorder.toggle()
+                            // Other hosts: just check if chat list is not empty
+                            canOpenFilePicker = chatListViewModel.ChatList.count != 0
                         }
-                        .popover(isPresented: $isShowingVoiceRecorder, arrowEdge: .top) {
-                            VStack {
-                                Text(NSLocalizedString("sendmsg.deepseek_upload_coming", comment: ""))
-                                    .padding()
-                                    .foregroundColor(.yellow)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .frame(maxWidth: 500, maxHeight: 40, alignment: .leading)
-                            }
+                        
+                        if canOpenFilePicker {
+                            showFilePicker.toggle()
                         }
                 }
 
@@ -290,6 +267,7 @@ struct SendMsgPanelView: View {
             let selectedApiHost = commonViewModel.selectedApiHost
             let isGroqFastAI = (selectedApiHost == ApiHostList[1].name)
             let isDeepSeek = (selectedApiHost == ApiHostList[2].name)
+            let isOllamaCloud = (selectedApiHost == ApiHostList[3].name)
 
             // msg params
             let chatId = chatListViewModel.selectedChat!
@@ -303,7 +281,11 @@ struct SendMsgPanelView: View {
                         modelName: commonViewModel.selectedGroqModel,
                         responseLang: responseLang,
                         content: content,
-                        historyMessages: messagesViewModel.messages
+                        historyMessages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
                     )
                 } else if isDeepSeek {
                     messagesViewModel.deepSeekSendMsgWithStreamingOn(
@@ -311,7 +293,23 @@ struct SendMsgPanelView: View {
                         modelName: commonViewModel.selectedDeepSeekModel,
                         responseLang: responseLang,
                         content: content,
-                        historyMessages: messagesViewModel.messages
+                        historyMessages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
+                    )
+                } else if isOllamaCloud {
+                    messagesViewModel.ollamaCloudSendMsgWithStreamingOn(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedOllamaCloudModel,
+                        responseLang: responseLang,
+                        content: content,
+                        historyMessages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
                     )
                 } else {
                     messagesViewModel.sendMsgWithStreamingOn(
@@ -342,6 +340,18 @@ struct SendMsgPanelView: View {
                         responseLang: responseLang,
                         content: content,
                         historyMessages: messagesViewModel.messages
+                    )
+                } else if isOllamaCloud {
+                    messagesViewModel.ollamaCloudSendMsg(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedOllamaCloudModel,
+                        responseLang: responseLang,
+                        content: content,
+                        historyMessages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
                     )
                 }
                 else {
@@ -435,6 +445,21 @@ struct SendMsgPanelView: View {
             let fileExtension = url.pathExtension.lowercased()
             let fileName = url.lastPathComponent
             
+            // Check if DeepSeek or Groq is selected and user is trying to upload an image
+            if (commonViewModel.selectedApiHost == ApiHostList[2].name || commonViewModel.selectedApiHost == ApiHostList[1].name) && ["png", "jpg", "jpeg"].contains(fileExtension) {
+                // DeepSeek and Groq do not support image uploads
+                let hostName = commonViewModel.selectedApiHost == ApiHostList[2].name ? "DeepSeek" : "Groq"
+                DispatchQueue.main.async {
+                    let alert = NSAlert()
+                    alert.messageText = "\(hostName) does not support image uploads"
+                    alert.informativeText = "Please use text files (PDF, TXT) or send text messages only."
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                }
+                return
+            }
+            
             if ["png", "jpg", "jpeg"].contains(fileExtension) {
                 do {
                     let fileHandle = try FileHandle(forReadingFrom: url)
@@ -467,18 +492,18 @@ struct SendMsgPanelView: View {
                     print("Detailed error: \(error)")
                 }
             } else if fileExtension == "pdf" {
-                print("开始处理PDF文件：\(fileName)")
+                print("Starting PDF file processing: \(fileName)")
                 do {
                     let fileHandle = try FileHandle(forReadingFrom: url)
                     let pdfData = fileHandle.readDataToEndOfFile()
                     try fileHandle.close()
                     
                     guard let pdf = PDFDocument(data: pdfData) else {
-                        print("无法创建PDF文档对象")
+                        print("Failed to create PDF document object")
                         return
                     }
                     
-                    print("成功创建PDF文档，页数：\(pdf.pageCount)")
+                    print("Successfully created PDF document, page count: \(pdf.pageCount)")
                     var text = ""
                     var errorPages: [Int] = []
                     
@@ -486,19 +511,19 @@ struct SendMsgPanelView: View {
                         if let page = pdf.page(at: i) {
                             if let pageText = page.string {
                                 text += pageText
-                                print("成功提取第\(i + 1)页文本，长度：\(pageText.count)")
+                                print("Successfully extracted text from page \(i + 1), length: \(pageText.count)")
                             } else {
                                 errorPages.append(i + 1)
-                                print("警告：第\(i + 1)页文本提取失败")
+                                print("Warning: Failed to extract text from page \(i + 1)")
                             }
                         }
                     }
                     
                     if !errorPages.isEmpty {
-                        print("警告：以下页面提取失败：\(errorPages)")
+                        print("Warning: Failed to extract text from the following pages: \(errorPages)")
                     }
                     
-                    print("PDF文本提取完成，总长度：\(text.count)")
+                    print("PDF text extraction completed, total length: \(text.count)")
                     
                     DispatchQueue.main.async {
                         self.selectedFileURL = url
@@ -508,14 +533,14 @@ struct SendMsgPanelView: View {
                         self.msgFileType = fileExtension
                         self.msgFileName = fileName
                         
-                        // 如果提取的文本为空，显示警告
+                        // If extracted text is empty, show warning
                         if text.isEmpty {
-                            print("警告：提取的PDF文本内容为空")
+                            print("Warning: Extracted PDF text content is empty")
                         }
                     }
                 } catch {
-                    print("PDF文件读取错误：\(error.localizedDescription)")
-                    print("详细错误信息：\(error)")
+                    print("Error reading PDF file: \(error.localizedDescription)")
+                    print("Detailed error: \(error)")
                 }
             } else if fileExtension == "txt" {
                 print("Processing TXT file")

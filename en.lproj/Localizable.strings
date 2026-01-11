@@ -100,6 +100,16 @@
 "ollama.ok" = "OK";
 "ollama.description" = "Configure the Ollama HTTP host and port. By default, the host is set to 127.0.0.1 and the port to 11434 in your local environment. You may only connect to remote hosts that do not require authentication.";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API";
+"ollamacloud.enter_secret_key" = "ENTER SECRET KEY";
+"ollamacloud.how_to_apply" = "How to apply a Ollama Cloud API key?";
+"ollamacloud.click_here" = "click here";
+"ollamacloud.connection_failed" = "Connection Failed";
+"ollamacloud.connection_failed_desc" = "Failed to connect to Ollama Cloud. Please verify your apiKey or HTTP Proxy Config.";
+"ollamacloud.ok" = "OK";
+"ollamacloud.description" = "Ollama Cloud provides managed hosting for Ollama models, offering scalable and reliable AI inference services in the cloud.";
+
 // Ollama Library
 "ollama.library.install_title" = "Install Ollama Model";
 "ollama.library.enter_model_name" = "Enter Model Name";
@@ -120,6 +130,7 @@
 "righttopbar.groq_api_key_config" = "Groq API Key Config";
 "righttopbar.ollama_http_host_config" = "Ollama HTTP Host Config";
 "righttopbar.deepseek_api_key_config" = "DeepSeek API Key Config";
+"righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API Key Config";
 "righttopbar.notice" = "Notice";
 "righttopbar.groq_no_streaming" = "Groq not support Streaming Output";
 "righttopbar.confirm" = "Confirm";
@@ -131,7 +142,7 @@
 
 // QuickCompletion
 "quick.prompt" = "Prompt";
-"quick.shortcut_hint" = "You can open quick completion by shortcut cmd + shift + h";
+"quick.shortcut_hint" = "You can use the shortcut cmd + shift + h to open or hide the quick completion dialog";
 "quick.ollama_not_available" = "You should start Ollama or install it first.";
 "quick.no_model" = "No model found. You may need to download a model and restart OllamaSpring first.";
 "quick.empty_input" = "Just tell me what is your question.";
@@ -146,3 +157,13 @@
 "messages.share_preview" = "Share OllamaSpring Message";
 
 
+"chatlist.new_conversation" = "New Conversation";
+"chatlist.clear_all_conversations" = "Clear All Conversations";
+"chatlist.clear_all_warning" = "Warning";
+"chatlist.clear_all_message" = "This will delete all conversations and their messages. This action cannot be undone.";
+"chatlist.clear_all_confirm" = "Clear All";
+"ollama.library.error_empty_name" = "Model name cannot be empty";
+"ollama.library.error_invalid_name" = "Invalid model name format. Use only letters, numbers, hyphens, underscores, and colons.";
+"ollama.library.error_already_installed" = "This model is already installed";
+"ollama.library.error_download_in_progress" = "Another download is in progress. Please wait.";
+"ollama.library.error_service_unavailable" = "Ollama service is not available. Please check if Ollama is running.";

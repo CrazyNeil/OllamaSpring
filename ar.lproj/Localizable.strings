@@ -99,6 +99,16 @@
 "ollama.connection_failed_desc" = "فشل الاتصال بخادم Ollama. يرجى التحقق من التكوين والمحاولة مرة أخرى.";
 "ollama.ok" = "موافق";
 
+// Ollama Cloud API Config
+"ollamacloud.api_title" = "Ollama Cloud API";
+"ollamacloud.enter_secret_key" = "أدخل المفتاح السري";
+"ollamacloud.how_to_apply" = "كيفية التقدم بطلب للحصول على مفتاح API لـ Ollama Cloud؟";
+"ollamacloud.click_here" = "انقر هنا";
+"ollamacloud.connection_failed" = "فشل الاتصال";
+"ollamacloud.connection_failed_desc" = "فشل الاتصال بـ Ollama Cloud. يرجى التحقق من مفتاح API أو تكوين وكيل HTTP.";
+"ollamacloud.ok" = "موافق";
+"ollamacloud.description" = "يوفر Ollama Cloud استضافة مدارة لنماذج Ollama، مما يوفر خدمات استدلال الذكاء الاصطناعي القابلة للتطوير والموثوقة في السحابة.";
+
 // StatusBar
 "statusbar.option_1" = "الخيار 1";
 "statusbar.option_2" = "الخيار 2";
@@ -130,13 +140,14 @@
 "quick.empty_input" = "أخبرني فقط ما هو سؤالك.";
 "quick.no_model" = "لم يتم العثور على نموذج. قد تحتاج إلى تحميل نموذج وإعادة تشغيل OllamaSpring أولاً.";
 "quick.ollama_not_available" = "يجب عليك بدء Ollama أو تثبيته أولاً.";
-"quick.shortcut_hint" = "يمكنك فتح الإكمال السريع باستخدام الاختصار cmd + shift + h";
+"quick.shortcut_hint" = "يمكنك استخدام الاختصار cmd + shift + h لفتح أو إخفاء مربع حوار الإكمال السريع";
 
 // Right Top Bar
 "righttopbar.api_host" = "مضيف API";
 "righttopbar.confirm" = "تأكيد";
 "righttopbar.deepseek_api_key_config" = "تكوين مفتاح API DeepSeek";
 "righttopbar.groq_api_key_config" = "تكوين مفتاح API Groq";
+"righttopbar.ollamacloud_api_key_config" = "تكوين مفتاح API Ollama Cloud";
 "righttopbar.groq_no_streaming" = "Groq لا يدعم الإخراج المتدفق";
 "righttopbar.library" = "السوق";
 "righttopbar.no_models_found" = "لم يتم العثور على نماذج";
@@ -148,3 +159,8 @@
 "messages.assistant" = "المساعد";
 
 
+"chatlist.new_conversation" = "محادثة جديدة";
+"chatlist.clear_all_conversations" = "مسح جميع المحادثات";
+"chatlist.clear_all_warning" = "تحذير";
+"chatlist.clear_all_message" = "سيؤدي هذا إلى حذف جميع المحادثات ورسائلها. لا يمكن التراجع عن هذا الإجراء.";
+"chatlist.clear_all_confirm" = "مسح الكل";
