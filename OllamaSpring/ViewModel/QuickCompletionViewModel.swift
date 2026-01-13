@@ -8,11 +8,20 @@
 import Foundation
 import SwiftyJSON
 
+// MARK: - Stream Delegates
+
+/// URLSession delegate for handling DeepSeek API streaming responses
+/// Processes Server-Sent Events (SSE) format responses line by line
 class QuickCompletionDeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
+    /// Accumulated received data (currently unused but kept for compatibility)
     private var receivedData = Data()
+    /// Reference to parent ViewModel for updating UI state
     private var quickCompletionViewModel: QuickCompletionViewModel
+    /// Buffer for accumulating incomplete lines from streaming data
     private var buffer = ""
     
+    /// Initialize delegate with ViewModel reference
+    /// - Parameter quickCompletionViewModel: Parent ViewModel instance
     init(quickCompletionViewModel: QuickCompletionViewModel) {
         self.quickCompletionViewModel = quickCompletionViewModel
     }
@@ -21,12 +30,12 @@ class QuickCompletionDeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
         guard let text = String(data: data, encoding: .utf8) else { return }
         buffer += text
         
-        // line handler
+        /// Process complete lines (ending with newline) from buffer
         while let newlineIndex = buffer.firstIndex(of: "\n") {
             let line = String(buffer[..<newlineIndex])
             buffer = String(buffer[buffer.index(after: newlineIndex)...])
             
-            // signal line handler
+            /// Process each complete line
             processLine(line)
         }
     }
@@ -118,11 +127,18 @@ class QuickCompletionDeepSeekStreamDelegate: NSObject, URLSessionDataDelegate {
     }
 }
 
+/// URLSession delegate for handling Groq API streaming responses
+/// Processes Server-Sent Events (SSE) format responses line by line
 class QuickCompletionGroqStreamDelegate: NSObject, URLSessionDataDelegate {
+    /// Accumulated received data (currently unused but kept for compatibility)
     private var receivedData = Data()
+    /// Reference to parent ViewModel for updating UI state
     private var quickCompletionViewModel: QuickCompletionViewModel
+    /// Buffer for accumulating incomplete lines from streaming data
     private var buffer = ""
     
+    /// Initialize delegate with ViewModel reference
+    /// - Parameter quickCompletionViewModel: Parent ViewModel instance
     init(quickCompletionViewModel: QuickCompletionViewModel) {
         self.quickCompletionViewModel = quickCompletionViewModel
     }
@@ -131,12 +147,12 @@ class QuickCompletionGroqStreamDelegate: NSObject, URLSessionDataDelegate {
         guard let text = String(data: data, encoding: .utf8) else { return }
         buffer += text
         
-        // line handler
+        /// Process complete lines (ending with newline) from buffer
         while let newlineIndex = buffer.firstIndex(of: "\n") {
             let line = String(buffer[..<newlineIndex])
             buffer = String(buffer[buffer.index(after: newlineIndex)...])
             
-            // signal line handler
+            /// Process each complete line
             processLine(line)
         }
     }
@@ -228,29 +244,61 @@ class QuickCompletionGroqStreamDelegate: NSObject, URLSessionDataDelegate {
     }
 }
 
+// MARK: - Quick Completion ViewModel
+
+/// ViewModel for managing quick completion feature
+/// Handles streaming and non-streaming requests to various AI APIs (Ollama, Groq, DeepSeek, Ollama Cloud)
+/// All UI updates are performed on the main thread via @MainActor
 class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelegate {
     
+    // MARK: - Properties
+    
+    /// Temporarily stored model name for current request
     private var tmpModelName:String
+    /// Accumulated data received from streaming response (for Ollama Cloud)
     private var receivedData = Data()
     
+    /// Shared ViewModel for application-wide configuration
     @Published var commonViewModel: CommonViewModel
+    /// Model options (temperature, seed, top_p, etc.)
     @Published var modelOptions: OptionsModel
     
+    /// Whether waiting for model response
     @Published var waitingModelResponse = false
+    /// Temporary response content accumulated during streaming
     @Published var tmpResponse:String = ""
+    /// Error message from API response
     @Published var responseErrorMsg:String = ""
+    /// Whether to show general response panel
     @Published var showResponsePanel = false
+    /// Whether to show Groq response panel
     @Published var showGroqResponsePanel = false
+    /// Whether to show DeepSeek response panel
     @Published var showDeepSeekResponsePanel = false
+    /// Whether to show Ollama Cloud response panel
     @Published var showOllamaCloudResponsePanel = false
+    /// Whether to show message panel
     @Published var showMsgPanel = false
     
+    /// Initialize QuickCompletionViewModel
+    /// - Parameters:
+    ///   - commonViewModel: Shared ViewModel instance
+    ///   - modelOptions: Model configuration options
+    ///   - tmpModelName: Initial model name
     init(commonViewModel: CommonViewModel, modelOptions: OptionsModel = OptionsModel(), tmpModelName: String) {
         self.commonViewModel = commonViewModel
         self.modelOptions = modelOptions
         self.tmpModelName = tmpModelName
     }
     
+    // MARK: - Streaming Request Methods
+    
+    /// Send streaming request to DeepSeek API
+    /// Uses Server-Sent Events (SSE) format for real-time response streaming
+    /// - Parameters:
+    ///   - modelName: DeepSeek model name to use
+    ///   - content: User prompt content
+    ///   - responseLang: Preferred response language
     @MainActor func deepSeekSendMsgWithStreamingOn(
         modelName: String,
         content: String,
@@ -258,27 +306,26 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
     ) {
         self.tmpModelName = modelName
         
-        // Construct the full URL
+        /// Construct the full URL
         let endpoint = "/chat/completions"
         
-        // Construct the full URL
         guard let url = URL(string: "\(deepSeekApiBaseUrl)" + "\(endpoint)") else {
             return
         }
         
-        // init request
+        /// Initialize HTTP request
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("Bearer \(commonViewModel.loadDeepSeekApiKeyFromDatabase())", forHTTPHeaderField: "Authorization")
         
-        // setup proxy configuration
+        /// Setup proxy configuration with timeouts
         let configuration = URLSessionConfiguration.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 300
         
-        // Configure proxy if enabled
+        /// Configure proxy if enabled
         if commonViewModel.loadHttpProxyStatusFromDatabase() {
             let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
             let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
@@ -341,7 +388,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             "top_logprobs": NSNull()
         ]
         
-        // Serialize request body
+        /// Serialize request body to JSON
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
@@ -350,18 +397,24 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             return
         }
         
-        // Start a session data task with the DeepSeekStreamDelegate
+        /// Start a session data task with the DeepSeekStreamDelegate for streaming response
         let deepSeekDelegate = QuickCompletionDeepSeekStreamDelegate(quickCompletionViewModel: self)
         let session = URLSession(configuration: configuration, delegate: deepSeekDelegate, delegateQueue: nil)
         let task = session.dataTask(with: request)
         task.resume()
         
-        // Update view state
+        /// Update view state for streaming response
         self.waitingModelResponse = true
         self.tmpResponse = ""
         self.showDeepSeekResponsePanel = true
     }
     
+    /// Send streaming request to Groq API
+    /// Uses Server-Sent Events (SSE) format for real-time response streaming
+    /// - Parameters:
+    ///   - modelName: Groq model name to use
+    ///   - content: User prompt content
+    ///   - responseLang: Preferred response language
     @MainActor func groqSendMsgWithStreamingOn(
         modelName: String,
         content: String,
@@ -369,24 +422,24 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
     ) {
         self.tmpModelName = modelName
         
-        // Construct the full URL
+        /// Construct the full URL for Groq API
         guard let url = URL(string: "https://api.groq.com/openai/v1/chat/completions") else {
             return
         }
         
-        // init request
+        /// Initialize HTTP request
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("Bearer \(commonViewModel.loadGroqApiKeyFromDatabase())", forHTTPHeaderField: "Authorization")
         
-        // setup proxy configuration
+        /// Setup proxy configuration with timeouts
         let configuration = URLSessionConfiguration.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 300
         
-        // Configure proxy if enabled
+        /// Configure proxy if enabled
         if commonViewModel.loadHttpProxyStatusFromDatabase() {
             let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
             let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
@@ -439,7 +492,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             "top_p": self.modelOptions.topP
         ]
         
-        // Serialize request body
+        /// Serialize request body to JSON
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
@@ -448,18 +501,24 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             return
         }
         
-        // Start a session data task with the GroqStreamDelegate
+        /// Start a session data task with the GroqStreamDelegate for streaming response
         let groqDelegate = QuickCompletionGroqStreamDelegate(quickCompletionViewModel: self)
         let session = URLSession(configuration: configuration, delegate: groqDelegate, delegateQueue: nil)
         let task = session.dataTask(with: request)
         task.resume()
         
-        // Update view state
+        /// Update view state for streaming response
         self.waitingModelResponse = true
         self.tmpResponse = ""
         self.showGroqResponsePanel = true
     }
     
+    /// Send streaming request to Ollama Cloud API
+    /// Uses Server-Sent Events (SSE) format for real-time response streaming
+    /// - Parameters:
+    ///   - modelName: Ollama Cloud model name to use
+    ///   - content: User prompt content
+    ///   - responseLang: Preferred response language
     @MainActor func ollamaCloudSendMsgWithStreamingOn(
         modelName: String,
         content: String,
@@ -473,20 +532,20 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         let isHttpProxyEnabled = commonViewModel.loadHttpProxyStatusFromDatabase()
         let isHttpProxyAuthEnabled = commonViewModel.loadHttpProxyAuthStatusFromDatabase()
         
-        // answer handler
+        /// Construct endpoint URL for Ollama Cloud API
         let endpoint = "/api/chat"
         guard let url = URL(string: "https://ollama.com\(endpoint)") else {
             return
         }
         
-        // init request
+        /// Initialize HTTP request
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("Bearer \(ollamaCloudAuthKey)", forHTTPHeaderField: "Authorization")
         
-        // setup proxy configuration
+        /// Setup proxy configuration with timeouts
         let configuration = URLSessionConfiguration.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = 30
@@ -517,7 +576,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             configuration.connectionProxyDictionary = [:]
         }
         
-        // options
+        /// Initialize model options for Ollama Cloud API
         let options: [String: Any] = [
             "temperature": self.modelOptions.temperature,
             "seed": self.modelOptions.seed,
@@ -541,7 +600,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         var context: [[String: Any?]] = []
         context.append(newPrompt)
         
-        /// system role config
+        /// Setup system role for response language preference
         if responseLang != "Auto" {
             let sysRolePrompt = [
                 "role": "system",
@@ -561,16 +620,23 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             return
         }
         
-        // start a session data task
+        /// Start a session data task with self as delegate for streaming response
         let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
         let task = session.dataTask(with: request)
         task.resume()
         
+        /// Update view state for streaming response
         self.waitingModelResponse = true
         self.tmpResponse = ""
         self.showOllamaCloudResponsePanel = true
     }
     
+    /// Send streaming request to local Ollama API
+    /// Uses Server-Sent Events (SSE) format for real-time response streaming
+    /// - Parameters:
+    ///   - modelName: Local Ollama model name to use
+    ///   - content: User prompt content
+    ///   - responseLang: Preferred response language
     func sendMsgWithStreamingOn(
         modelName: String,
         content: String,
@@ -579,10 +645,10 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         
         self.tmpModelName = modelName
         
-        // Generate a completion
+        /// Construct endpoint for local Ollama API
         let endpoint = "/api/chat"
         
-        // Construct the full URL
+        /// Load Ollama host configuration from database
         let preference = PreferenceManager()
         let baseUrl = preference.loadPreferenceValue(forKey: "ollamaHostName", defaultValue: ollamaApiDefaultBaseUrl)
         let port = preference.loadPreferenceValue(forKey: "ollamaHostPort", defaultValue: ollamaApiDefaultPort)
@@ -590,13 +656,13 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             return
         }
         
-        // init request
+        /// Initialize HTTP request
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         
-        // options
+        /// Initialize model options for Ollama API
         let options:[String: Any] = [
             /// The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)
             "temperature": self.modelOptions.temperature,
@@ -628,28 +694,37 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         
         var context: [[String: Any?]] = []
         
-        
+        /// Add user prompt and system role to context
         context.append(newPrompt)
         context.insert(sysRolePrompt, at: 0)
         
         params["messages"] = context
         
-        // send request
+        /// Serialize and send request
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
             request.httpBody = jsonData
         } catch {
             return
         }
-        // start a session data task
+        /// Start a session data task with self as delegate for streaming response
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         let task = session.dataTask(with: request)
         task.resume()
         
+        /// Update view state for streaming response
         self.waitingModelResponse = true
         self.tmpResponse = ""
     }
     
+    // MARK: - Non-Streaming Request Methods
+    
+    /// Send non-streaming request to Groq API
+    /// Returns complete response after generation finishes
+    /// - Parameters:
+    ///   - modelName: Groq model name to use
+    ///   - responseLang: Preferred response language
+    ///   - content: User prompt content
     @MainActor func groqSendMsg(
         modelName: String,
         responseLang: String,
@@ -670,13 +745,12 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         
         Task {
             do {
-                /// user prompt
+                /// Prepare user prompt messages
                 let messages = [
                     ["role": "user", "content": content]
                 ]
                 
-                
-                /// groq response
+                /// Send request to Groq API and get response
                 let response = try await groq.chat(
                     modelName: modelName,
                     responseLang: responseLang,
@@ -689,7 +763,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                 
                 let jsonResponse = JSON(response)
                 
-                /// parse groq message content
+                /// Parse Groq message content or error message
                 let errorMessage = jsonResponse["msg"].string
                 
                 let content: String
@@ -710,7 +784,14 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         }
     }
     
+    // MARK: - URLSessionDataDelegate
     
+    /// Handle incoming streaming data from URLSession (for Ollama Cloud)
+    /// Processes JSON lines and extracts message content or error information
+    /// - Parameters:
+    ///   - session: URLSession instance
+    ///   - dataTask: Data task receiving the data
+    ///   - data: Chunk of data received
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         receivedData.append(data)
         
@@ -726,7 +807,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                 }
                 
                 DispatchQueue.main.async {
-                    // Check for error in response (Ollama Cloud format)
+                    /// Check for error in response (Ollama Cloud format)
                     if let errorDict = jsonObject["error"] as? [String: Any],
                        let errorMessage = errorDict["message"] as? String {
                         let errorMsg = "Error: Ollama Cloud API error - \(errorMessage)"
@@ -739,25 +820,26 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                         return
                     }
                     
+                    /// Extract message content from Ollama Cloud response format
                     if let messageDict = jsonObject["message"] as? [String: Any],
                        let content = messageDict["content"] as? String {
                         self.tmpResponse = (self.tmpResponse) + content
                     } else {
-                        // Check if this is a done message without content (which is normal)
+                        /// Check if this is a done message without content (which is normal)
                         if let done = jsonObject["done"] as? Int, done == 1 {
-                            // This is normal completion, continue processing
+                            /// This is normal completion, continue processing
                             return
                         }
                         NSLog("Error: Missing message content")
                     }
                     
-                    // after streaming done
+                    /// Check if streaming is complete (done == 1)
                     if let doneValue = jsonObject["done"] as? Int {
                         if doneValue == 1 {
                             self.waitingModelResponse = false
                         }
                     } else {
-                        // Only set error if we haven't already processed a done message
+                        /// Only set error if we haven't already processed a done message
                         if jsonObject["done"] == nil {
                             self.waitingModelResponse = false
                             self.showResponsePanel = false
@@ -773,7 +855,7 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
             }
         }
         
-        // Clear processed data
+        /// Clear processed data after handling
         receivedData = Data()
     }
     

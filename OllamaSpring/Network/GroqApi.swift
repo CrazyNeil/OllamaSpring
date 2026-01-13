@@ -1,6 +1,15 @@
+//
+//  GroqApi.swift
+//  OllamaSpring
+//
+//  Created by NeilStudio on 2024/5/17.
+//
+
 import Foundation
 import SwiftyJSON
 
+/// API client for interacting with Groq's OpenAI-compatible API
+/// Supports HTTP/HTTPS proxy configuration with optional authentication
 class GroqApi {
     private var apiBaseUrl: String
     private var proxyUrl: String
@@ -11,6 +20,16 @@ class GroqApi {
     private var login: String?
     private var password: String?
     
+    /// Initialize Groq API client
+    /// - Parameters:
+    ///   - apiBaseUrl: Base URL for Groq API (defaults to groqApiBaseUrl)
+    ///   - proxyUrl: HTTP proxy server URL
+    ///   - proxyPort: HTTP proxy server port
+    ///   - authorizationToken: Groq API key (Bearer token)
+    ///   - isHttpProxyEnabled: Whether HTTP proxy is enabled
+    ///   - isHttpProxyAuthEnabled: Whether proxy authentication is required
+    ///   - login: Proxy authentication username (optional)
+    ///   - password: Proxy authentication password (optional)
     init(
         apiBaseUrl: String = groqApiBaseUrl,
         proxyUrl: String,
@@ -31,6 +50,13 @@ class GroqApi {
         self.password = password
     }
     
+    /// Make HTTP request to Groq API with proxy support
+    /// - Parameters:
+    ///   - method: HTTP method (GET, POST, etc.)
+    ///   - endpoint: API endpoint path
+    ///   - params: Request parameters as dictionary
+    /// - Returns: Response data as AnyObject (typically JSON)
+    /// - Throws: URLError if request fails
     private func makeRequest(
         method: String,
         endpoint: String,
@@ -101,7 +127,7 @@ class GroqApi {
                 }
             }
             
-            /// decode failed handler
+            /// Handle decode failure - response is not valid JSON
             if ((try? JSONSerialization.jsonObject(with: data, options: []) is [String: Any]) == nil) {
                 let response = ["error": ["message": "Groq Response No JSON body or failed to decode."]]
                 return response as AnyObject
@@ -126,6 +152,17 @@ class GroqApi {
         }
     }
     
+    /// Send chat completion request to Groq API
+    /// - Parameters:
+    ///   - modelName: Name of the Groq model to use
+    ///   - responseLang: Preferred response language (defaults to "English", use "Auto" for automatic)
+    ///   - messages: Current conversation messages
+    ///   - historyMessages: Previous conversation messages (last 5 will be included)
+    ///   - seed: Random seed for reproducible outputs (default: 0)
+    ///   - temperature: Sampling temperature (0.0-2.0, default: 0.8)
+    ///   - top_p: Nucleus sampling parameter (default: 0.9)
+    /// - Returns: API response containing chat completion
+    /// - Throws: Error if request fails
     public func chat(
         modelName: String,
         responseLang: String = "English",
@@ -138,7 +175,7 @@ class GroqApi {
 
         var mutableMessages = messages
         
-        /// parse history msg
+        /// Parse and prepend history messages (last 5 messages in reverse order)
         if !historyMessages.isEmpty {
             for historyMessage in historyMessages.suffix(5).reversed() {
                 mutableMessages.insert([
@@ -148,7 +185,7 @@ class GroqApi {
             }
         }
         
-        /// setup sys role for response language
+        /// Setup system role prompt for response language preference
         if responseLang != "Auto" {
             let sysRolePrompt = [
                 "role": "system",
@@ -169,7 +206,9 @@ class GroqApi {
     }
     
     /// Fetch available models from Groq API
-    /// Tests if Groq supports the OpenAI-compatible /models endpoint
+    /// Uses OpenAI-compatible /models endpoint to retrieve list of available models
+    /// - Returns: API response containing list of available models
+    /// - Throws: Error if request fails
     public func models() async throws -> AnyObject {
         return try await makeRequest(method: "GET", endpoint: "openai/v1/models", params: [:])
     }

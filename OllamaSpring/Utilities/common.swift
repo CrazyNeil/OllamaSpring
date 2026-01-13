@@ -10,6 +10,12 @@ import SwiftUI
 import Carbon
 import PDFKit
 
+// MARK: - Date & Time Utilities
+
+/// Format a date string to a human-readable relative time string
+/// Converts dates like "2024-01-15 10:30:00" to relative formats like "Today", "Yesterday", "3 days ago", etc.
+/// - Parameter dateString: Date string in format "yyyy-MM-dd HH:mm:ss"
+/// - Returns: Human-readable relative date string, or original string if parsing fails
 func formatRelativeDate(_ dateString: String) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -49,7 +55,12 @@ func formatRelativeDate(_ dateString: String) -> String {
     return dateString
 }
 
+// MARK: - File Processing Utilities
 
+/// Extract text content from a PDF file
+/// Iterates through all pages and extracts text content
+/// - Parameter url: File URL pointing to the PDF file
+/// - Returns: Extracted text content as String, or nil if PDF cannot be opened
 func extractTextFromPDF(url: URL) -> String? {
     guard let pdfDocument = PDFDocument(url: url) else {
         return nil
@@ -70,6 +81,10 @@ func extractTextFromPDF(url: URL) -> String? {
     return documentContent
 }
 
+/// Extract text content from a plain text file
+/// Reads file content using UTF-8 encoding
+/// - Parameter url: File URL pointing to the text file
+/// - Returns: File content as String, or empty string if reading fails
 func extractTextFromPlainText(url: URL) -> String? {
     do {
         let content = try String(contentsOf: url, encoding: .utf8)
@@ -79,18 +94,29 @@ func extractTextFromPlainText(url: URL) -> String? {
     }
 }
 
+// MARK: - System Utilities
+
+/// Copy text to the system clipboard
+/// Clears existing clipboard content before setting new text
+/// - Parameter text: Text string to copy to clipboard
 func copyToClipboard(text: String) {
     let pasteboard = NSPasteboard.general
     pasteboard.clearContents()
     pasteboard.setString(text, forType: .string)
 }
 
+/// Open a URL in the default system browser
+/// - Parameter urlString: URL string to open (e.g., "https://example.com")
+/// - Note: Silently fails if URL string is invalid
 func openURL(_ urlString: String) {
     if let url = URL(string: urlString) {
         NSWorkspace.shared.open(url)
     }
 }
 
+/// Restart the application
+/// Launches a new instance of the app and exits the current process
+/// - Warning: This function calls `exit(0)` and will terminate the current process
 func restartApp() {
     let url = URL(fileURLWithPath: Bundle.main.resourcePath!)
     let path = url.deletingLastPathComponent().deletingLastPathComponent().absoluteString
@@ -101,6 +127,8 @@ func restartApp() {
     exit(0)
 }
 
+/// Get current date and time as a formatted string
+/// - Returns: Current date and time in format "yyyy-MM-dd HH:mm:ss"
 func strDatetime() -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -109,6 +137,12 @@ func strDatetime() -> String {
     return createdAt
 }
 
+// MARK: - Image Utilities
+
+/// Convert NSImage to Base64-encoded string
+/// Attempts JPEG encoding first, falls back to PNG if JPEG fails
+/// - Parameter image: NSImage to convert
+/// - Returns: Base64-encoded string representation of the image, or empty string if conversion fails
 func convertToBase64(image: NSImage) -> String {
     guard let tiffData = image.tiffRepresentation,
           let bitmap = NSBitmapImageRep(data: tiffData),
@@ -118,6 +152,10 @@ func convertToBase64(image: NSImage) -> String {
     return data.base64EncodedString(options: .lineLength64Characters)
 }
 
+/// Convert Base64-encoded string to NSImage
+/// Attempts to decode and create NSImage from the base64 data
+/// - Parameter base64String: Base64-encoded image string
+/// - Returns: NSImage if conversion succeeds, nil otherwise
 func convertFromBase64(base64String: String) -> NSImage? {
     guard let imageData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
         print("Error decoding base64 string")
@@ -137,11 +175,19 @@ func convertFromBase64(base64String: String) -> NSImage? {
     return nil
 }
 
+// MARK: - Text Utilities
+
+/// Check if input text is empty after trimming whitespace and newlines
+/// - Parameter inputText: Text string to check
+/// - Returns: True if text is empty or contains only whitespace, false otherwise
 func isInputEmpty(_ inputText: String) -> Bool {
     let trimmedText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
     return trimmedText.isEmpty
 }
 
+/// Format a number to string without decimal places or grouping separators
+/// - Parameter value: Double value to format
+/// - Returns: Formatted number string without decimals or grouping separators
 func formattedNumber(_ value: Double) -> String {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
@@ -150,8 +196,16 @@ func formattedNumber(_ value: Double) -> String {
     return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
 }
 
-/// hot key handler
-/// for quick completion etc
+// MARK: - Hot Key Handler
+
+/// Global hot key event handler for system-wide keyboard shortcuts
+/// Handles hot key events (e.g., cmd+shift+h for quick completion)
+/// - Parameters:
+///   - nextHandler: Reference to the next event handler in the chain
+///   - theEvent: Carbon event reference
+///   - userData: Unsafe pointer to user data (AppDelegate instance)
+/// - Returns: OSStatus indicating success or error
+/// - Note: Uses Carbon framework for global hot key registration
 func hotKeyEventHandler(nextHandler: EventHandlerCallRef?, theEvent: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
     let appDelegate = Unmanaged<AppDelegate>.fromOpaque(userData!).takeUnretainedValue()
     var hotKeyID = EventHotKeyID()
@@ -167,6 +221,11 @@ func hotKeyEventHandler(nextHandler: EventHandlerCallRef?, theEvent: EventRef?, 
     return CallNextEventHandler(nextHandler, theEvent)
 }
 
+// MARK: - URL Utilities
+
+/// Remove protocol prefix (http://, https://, ws://, wss://) from URL string
+/// - Parameter urlString: URL string with protocol prefix
+/// - Returns: URL string without protocol prefix
 func removeProtocolPrefix(from urlString: String) -> String {
     let trimmedUrl = urlString.replacingOccurrences(of: "https://", with: "")
                               .replacingOccurrences(of: "http://", with: "")
@@ -175,10 +234,14 @@ func removeProtocolPrefix(from urlString: String) -> String {
     return trimmedUrl
 }
 
-/// Filter out redacted_reasoning tags and think tags from markdown content
-/// These tags (like <think>...</think> or <think>...</think>) are not standard markdown
-/// and should be removed before rendering to avoid display issues
-/// Filter out thinking tags for display purposes (keeps other content)
+// MARK: - Content Filtering Utilities
+
+/// Filter out reasoning and thinking tags from markdown content for display
+/// Removes tags like `<think>`, `<thinking>`, `<reasoning>` while preserving other content
+/// These tags are not standard markdown and should be removed before rendering to avoid display issues
+/// - Parameter content: Markdown content string that may contain reasoning tags
+/// - Returns: Filtered content with reasoning tags removed
+/// - Note: Uses iterative regex matching to handle nested or overlapping tags (max 10 iterations)
 func filterRedactedReasoningTagsForDisplay(_ content: String) -> String {
     var filteredContent = content
 
@@ -206,7 +269,7 @@ func filterRedactedReasoningTagsForDisplay(_ content: String) -> String {
             }
         }
 
-        // Check if we made any changes
+        /// Check if we made any changes in this iteration
         if !changed && filteredContent.count == previousLength {
             break
         }
@@ -217,11 +280,15 @@ func filterRedactedReasoningTagsForDisplay(_ content: String) -> String {
     return filteredContent
 }
 
-/// Filter out thinking tags for title generation (removes everything after thinking tags)
+/// Filter reasoning tags for title generation
+/// Attempts to extract content from within reasoning tags first, then falls back to removing tags
+/// - Parameter content: Content string that may contain reasoning tags
+/// - Returns: Filtered content suitable for title generation, or empty string if all content is filtered
+/// - Note: This function prioritizes extracting meaningful content from reasoning tags for better title quality
 func filterRedactedReasoningTagsForTitle(_ content: String) -> String {
     var filteredContent = content
 
-    // First, try to extract content after thinking tags
+    /// First, try to extract content from within thinking tags
     let patterns = [
         "<think>(.*?)</think>",           // Extract content between <think> and </think>
         "<redacted_reasoning>(.*?)</redacted_reasoning>",
@@ -245,19 +312,23 @@ func filterRedactedReasoningTagsForTitle(_ content: String) -> String {
         }
     }
 
-    // If no content found after thinking tags, remove thinking tags and use the rest
+    /// If no content found within thinking tags, remove thinking tags and use the rest
     filteredContent = filterRedactedReasoningTagsForDisplay(filteredContent)
 
-    // If after filtering we have content, return it
+    /// If after filtering we have content, return it
     if !filteredContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
         return filteredContent.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    // If everything is filtered out, return empty string (let the title generation handle it)
+    /// If everything is filtered out, return empty string (let the title generation handle it)
     return ""
 }
 
-// Backward compatibility - use display filtering by default
+/// Backward compatibility function for filtering reasoning tags
+/// Uses display filtering by default
+/// - Parameter content: Content string that may contain reasoning tags
+/// - Returns: Filtered content with reasoning tags removed
+/// - Note: This function is maintained for backward compatibility with existing code
 func filterRedactedReasoningTags(_ content: String) -> String {
     return filterRedactedReasoningTagsForDisplay(content)
 }

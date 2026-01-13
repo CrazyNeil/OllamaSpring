@@ -7,41 +7,92 @@
 
 import Foundation
 
+/// Main ViewModel for managing application-wide state and configuration
+/// Handles API hosts, models, preferences, HTTP proxy settings, and service status
+/// All UI updates are performed on the main thread via @MainActor
 @MainActor
 class CommonViewModel: ObservableObject {
+    // MARK: - Published Properties
+    
+    // MARK: Response Language & API Host
+    /// Currently selected response language preference
     @Published var selectedResponseLang:String = defaultResponseLang
+    /// Currently selected API host (Ollama, Groq, DeepSeek, Ollama Cloud)
     @Published var selectedApiHost:String = defaultApiHost
+    
+    // MARK: HTTP Proxy Configuration
+    /// HTTP proxy server hostname or IP address
     @Published var httpProxyHostName:String = defaultHttpProxyHostName
+    /// HTTP proxy server port number
     @Published var httpProxyHostPort:String = defaultHttpProxyHostPort
+    /// HTTP proxy authentication username
     @Published var httpProxyLogin:String = defaultHttpProxyLogin
+    /// HTTP proxy authentication password
     @Published var httpProxyPassword:String = defaultHttpProxyPassword
+    /// Whether HTTP proxy is enabled
     @Published var isHttpProxyEnabled:Bool = httpProxyDefaultStatus
+    /// Whether HTTP proxy authentication is required
     @Published var isHttpProxyAuthEnabled:Bool = httpProxyAuthDefaultStatus
+    
+    // MARK: API Keys
+    /// Groq API key for authentication
     @Published var groqApiKey:String = defaultGroqApiKey
+    /// DeepSeek API key for authentication
     @Published var deepSeekApiKey:String = defaultDeepSeekApiKey
+    /// Ollama Cloud API key for authentication
     @Published var ollamaCloudApiKey:String = defaultOllamaCloudApiKey
+    
+    // MARK: Service Status
+    /// Whether local Ollama API service is available and reachable
     @Published var isOllamaApiServiceAvailable:Bool = false
+    /// Whether at least one local Ollama model is installed
     @Published var hasLocalModelInstalled:Bool = false
+    
+    // MARK: Selected Models
+    /// Currently selected Ollama local model name
     @Published var selectedOllamaModel:String = ""
+    /// Currently selected Groq model name
     @Published var selectedGroqModel:String = ""
+    /// Currently selected DeepSeek model name
     @Published var selectedDeepSeekModel:String = ""
+    /// Currently selected Ollama Cloud model name
     @Published var selectedOllamaCloudModel:String = ""
+    
+    // MARK: Model Lists
+    /// List of locally installed Ollama models
     @Published var ollamaLocalModelList:[OllamaModel] = []
+    /// List of available Ollama models from remote library
     @Published var ollamaRemoteModelList:[OllamaModel] = []
+    /// List of available DeepSeek models
     @Published var deepSeekModelList:[DeepSeekModel] = []
+    /// List of available Groq models
     @Published var groqModelList:[GroqModel] = []
+    /// List of available Ollama Cloud models
     @Published var ollamaCloudModelList:[OllamaCloudModel] = []
+    /// Loading state indicator for Ollama Cloud models fetch operation
     @Published var isLoadingOllamaCloudModels: Bool = false
     
+    // MARK: Ollama Host Configuration
+    /// Local Ollama API hostname or IP address
     @Published var ollamaHostName: String = ollamaApiDefaultBaseUrl
+    /// Local Ollama API port number
     @Published var ollamaHostPort: String = ollamaApiDefaultPort
     
-    
+    // MARK: - Dependencies
+    /// Preference manager for persistent storage
     let preference = PreferenceManager()
+    /// Ollama API client instance
     let ollama = OllamaApi()
+    /// Shared instance for fetching model lists from various sources
     let ollamaSpringModelsApi = OllamaSpringModelsApi.shared
     
+    // MARK: - Ollama Host Configuration
+    
     /// Test Ollama host configuration and update if successful
+    /// Attempts to connect to the specified Ollama host and fetches available models
+    /// - Parameters:
+    ///   - host: Ollama hostname or IP address (without protocol prefix)
+    ///   - port: Ollama API port number
     /// - Returns: True if connection successful and config updated, false otherwise
     func testOllamaHostConfig(host: String, port: String) async -> Bool {
         let testOllama = OllamaApi(apiBaseUrl: "http://" + host, port: port)
@@ -49,7 +100,7 @@ class CommonViewModel: ObservableObject {
         do {
             let response = try await testOllama.tags()
             if response["models"] is [[String: Any]] {
-                // Connection successful, update the configuration
+                /// Connection successful, update the configuration
                 updateOllamaHostConfig(host: host, port: port)
                 return true
             } else {
@@ -63,6 +114,11 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Update Ollama host configuration in both database and memory
+    /// Removes protocol prefix (http://, https://) from host before storing
+    /// - Parameters:
+    ///   - host: Ollama hostname or IP address
+    ///   - port: Ollama API port number
     func updateOllamaHostConfig(host: String, port: String) {
         preference.updatePreference(preferenceKey: "ollamaHostName", preferenceValue: removeProtocolPrefix(from: host)) // remove http:// or https://
         preference.updatePreference(preferenceKey: "ollamaHostPort", preferenceValue: port)
@@ -70,6 +126,8 @@ class CommonViewModel: ObservableObject {
         self.ollamaHostPort = port
     }
 
+    /// Load Ollama host configuration from database
+    /// - Returns: Tuple containing hostname and port
     func loadOllamaHostConfigFromDatabase() -> (host: String, port: String) {
         self.ollamaHostName = loadPreference(forKey: "ollamaHostName", defaultValue: ollamaApiDefaultBaseUrl)
         self.ollamaHostPort = loadPreference(forKey: "ollamaHostPort", defaultValue: ollamaApiDefaultPort)
@@ -77,6 +135,10 @@ class CommonViewModel: ObservableObject {
         return (host: self.ollamaHostName, port: self.ollamaHostPort)
     }
     
+    // MARK: - Model Fetching
+    
+    /// Fetch available Ollama models from remote library
+    /// Updates remote model list and sets default selected model
     func fetchOllamaModels() async {
         do {
             let apiModels = try await ollamaSpringModelsApi.fetchOllamaModels()
@@ -95,7 +157,7 @@ class CommonViewModel: ObservableObject {
                 if self.ollamaRemoteModelList.isEmpty {
                     self.selectedOllamaModel = "Ollama Models"
                 } else {
-                    /// setup default selected model
+                    /// Setup default selected model from local or remote list
                     if let defaultModel = self.ollamaLocalModelList.first(where: { $0.isDefault }) {
                         self.selectedOllamaModel = defaultModel.name
                     } else {
@@ -117,8 +179,11 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Fetch available Groq models from Groq API
+    /// Uses OpenAI-compatible endpoint to retrieve model list
+    /// Sets default model based on availability (llama3-70b or mixtral-8x7b preferred)
     func fetchGroqModels() async {
-        // First, try to fetch models from Groq API directly
+        /// First, try to fetch models from Groq API directly
         let groqApiKey = loadGroqApiKeyFromDatabase()
         if !groqApiKey.isEmpty {
             let httpProxy = loadHttpProxyHostFromDatabase()
@@ -137,7 +202,7 @@ class CommonViewModel: ObservableObject {
                 NSLog("Groq API - Attempting to fetch models from Groq API endpoint: openai/v1/models")
                 let response = try await groqApi.models()
                 
-                // Check if response contains error
+                /// Check if response contains error
                 if let errorResponse = response as? [String: Any],
                    let error = errorResponse["error"] as? [String: Any],
                    let errorMessage = error["message"] as? String {
@@ -173,7 +238,7 @@ class CommonViewModel: ObservableObject {
                     self.updateSelectedGroqModel(name: self.selectedGroqModel)
                         }
                     }
-                    return // Successfully fetched from Groq API, exit early
+                    return /// Successfully fetched from Groq API, exit early
                 } else {
                     NSLog("Groq API - Response format is not OpenAI-compatible")
                     DispatchQueue.main.async {
@@ -197,6 +262,8 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Fetch available DeepSeek models from DeepSeek API
+    /// - Parameter apiKey: DeepSeek API key for authentication
     func fetchDeepSeekModels(apiKey:String) async {
         do {
             let httpProxy = loadHttpProxyHostFromDatabase()
@@ -232,6 +299,14 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Preference Management
+    
+    /// Load preference value from database with default value fallback
+    /// Creates preference with default value if it doesn't exist
+    /// - Parameters:
+    ///   - key: Preference key to load
+    ///   - defaultValue: Default value to use if preference doesn't exist
+    /// - Returns: Preference value or default value
     func loadPreference(forKey key: String, defaultValue: String) -> String {
         let preferenceValue = preference.getPreference(preferenceKey: key).first?.preferenceValue
         if let value = preferenceValue, !value.isEmpty {
@@ -242,87 +317,119 @@ class CommonViewModel: ObservableObject {
         }
     }
     
-    /// response language
+    // MARK: - Response Language Configuration
+    
+    /// Update selected response language preference
+    /// - Parameter lang: Language name to set as preferred response language
     func updateSelectedResponseLang(lang:String) {
         preference.updatePreference(preferenceKey: "responseLang", preferenceValue: lang)
         self.selectedResponseLang = lang
     }
     
+    /// Load selected response language from database
     func loadSelectedResponseLangFromDatabase() {
         self.selectedResponseLang = loadPreference(forKey: "responseLang", defaultValue: defaultResponseLang)
     }
     
-    /// api host config
+    // MARK: - API Host Configuration
+    
+    /// Update selected API host preference
+    /// - Parameter name: API host name to select (Ollama, Groq, DeepSeek, Ollama Cloud)
     func updateSelectedApiHost(name:String) {
         preference.updatePreference(preferenceKey: "apiHost", preferenceValue: name)
         self.selectedApiHost = name
     }
     
+    /// Load selected API host from database
     func loadSelectedApiHostFromDatabase() {
         self.selectedApiHost = loadPreference(forKey: "apiHost", defaultValue: defaultApiHost)
     }
     
-    /// selected model config
+    // MARK: - Model Selection Configuration
+    
+    /// Update selected Ollama model preference
+    /// - Parameter name: Ollama model name to select
     func updateSelectedOllamaModel(name:String) {
         preference.updatePreference(preferenceKey: "selectedOllamaModelName", preferenceValue: name)
         self.selectedOllamaModel = name
     }
     
+    /// Load selected Ollama model from database
     func loadSelectedOllamaModelFromDatabase() {
         self.selectedOllamaModel = loadPreference(forKey: "selectedOllamaModelName", defaultValue: selectedOllamaModel)
     }
     
+    /// Update selected Groq model preference
+    /// - Parameter name: Groq model name to select
     func updateSelectedGroqModel(name:String) {
         preference.updatePreference(preferenceKey: "selectedGroqModelName", preferenceValue: name)
         self.selectedGroqModel = name
     }
     
+    /// Update selected DeepSeek model preference
+    /// - Parameter name: DeepSeek model name to select
     func updateSelectedDeepSeekModel(name:String) {
         preference.updatePreference(preferenceKey: "selectedDeepSeekModelName", preferenceValue: name)
         self.selectedDeepSeekModel = name
     }
     
+    /// Update selected Ollama Cloud model preference
+    /// - Parameter name: Ollama Cloud model name to select
     func updateSelectedOllamaCloudModel(name:String) {
         preference.updatePreference(preferenceKey: "selectedOllamaCloudModelName", preferenceValue: name)
         self.selectedOllamaCloudModel = name
     }
     
+    /// Load selected Groq model from database
     func loadSelectedGroqModelFromDatabase() {
         self.selectedGroqModel = loadPreference(forKey: "selectedGroqModelName", defaultValue: selectedGroqModel)
     }
     
+    /// Load selected DeepSeek model from database
     func loadSelectedDeepSeekModelFromDatabase() {
         self.selectedDeepSeekModel = loadPreference(forKey: "selectedDeepSeekModelName", defaultValue: selectedDeepSeekModel)
     }
     
+    /// Load selected Ollama Cloud model from database
     func loadSelectedOllamaCloudModelFromDatabase() {
         self.selectedOllamaCloudModel = loadPreference(forKey: "selectedOllamaCloudModelName", defaultValue: selectedOllamaCloudModel)
     }
     
-    /// groq api key config
+    // MARK: - API Key Configuration
+    
+    /// Update Groq API key in both database and memory
+    /// - Parameter key: Groq API key string
     func updateGroqApiKey(key: String) {
         preference.updatePreference(preferenceKey: "groqApiKey", preferenceValue: key)
         self.groqApiKey = key
     }
     
+    /// Load Groq API key from database
+    /// - Returns: Groq API key string
     func loadGroqApiKeyFromDatabase() -> String {
         self.groqApiKey = loadPreference(forKey: "groqApiKey", defaultValue: defaultGroqApiKey)
         
         return self.groqApiKey
     }
     
-    /// DeepSeek api key config
+    /// Load DeepSeek API key from database
+    /// - Returns: DeepSeek API key string
     func loadDeepSeekApiKeyFromDatabase() -> String {
         self.deepSeekApiKey = loadPreference(forKey: "deepSeekApiKey", defaultValue: defaultDeepSeekApiKey)
         
         return self.deepSeekApiKey
     }
     
+    /// Update DeepSeek API key in both database and memory
+    /// - Parameter key: DeepSeek API key string
     func updateDeepSeekApiKey(key: String) {
         preference.updatePreference(preferenceKey: "deepSeekApiKey", preferenceValue: key)
         self.deepSeekApiKey = key
     }
     
+    /// Verify DeepSeek API key by attempting to fetch models
+    /// - Parameter key: DeepSeek API key to verify
+    /// - Returns: True if API key is valid and can fetch models, false otherwise
     func verifyDeepSeekApiKey(key: String) async -> Bool {
         let httpProxy = loadHttpProxyHostFromDatabase()
         let deepSeekApi = DeepSeekApi(
@@ -345,25 +452,32 @@ class CommonViewModel: ObservableObject {
         }
     }
     
-    /// Ollama Cloud api key config
+    /// Load Ollama Cloud API key from database
+    /// - Returns: Ollama Cloud API key string
     func loadOllamaCloudApiKeyFromDatabase() -> String {
         self.ollamaCloudApiKey = loadPreference(forKey: "ollamaCloudApiKey", defaultValue: defaultOllamaCloudApiKey)
         
         return self.ollamaCloudApiKey
     }
     
+    /// Update Ollama Cloud API key in both database and memory
+    /// - Parameter key: Ollama Cloud API key string
     func updateOllamaCloudApiKey(key: String) {
         preference.updatePreference(preferenceKey: "ollamaCloudApiKey", preferenceValue: key)
         self.ollamaCloudApiKey = key
     }
     
+    /// Verify Ollama Cloud API key by making a minimal chat request
+    /// Uses a small model (gemma3:4b) to minimize API usage during verification
+    /// - Parameter key: Ollama Cloud API key to verify
+    /// - Returns: True if API key is valid, false otherwise
     func verifyOllamaCloudApiKey(key: String) async -> Bool {
-        // Check if API key is empty
+        /// Check if API key is empty
         if key.isEmpty || key.trimmingCharacters(in: .whitespaces).isEmpty {
             return false
         }
         
-        // Use /api/chat endpoint to verify API key since /api/tags doesn't require authentication
+        /// Use /api/chat endpoint to verify API key since /api/tags doesn't require authentication
         let httpProxy = loadHttpProxyHostFromDatabase()
         let httpProxyAuth = loadHttpProxyAuthFromDatabase()
         let ollamaCloudApi = OllamaCloudApi(
@@ -378,8 +492,8 @@ class CommonViewModel: ObservableObject {
         )
         
         do {
-            // Try to make a minimal chat request to verify API key
-            // Use a simple test message with a small model to minimize API usage
+            /// Try to make a minimal chat request to verify API key
+            /// Use a simple test message with a small model to minimize API usage
             let response = try await ollamaCloudApi.chat(
                 modelName: "gemma3:4b", // Use a small model for verification
                 role: "user",
@@ -394,14 +508,14 @@ class CommonViewModel: ObservableObject {
                 top_p: 0.1
             )
             
-            // Check if response contains error message
+            /// Check if response contains error message
             if let errorMsg = response["msg"] as? String {
                 NSLog("Ollama Cloud API key verification failed: \(errorMsg)")
                 return false
             }
             
-            // If we get a valid response (even if it's an error about the model), the API key is valid
-            // The API key is valid if we don't get a 401 or 403 error
+            /// If we get a valid response (even if it's an error about the model), the API key is valid
+            /// The API key is valid if we don't get a 401 or 403 error
             return true
         } catch {
             NSLog("Ollama Cloud API key verification error: \(error)")
@@ -409,15 +523,18 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Fetch available Ollama Cloud models from Ollama Cloud API
+    /// Verifies API key before fetching and handles loading states
+    /// - Parameter apiKey: Ollama Cloud API key for authentication
     func fetchOllamaCloudModels(apiKey: String) async {
-        // Set loading state to true and clear existing models immediately
+        /// Set loading state to true and clear existing models immediately
         DispatchQueue.main.async {
             self.isLoadingOllamaCloudModels = true
             self.ollamaCloudModelList = []
             self.selectedOllamaCloudModel = "Ollama Cloud"
         }
         
-        // Check if API key is empty or invalid
+        /// Check if API key is empty or invalid
         if apiKey.isEmpty || apiKey.trimmingCharacters(in: .whitespaces).isEmpty {
             NSLog("Ollama Cloud API key is empty")
             DispatchQueue.main.async {
@@ -428,8 +545,8 @@ class CommonViewModel: ObservableObject {
             return
         }
         
-        // Verify API key first since /api/tags doesn't require authentication
-        // Only fetch models if API key is valid
+        /// Verify API key first since /api/tags doesn't require authentication
+        /// Only fetch models if API key is valid
         let isApiKeyValid = await verifyOllamaCloudApiKey(key: apiKey)
         if !isApiKeyValid {
             NSLog("Ollama Cloud API key is invalid")
@@ -457,7 +574,7 @@ class CommonViewModel: ObservableObject {
             
             let response = try await ollamaCloudApi.tags()
             
-            // Check if response contains error message
+            /// Check if response contains error message
             if let errorMsg = response["msg"] as? String {
                 NSLog("Ollama Cloud API error: \(errorMsg)")
                 DispatchQueue.main.async {
@@ -511,7 +628,13 @@ class CommonViewModel: ObservableObject {
         }
     }
     
-    /// http proxy config
+    // MARK: - HTTP Proxy Configuration
+    
+    /// Update HTTP proxy host configuration
+    /// Removes protocol prefix (http://, https://) from host before storing
+    /// - Parameters:
+    ///   - name: Proxy server hostname or IP address
+    ///   - port: Proxy server port number
     func updateHttpProxyHost(name: String, port: String) {
         preference.updatePreference(preferenceKey: "httpProxyHostName", preferenceValue: removeProtocolPrefix(from: name))
         preference.updatePreference(preferenceKey: "httpProxyHostPort", preferenceValue: port)
@@ -519,6 +642,10 @@ class CommonViewModel: ObservableObject {
         self.httpProxyHostPort = port
     }
     
+    /// Update HTTP proxy authentication credentials
+    /// - Parameters:
+    ///   - login: Proxy authentication username
+    ///   - password: Proxy authentication password
     func updateHttpProxyAuth(login: String, password: String) {
         preference.updatePreference(preferenceKey: "httpProxyLogin", preferenceValue: login)
         preference.updatePreference(preferenceKey: "httpProxyPassword", preferenceValue: password)
@@ -526,18 +653,24 @@ class CommonViewModel: ObservableObject {
         self.httpProxyPassword = password
     }
     
+    /// Update HTTP proxy enabled status
+    /// - Parameter key: Whether HTTP proxy should be enabled
     func updateHttpProxyStatus(key: Bool) {
         let keyString = key ? "true" : "false"
         preference.updatePreference(preferenceKey: "isHttpProxyEnabled", preferenceValue: keyString)
         self.isHttpProxyEnabled = key
     }
     
+    /// Update HTTP proxy authentication enabled status
+    /// - Parameter key: Whether HTTP proxy authentication should be enabled
     func updateHttpProxyAuthStatus(key: Bool) {
         let keyString = key ? "true" : "false"
         preference.updatePreference(preferenceKey: "isHttpProxyAuthEnabled", preferenceValue: keyString)
         self.isHttpProxyAuthEnabled = key
     }
     
+    /// Load HTTP proxy enabled status from database
+    /// - Returns: True if HTTP proxy is enabled, false otherwise
     func loadHttpProxyStatusFromDatabase() -> Bool {
         let keyString = httpProxyDefaultStatus ? "true" : "false"
         let isHttpProxyEnabledString = loadPreference(forKey: "isHttpProxyEnabled", defaultValue: keyString)
@@ -547,6 +680,8 @@ class CommonViewModel: ObservableObject {
         return self.isHttpProxyEnabled
     }
     
+    /// Load HTTP proxy authentication enabled status from database
+    /// - Returns: True if HTTP proxy authentication is enabled, false otherwise
     func loadHttpProxyAuthStatusFromDatabase() -> Bool {
         let keyString = httpProxyAuthDefaultStatus ? "true" : "false"
         let isHttpProxyAuthEnabledString = loadPreference(forKey: "isHttpProxyAuthEnabled", defaultValue: keyString)
@@ -556,6 +691,8 @@ class CommonViewModel: ObservableObject {
         return self.isHttpProxyAuthEnabled
     }
     
+    /// Load HTTP proxy host configuration from database
+    /// - Returns: Tuple containing proxy hostname and port
     func loadHttpProxyHostFromDatabase() -> (name: String, port: String) {
         self.httpProxyHostName = loadPreference(forKey: "httpProxyHostName", defaultValue: defaultHttpProxyHostName)
         self.httpProxyHostPort = loadPreference(forKey: "httpProxyHostPort", defaultValue: defaultHttpProxyHostPort)
@@ -563,6 +700,8 @@ class CommonViewModel: ObservableObject {
         return (name: self.httpProxyHostName, port: self.httpProxyHostPort)
     }
     
+    /// Load HTTP proxy authentication credentials from database
+    /// - Returns: Tuple containing proxy login username and password
     func loadHttpProxyAuthFromDatabase() -> (login: String, password: String) {
         self.httpProxyLogin = loadPreference(forKey: "httpProxyLogin", defaultValue: defaultHttpProxyLogin)
         self.httpProxyPassword = loadPreference(forKey: "httpProxyPassword", defaultValue: defaultHttpProxyPassword)
@@ -570,6 +709,10 @@ class CommonViewModel: ObservableObject {
         return (login: self.httpProxyLogin, password: self.httpProxyPassword)
     }
     
+    // MARK: - Ollama Service Status
+    
+    /// Check if local Ollama API service is available
+    /// Updates service availability status and loads available local models
     func ollamaApiServiceStatusCheck() {
         Task {
             let ollama = OllamaApi()
@@ -593,6 +736,8 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Check if at least one local Ollama model is installed
+    /// Updates hasLocalModelInstalled status and loads available local models
     func localModelInstalledCheck() {
         Task {
             let ollama = OllamaApi()
@@ -616,10 +761,20 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Local Model Management
+    
+    /// Find a local model by name in the provided model list
+    /// - Parameters:
+    ///   - name: Model name to search for
+    ///   - models: Array of OllamaModel objects to search in
+    /// - Returns: Matching OllamaModel if found, nil otherwise
     func findLocalModel(byName name: String, in models: [OllamaModel]) -> OllamaModel? {
         return models.first(where: { $0.name == name })
     }
     
+    /// Load and update list of available local Ollama models
+    /// Fetches models from local Ollama instance and calculates model sizes
+    /// Also appends models to remote list if they're not already present
     func loadAvailableLocalModels() {
         
         Task {
@@ -642,8 +797,7 @@ class CommonViewModel: ObservableObject {
                         sizeInGB = 0.0
                     }
                     
-                    
-                    // init available local model list
+                    /// Initialize available local model list
                     DispatchQueue.main.async {
                         self.ollamaLocalModelList.append(OllamaModel(
                             modelName: (model["name"] as? String ?? "Not Available"),
@@ -653,7 +807,7 @@ class CommonViewModel: ObservableObject {
                             isDefault: false
                         ))
                         
-                        // append model installed by library
+                        /// Append model to remote list if not already present (installed by library)
                         if self.findLocalModel(byName: model["name"] as! String, in: self.ollamaRemoteModelList) == nil {
                             self.ollamaRemoteModelList.append(OllamaModel(
                                 modelName: (model["name"] as? String ?? "Not Available"),
@@ -668,7 +822,7 @@ class CommonViewModel: ObservableObject {
                     }
                 }
                 
-                // setup default model
+                /// Setup default selected model
                 DispatchQueue.main.async {
                     if self.ollamaLocalModelList.count > 0 {
                         self.selectedOllamaModel = self.ollamaLocalModelList[0].name
@@ -681,6 +835,9 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Remove a local Ollama model by name
+    /// - Parameter name: Name of the model to delete
+    /// - Returns: True if deletion was successful, false otherwise
     func removeOllamaLocalModel(name: String) async -> Bool {
         do {
             let res = try await ollama.delete(model: name)
@@ -696,6 +853,9 @@ class CommonViewModel: ObservableObject {
         return false
     }
     
+    /// Check if a local Ollama model exists by name
+    /// - Parameter name: Model name to check
+    /// - Returns: True if model exists locally, false otherwise
     func isLocalModelExist(name: String) async -> Bool {
         do {
             let response = try await ollama.tags()

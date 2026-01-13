@@ -8,6 +8,8 @@
 import Foundation
 import SwiftyJSON
 
+/// API client for interacting with DeepSeek API
+/// Supports HTTP/HTTPS proxy configuration with optional authentication
 class DeepSeekApi {
     private var apiBaseUrl: String
     private var proxyUrl: String
@@ -18,6 +20,16 @@ class DeepSeekApi {
     private var login: String?
     private var password: String?
     
+    /// Initialize DeepSeek API client
+    /// - Parameters:
+    ///   - apiBaseUrl: Base URL for DeepSeek API (defaults to deepSeekApiBaseUrl)
+    ///   - proxyUrl: HTTP proxy server URL
+    ///   - proxyPort: HTTP proxy server port
+    ///   - authorizationToken: DeepSeek API key (Bearer token)
+    ///   - isHttpProxyEnabled: Whether HTTP proxy is enabled
+    ///   - isHttpProxyAuthEnabled: Whether proxy authentication is required
+    ///   - login: Proxy authentication username (optional)
+    ///   - password: Proxy authentication password (optional)
     init(
         apiBaseUrl: String = deepSeekApiBaseUrl,
         proxyUrl: String,
@@ -38,10 +50,24 @@ class DeepSeekApi {
         self.password = password
     }
     
+    /// Fetch available models from DeepSeek API
+    /// - Returns: API response containing list of available models
+    /// - Throws: Error if request fails
     public func models() async throws -> AnyObject {
         return try await makeRequest(method: "GET", endpoint: "models")
     }
     
+    /// Send chat completion request to DeepSeek API
+    /// - Parameters:
+    ///   - modelName: Name of the DeepSeek model to use
+    ///   - responseLang: Preferred response language (defaults to "English", use "Auto" for automatic)
+    ///   - messages: Current conversation messages
+    ///   - historyMessages: Previous conversation messages (last 5 will be included)
+    ///   - seed: Random seed for reproducible outputs (default: 0)
+    ///   - temperature: Sampling temperature (default: 0.8)
+    ///   - top_p: Nucleus sampling parameter (default: 0.9)
+    /// - Returns: API response containing chat completion
+    /// - Throws: Error if request fails or invalid message role is provided
     public func chat(
         modelName: String,
         responseLang: String = "English",
@@ -54,6 +80,8 @@ class DeepSeekApi {
         
         var mutableMessages = messages
         
+        /// Parse and prepend history messages (last 5 messages in reverse order)
+        /// Validate and normalize message roles to lowercase
         if !historyMessages.isEmpty {
             for historyMessage in historyMessages.suffix(5).reversed() {
                 let role = historyMessage.messageRole.lowercased()
@@ -67,6 +95,7 @@ class DeepSeekApi {
             }
         }
         
+        /// Setup system role prompt for response language preference
         if responseLang != "Auto" {
             let sysRolePrompt = [
                 "role": "system",
@@ -75,7 +104,7 @@ class DeepSeekApi {
             mutableMessages.insert(sysRolePrompt, at: 0)
         }
         
-        // [修改点3] 清理无效字段
+        /// Prepare request parameters with required fields for DeepSeek API
         let params: [String: Any] = [
             "model": modelName,
             "messages": mutableMessages,
@@ -92,6 +121,13 @@ class DeepSeekApi {
         return try await makeRequest(method: "POST", endpoint: "chat/completions", params: params)
     }
     
+    /// Make HTTP request to DeepSeek API with proxy support
+    /// - Parameters:
+    ///   - method: HTTP method (GET, POST, etc.)
+    ///   - endpoint: API endpoint path
+    ///   - params: Request parameters as dictionary
+    /// - Returns: Response data as AnyObject (typically JSON)
+    /// - Throws: URLError if request fails
     private func makeRequest(
         method: String,
         endpoint: String,
@@ -145,7 +181,7 @@ class DeepSeekApi {
                 if !(200...299).contains(httpResponse.statusCode) {
                     let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
                     
-                    // parse error msg
+                    /// Parse error message from JSON response if available
                     if let data = responseBody.data(using: .utf8),
                        let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let error = json["error"] as? [String: Any],
@@ -153,11 +189,12 @@ class DeepSeekApi {
                         return ["msg": "DeepSeek Error: \(message)"] as AnyObject
                     }
                     
-                    // if failed return origin msg
+                    /// If JSON parsing fails, return original error message
                     return ["msg": "DeepSeek Error \(httpResponse.statusCode): \(responseBody)"] as AnyObject
                 }
             }
             
+            /// Handle decode failure - response is not valid JSON
             if ((try? JSONSerialization.jsonObject(with: data, options: []) is [String: Any]) == nil) {
                 let response = ["msg": "DeepSeek Response No JSON body or failed to decode."]
                 return response as AnyObject

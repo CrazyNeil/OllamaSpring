@@ -9,11 +9,17 @@ import Foundation
 import SwiftyJSON
 import SwiftUI
 
+/// API client for interacting with local Ollama API
+/// Connects to locally running Ollama instance via HTTP
 class OllamaApi {
     private var apiBaseUrl: String
     private var port: String
     private let preference = PreferenceManager()
     
+    /// Initialize Ollama API client
+    /// - Parameters:
+    ///   - apiBaseUrl: Base URL for Ollama API (optional, defaults to database value or ollamaApiDefaultBaseUrl)
+    ///   - port: Port number for Ollama API (optional, defaults to database value or ollamaApiDefaultPort)
     init(apiBaseUrl: String? = nil, port: String? = nil) {
         // First initialize stored properties
         self.apiBaseUrl = ollamaApiDefaultBaseUrl
@@ -30,13 +36,21 @@ class OllamaApi {
         }
     }
     
+    /// Load Ollama host configuration from database
+    /// - Returns: Tuple containing base URL and port
     private func loadConfigFromDatabase() -> (baseUrl: String, port: String) {
         let baseUrl = preference.loadPreferenceValue(forKey: "ollamaHostName", defaultValue: ollamaApiDefaultBaseUrl)
         let port = preference.loadPreferenceValue(forKey: "ollamaHostPort", defaultValue: ollamaApiDefaultPort)
         return ("http://" + baseUrl, port)
     }
-
     
+    /// Make HTTP request to local Ollama API
+    /// - Parameters:
+    ///   - method: HTTP method (GET, POST, DELETE)
+    ///   - endpoint: API endpoint path
+    ///   - params: Request parameters as dictionary
+    /// - Returns: Response data as AnyObject (typically JSON)
+    /// - Throws: URLError if request fails
     private func makeRequest(
         method: String,
         endpoint: String,
@@ -54,14 +68,15 @@ class OllamaApi {
                 let apiResponse = JSON(data)
                 return apiResponse.rawValue as AnyObject
             } else if method == "DELETE" {
-                // Convert params dictionary to JSON data
+                /// Convert params dictionary to JSON data for DELETE request
                 let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
                 request.httpBody = jsonData
-                // Send the request
+                /// Send the DELETE request
                 let (data, _) = try await URLSession.shared.data(for: request)
                 let apiResponse = JSON(data)
                 return apiResponse.rawValue as AnyObject
             } else {
+                /// Handle POST and other methods
                 let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
                 request.httpBody = jsonData
                 let (data, _) = try await URLSession.shared.data(for: request)
@@ -85,6 +100,22 @@ class OllamaApi {
         }
     }
     
+    /// Send chat completion request to local Ollama API
+    /// - Parameters:
+    ///   - modelName: Name of the Ollama model to use
+    ///   - role: Message role (user, assistant, system)
+    ///   - content: Message content
+    ///   - stream: Whether to stream the response (default: false)
+    ///   - responseLang: Preferred response language (defaults to "English", use "Auto" for automatic)
+    ///   - messages: Previous conversation messages (last 5 will be included)
+    ///   - image: Base64-encoded images for vision models (optional)
+    ///   - temperature: Sampling temperature (default: 0.8)
+    ///   - seed: Random seed for reproducible outputs (default: 0)
+    ///   - num_ctx: Context window size (default: 2048)
+    ///   - top_k: Top-k sampling parameter (default: 40)
+    ///   - top_p: Nucleus sampling parameter (default: 0.9)
+    /// - Returns: API response containing chat completion
+    /// - Throws: Error if request fails
     public func chat(
         modelName:String,
         role:String,
@@ -100,7 +131,7 @@ class OllamaApi {
         top_p: Double = 0.9
     ) async throws -> AnyObject {
         
-        // options init
+        /// Initialize model options for Ollama API
         let options:[String: Any] = [
             /// The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)
             "temperature": temperature,
@@ -134,7 +165,7 @@ class OllamaApi {
         }
         context.append(newPrompt)
         
-        /// system role config
+        /// Setup system role prompt for response language preference
         if responseLang != "Auto" {
             let sysRolePrompt = [
                 "role": "system",
@@ -148,11 +179,17 @@ class OllamaApi {
         return try await makeRequest(method: "POST", endpoint: "chat", params: params)
     }
     
+    /// Fetch available models from local Ollama instance
+    /// - Returns: API response containing list of available models
+    /// - Throws: Error if request fails
     public func tags() async throws -> AnyObject {
-        
         return try await makeRequest(method: "GET", endpoint: "tags")
     }
     
+    /// Delete a model from local Ollama instance
+    /// - Parameter model: Name of the model to delete
+    /// - Returns: True if deletion successful, false otherwise
+    /// - Throws: Error if request fails
     public func delete(model:String) async throws -> Bool {
         let params: [String: Any] = [
             "name": model

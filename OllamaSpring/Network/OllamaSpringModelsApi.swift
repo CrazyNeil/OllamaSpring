@@ -8,12 +8,17 @@
 import Foundation
 import SwiftUI
 
+/// API client for fetching model lists from various sources
+/// Singleton pattern for shared access across the application
 class OllamaSpringModelsApi {
     static let shared = OllamaSpringModelsApi()
     
     private init() {}
     
-    /// Fetch Ollama model list
+    /// Fetch Ollama model list from remote JSON endpoint
+    /// Uses cache-busting query parameter to ensure fresh data
+    /// - Returns: Array of OllamaModel objects
+    /// - Throws: URLError if request fails, returns empty array on decode failure
     func fetchOllamaModels() async throws -> [OllamaModel] {
         guard let url = URL(string: "\(OllamaSpringModelsApiURL.ollamaModels)?_=\(Date().timeIntervalSince1970)") else {
             throw URLError(.badURL)
@@ -29,7 +34,15 @@ class OllamaSpringModelsApi {
         }
     }
     
-    /// Fetch DeepSeek model list
+    /// Fetch DeepSeek model list from DeepSeek API
+    /// - Parameters:
+    ///   - apiKey: DeepSeek API key for authentication
+    ///   - proxyUrl: HTTP proxy server URL
+    ///   - proxyPort: HTTP proxy server port
+    ///   - isHttpProxyEnabled: Whether HTTP proxy is enabled
+    ///   - isHttpProxyAuthEnabled: Whether proxy authentication is required
+    /// - Returns: Array of DeepSeekModel objects
+    /// - Throws: Error if request fails, returns empty array on parse failure
     func fetchDeepSeekModels(apiKey: String, proxyUrl: String, proxyPort: Int, isHttpProxyEnabled: Bool, isHttpProxyAuthEnabled: Bool) async throws -> [DeepSeekModel] {
         let deepSeekApi = DeepSeekApi(
             proxyUrl: proxyUrl,
@@ -44,6 +57,8 @@ class OllamaSpringModelsApi {
             if let modelResponse = response as? [String: Any],
                let modelsData = modelResponse["data"] as? [[String: Any]] {
                 
+                /// Map API response data to DeepSeekModel objects
+                /// Mark "deepseek-chat" as the default model
                 return modelsData.map { modelData in
                     let modelId = modelData["id"] as? String ?? ""
                     return DeepSeekModel(
@@ -61,7 +76,9 @@ class OllamaSpringModelsApi {
     }
 }
 
-// Response structures
+// MARK: - Response Structures
+
+/// Response structure for Ollama model list API
 struct OllamaModelResponse: Codable {
     let models: [OllamaModel]
 }

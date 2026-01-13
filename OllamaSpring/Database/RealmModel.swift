@@ -8,17 +8,25 @@
 import Foundation
 import RealmSwift
 
+// MARK: - Realm Configuration
+
+/// Singleton class for managing Realm database configuration
+/// Handles schema versioning and migration logic
 class RealmConfiguration {
     static let shared = RealmConfiguration()
 
     private init() {}
 
+    /// Lazy-initialized Realm configuration with migration support
+    /// - Note: Schema version should be incremented when updating the data model
+    /// - Warning: `deleteRealmIfMigrationNeeded` is set to true for development convenience
     lazy var config: Realm.Configuration = {
         var config = Realm.Configuration(
             schemaVersion: 0, // Increment this value when you update the schema
             migrationBlock: { migration, oldSchemaVersion in
+                /// Migrate from schema version < 2 to version 2
+                /// Renames preference key/value fields for consistency
                 if oldSchemaVersion < 2 {
-                    // Migrate to schema version 2
                     migration.enumerateObjects(ofType: RealmPreference.className()) { oldObject, newObject in
                         newObject?["preferenceKey"] = oldObject?["key"]
                         newObject?["preferenceValue"] = oldObject?["value"]
@@ -30,10 +38,18 @@ class RealmConfiguration {
     }()
 }
 
+// MARK: - Realm Models
+
+/// Realm model for storing application preferences
+/// Uses key-value pair structure for flexible preference management
 class RealmPreference: Object {
     @Persisted(primaryKey: true) var preferenceKey: String
     @Persisted var preferenceValue: String
     
+    /// Convenience initializer for creating preference records
+    /// - Parameters:
+    ///   - preferenceKey: Unique key identifier for the preference
+    ///   - preferenceValue: String value of the preference
     convenience init(preferenceKey: String, preferenceValue: String) {
         self.init()
         self.preferenceKey = preferenceKey
@@ -41,6 +57,8 @@ class RealmPreference: Object {
     }
 }
 
+/// Realm model for storing chat/conversation information
+/// Represents a single conversation session
 class RealmChat: Object {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var chatId: String
@@ -48,6 +66,12 @@ class RealmChat: Object {
     @Persisted var image: String
     @Persisted var createdAt: String
     
+    /// Convenience initializer for creating chat records
+    /// - Parameters:
+    ///   - chatId: Unique identifier for the chat (UUID as String)
+    ///   - name: Display name of the chat
+    ///   - image: Avatar image identifier for the chat
+    ///   - createdAt: Creation timestamp as formatted string
     convenience init(chatId: String, name: String, image: String, createdAt: String){
         self.init()
         self.chatId = chatId
@@ -57,6 +81,8 @@ class RealmChat: Object {
     }
 }
 
+/// Realm model for storing individual messages within chats
+/// Contains message content, metadata, and performance metrics
 class RealmMessage: Object {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var chatId: String
@@ -76,7 +102,24 @@ class RealmMessage: Object {
     @Persisted var messageFileType: String = ""
     @Persisted var messageFileText: String = ""
 
-    
+    /// Convenience initializer for creating message records
+    /// - Parameters:
+    ///   - chatId: Identifier of the chat this message belongs to
+    ///   - model: Name of the AI model used for this message
+    ///   - createdAt: Creation timestamp as formatted string
+    ///   - messageRole: Role of the message sender (user, assistant, system)
+    ///   - messageContent: Text content of the message
+    ///   - done: Whether the message generation is complete
+    ///   - totalDuration: Total processing duration in milliseconds
+    ///   - loadDuration: Model loading duration in milliseconds
+    ///   - promptEvalCount: Number of tokens in the prompt
+    ///   - promptEvalCuration: Prompt evaluation duration in nanoseconds
+    ///   - evalCount: Number of tokens generated
+    ///   - evalDuration: Token generation duration in nanoseconds
+    ///   - image: List of base64-encoded images (for vision models)
+    ///   - messageFileName: Name of attached file (if any)
+    ///   - messageFileType: Type/MIME type of attached file (if any)
+    ///   - messageFileText: Extracted text content from attached file (if any)
     convenience init(
         chatId: String,
         model: String,
@@ -115,18 +158,26 @@ class RealmMessage: Object {
     }
 }
 
+// MARK: - Preference Manager
+
+/// Manager class for handling application preferences in Realm database
+/// Provides CRUD operations for preference key-value pairs
 class PreferenceManager {
 
+    /// Update existing preference or create new one if it doesn't exist
+    /// - Parameters:
+    ///   - preferenceKey: Unique key identifier for the preference
+    ///   - preferenceValue: String value to set for the preference
     func updatePreference(preferenceKey: String, preferenceValue: String) {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
 
         if let record = realm.objects(RealmPreference.self).filter("preferenceKey == %@", preferenceKey).first {
-            // update if exists
+            /// Update existing preference record
             try! realm.write {
                 record.preferenceValue = preferenceValue
             }
         } else {
-            // create if not exists
+            /// Create new preference record if it doesn't exist
             let newRecord = RealmPreference()
             newRecord.preferenceKey = preferenceKey
             newRecord.preferenceValue = preferenceValue
@@ -137,6 +188,11 @@ class PreferenceManager {
         }
     }
     
+    /// Set preference value only if it doesn't already exist
+    /// - Parameters:
+    ///   - preferenceKey: Unique key identifier for the preference
+    ///   - preferenceValue: String value to set for the preference
+    /// - Note: This method will not overwrite existing preferences
     func setPreference(preferenceKey: String, preferenceValue: String) {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         guard realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) == nil else {
@@ -148,6 +204,9 @@ class PreferenceManager {
         }
     }
 
+    /// Get preference records matching the specified key
+    /// - Parameter preferenceKey: Key to search for
+    /// - Returns: Realm Results containing matching preference records
     func getPreference(preferenceKey: String) -> Results<RealmPreference> {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
@@ -159,6 +218,9 @@ class PreferenceManager {
         return item
     }
     
+    /// Delete a preference record by key
+    /// - Parameter preferenceKey: Key of the preference to delete
+    /// - Note: Silently returns if the preference doesn't exist
     func deletePreference(preferenceKey: String) {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         guard let record = realm.object(ofType: RealmPreference.self, forPrimaryKey: preferenceKey) else {
@@ -169,7 +231,12 @@ class PreferenceManager {
         }
     }
     
-    /// Load preference value with default value
+    /// Load preference value with default value fallback
+    /// If preference doesn't exist or is empty, creates it with the default value
+    /// - Parameters:
+    ///   - key: Preference key to load
+    ///   - defaultValue: Default value to use if preference doesn't exist
+    /// - Returns: Preference value or default value if not found
     func loadPreferenceValue(forKey key: String, defaultValue: String) -> String {
         let preferenceValue = getPreference(preferenceKey: key).first?.preferenceValue
         if let value = preferenceValue, !value.isEmpty {
@@ -182,8 +249,14 @@ class PreferenceManager {
 
 }
 
+// MARK: - Message Manager
+
+/// Manager class for handling message operations in Realm database
+/// Provides CRUD operations for chat messages
 class MessageManager {
 
+    /// Delete all messages from the database
+    /// - Warning: This operation is irreversible
     func deleteAllMessages() {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         let allMessages = realm.objects(RealmMessage.self)
@@ -192,6 +265,9 @@ class MessageManager {
         }
     }
 
+    /// Get all messages for a specific chat
+    /// - Parameter chatId: Identifier of the chat to retrieve messages for
+    /// - Returns: Realm Results containing messages for the specified chat, ordered by creation time
     func getMessagesByChatId(chatId: String) -> Results<RealmMessage> {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
@@ -246,6 +322,8 @@ class MessageManager {
         return latestDates
     }
     
+    /// Delete all messages belonging to a specific chat
+    /// - Parameter chatId: Identifier of the chat whose messages should be deleted
     func deleteMessagesByChatId(chatId: String) {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
@@ -259,11 +337,16 @@ class MessageManager {
         }
     }
     
+    /// Save a message to the database
+    /// - Parameter message: Message object to save
+    /// - Returns: True if save was successful, false otherwise
+    /// - Note: Converts UUID chatId to String for storage
     func saveMessage(message:Message) -> Bool {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
         do {
             try realm.write {
+                /// Convert image array to Realm List
                 let imageList = List<String>()
                 imageList.append(objectsIn: message.image)
                 
@@ -295,10 +378,16 @@ class MessageManager {
     }
 }
 
+// MARK: - Chat Manager
 
-
+/// Manager class for handling chat/conversation operations in Realm database
+/// Provides CRUD operations for chat records
 class ChatManager {
     
+    /// Save a chat to the database
+    /// - Parameter chat: Chat object to save
+    /// - Returns: True if save was successful, false otherwise
+    /// - Note: Converts UUID chatId to String for storage
     func saveChat(chat:Chat) -> Bool {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
@@ -319,6 +408,9 @@ class ChatManager {
         }
     }
     
+    /// Delete a chat by its UUID
+    /// - Parameter id: UUID of the chat to delete
+    /// - Returns: True if deletion was successful, false if chat not found or deletion failed
     func deleteChat(withId id: UUID) -> Bool {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         
@@ -338,6 +430,11 @@ class ChatManager {
         }
     }
     
+    /// Update the name of an existing chat
+    /// - Parameters:
+    ///   - id: UUID of the chat to update
+    ///   - newName: New name to set for the chat
+    /// - Returns: True if update was successful, false if chat not found or update failed
     func updateChatName(withId id: UUID, newName: String) -> Bool {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
 
@@ -357,6 +454,8 @@ class ChatManager {
         }
     }
 
+    /// Delete all chats from the database
+    /// - Warning: This operation is irreversible and will delete all chat records
     func deleteAllChats() {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         let allChats = realm.objects(RealmChat.self)
@@ -365,6 +464,8 @@ class ChatManager {
         }
     }
     
+    /// Get all chats from the database
+    /// - Returns: Realm Results containing all chat records
     func getAllChats() -> Results<RealmChat> {
         let realm = try! Realm(configuration: RealmConfiguration.shared.config)
         return  realm.objects(RealmChat.self)

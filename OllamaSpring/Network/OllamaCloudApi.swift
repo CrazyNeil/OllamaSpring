@@ -8,6 +8,8 @@
 import Foundation
 import SwiftyJSON
 
+/// API client for interacting with Ollama Cloud API
+/// Supports HTTP/HTTPS proxy configuration with optional authentication
 class OllamaCloudApi {
     private var apiBaseUrl: String
     private var proxyUrl: String
@@ -18,6 +20,16 @@ class OllamaCloudApi {
     private var login: String?
     private var password: String?
     
+    /// Initialize Ollama Cloud API client
+    /// - Parameters:
+    ///   - apiBaseUrl: Base URL for Ollama Cloud API (defaults to "https://ollama.com")
+    ///   - proxyUrl: HTTP proxy server URL
+    ///   - proxyPort: HTTP proxy server port
+    ///   - authorizationToken: Ollama Cloud API key (Bearer token)
+    ///   - isHttpProxyEnabled: Whether HTTP proxy is enabled
+    ///   - isHttpProxyAuthEnabled: Whether proxy authentication is required
+    ///   - login: Proxy authentication username (optional)
+    ///   - password: Proxy authentication password (optional)
     init(
         apiBaseUrl: String = "https://ollama.com",
         proxyUrl: String,
@@ -46,6 +58,21 @@ class OllamaCloudApi {
     
     /// Send chat message to Ollama Cloud
     /// API endpoint: https://ollama.com/api/chat
+    /// - Parameters:
+    ///   - modelName: Name of the Ollama Cloud model to use
+    ///   - role: Message role (user, assistant, system)
+    ///   - content: Message content
+    ///   - stream: Whether to stream the response (default: false)
+    ///   - responseLang: Preferred response language (defaults to "English", use "Auto" for automatic)
+    ///   - messages: Previous conversation messages (last 5 will be included)
+    ///   - image: Base64-encoded images for vision models (optional)
+    ///   - temperature: Sampling temperature (default: 0.8)
+    ///   - seed: Random seed for reproducible outputs (default: 0)
+    ///   - num_ctx: Context window size (default: 2048)
+    ///   - top_k: Top-k sampling parameter (default: 40)
+    ///   - top_p: Nucleus sampling parameter (default: 0.9)
+    /// - Returns: API response containing chat completion
+    /// - Throws: Error if request fails
     public func chat(
         modelName: String,
         role: String,
@@ -60,7 +87,7 @@ class OllamaCloudApi {
         top_k: Int = 40,
         top_p: Double = 0.9
     ) async throws -> AnyObject {
-        // options init
+        /// Initialize model options for Ollama Cloud API
         let options: [String: Any] = [
             "temperature": temperature,
             "seed": seed,
@@ -104,6 +131,13 @@ class OllamaCloudApi {
         return try await makeRequest(method: "POST", endpoint: "api/chat", params: params)
     }
     
+    /// Make HTTP request to Ollama Cloud API with proxy support
+    /// - Parameters:
+    ///   - method: HTTP method (GET, POST, etc.)
+    ///   - endpoint: API endpoint path
+    ///   - params: Request parameters as dictionary
+    /// - Returns: Response data as AnyObject (typically JSON)
+    /// - Throws: URLError if request fails
     private func makeRequest(
         method: String,
         endpoint: String,
@@ -156,7 +190,7 @@ class OllamaCloudApi {
             if let httpResponse = response as? HTTPURLResponse {
                 if !(200...299).contains(httpResponse.statusCode) {
                     let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
-                    // Handle specific error codes
+                    /// Handle specific HTTP error codes with user-friendly messages
                     if httpResponse.statusCode == 401 {
                         return ["msg": "Invalid API key. Please check your Ollama Cloud API key."] as AnyObject
                     } else if httpResponse.statusCode == 403 {
@@ -167,6 +201,7 @@ class OllamaCloudApi {
                 }
             }
             
+            /// Handle decode failure - response is not valid JSON
             if ((try? JSONSerialization.jsonObject(with: data, options: []) is [String: Any]) == nil) {
                 let response = ["msg": "Ollama Cloud Response No JSON body or failed to decode."]
                 return response as AnyObject
