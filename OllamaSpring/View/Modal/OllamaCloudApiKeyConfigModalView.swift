@@ -80,6 +80,15 @@ struct OllamaCloudApiKeyConfigModalView: View {
                     .cornerRadius(4)
                     .onTapGesture {
                         Task {
+                            // Allow saving empty key (deletion) without verification
+                            let trimmedKey = ollamaCloudApiKeyText.trimmingCharacters(in: .whitespaces)
+                            if trimmedKey.isEmpty {
+                                // Save empty key (delete) and close modal
+                                commonViewModel.updateOllamaCloudApiKey(key: "")
+                                self.openOllamaCloudApiKeyConfigModal = false
+                                // Clear model list when key is deleted
+                                await commonViewModel.fetchOllamaCloudModels(apiKey: "")
+                            } else {
                             // Save API key first
                             commonViewModel.updateOllamaCloudApiKey(key: ollamaCloudApiKeyText)
                             
@@ -101,6 +110,7 @@ struct OllamaCloudApiKeyConfigModalView: View {
                                 
                                 // Refresh model list even if verification failed
                                 await commonViewModel.fetchOllamaCloudModels(apiKey: ollamaCloudApiKeyText)
+                                }
                             }
                         }
                     }

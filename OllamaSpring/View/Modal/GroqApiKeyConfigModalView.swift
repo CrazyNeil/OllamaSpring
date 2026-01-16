@@ -79,12 +79,31 @@ struct GroqApiKeyConfigModalView: View {
                     .background(Color.blue)
                     .cornerRadius(4)
                     .onTapGesture {
-                        commonViewModel.updateGroqApiKey(key: groqApiKeyText)
-                        // Refresh model list after saving API key
                         Task {
+                            // Allow saving empty key (deletion) without verification
+                            let trimmedKey = groqApiKeyText.trimmingCharacters(in: .whitespaces)
+                            if trimmedKey.isEmpty {
+                                // Save empty key (delete) and close modal
+                                commonViewModel.updateGroqApiKey(key: "")
+                                self.openGroqApiKeyConfigModal = false
+                                // Clear model list when key is deleted
+                                await commonViewModel.fetchGroqModels()
+                            } else {
+                                // Verify non-empty key before saving
+                                if await commonViewModel.verifyGroqApiKey(key: groqApiKeyText) {
+                                    commonViewModel.updateGroqApiKey(key: groqApiKeyText)
+                                    self.openGroqApiKeyConfigModal = false
                             await commonViewModel.fetchGroqModels()
+                                } else {
+                                    let alert = NSAlert()
+                                    alert.messageText = NSLocalizedString("groq.connection_failed", comment: "")
+                                    alert.informativeText = NSLocalizedString("groq.connection_failed_desc", comment: "")
+                                    alert.alertStyle = .warning
+                                    alert.addButton(withTitle: NSLocalizedString("groq.ok", comment: ""))
+                                    alert.runModal()
+                                }
+                            }
                         }
-                        self.openGroqApiKeyConfigModal = false
                     }
 
                 Text(NSLocalizedString("modal.cancel", comment: ""))

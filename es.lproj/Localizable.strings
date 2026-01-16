@@ -35,7 +35,8 @@
 "chatlist.model" = "Modelo";
 "chatlist.download_first" = "Primero debes descargar un modelo y seleccionar uno preferido antes de crear un nuevo chat";
 "chatlist.remove" = "Eliminar";
-"chatlist.downloads" = "Descargas";
+"chatlist.downloads" = "Modelos locales";
+"chatlist.no_model_installed" = "No hay modelos instalados";
 "chatlist.reset_all" = "Restablecer todo";
 "chatlist.temperature" = "Temperatura";
 "chatlist.temperature_desc" = "La temperatura del modelo. Aumentar la temperatura hará que las respuestas del modelo sean más creativas. (Predeterminado: 0.8)";
@@ -91,6 +92,9 @@
 "groq.enter_secret_key" = "INGRESAR CLAVE SECRETA";
 "groq.how_to_apply" = "¿Cómo solicitar una clave API de Groq?";
 "groq.click_here" = "haz clic aquí";
+"groq.connection_failed" = "Error de conexión";
+"groq.connection_failed_desc" = "No se pudo conectar al host de Groq. Por favor verifica tu apiKey o la configuración del proxy HTTP.";
+"groq.ok" = "OK";
 "groq.description" = "Groq es una inferencia de IA rápida, impulsada por la tecnología de inferencia de IA LPU™ que proporciona IA rápida, asequible y energéticamente eficiente.";
 
 // Ollama Host Config
@@ -123,7 +127,7 @@
 "menu.check_for_updates" = "Buscar actualizaciones…";
 
 // Ollama Library
-"ollama.library.install_title" = "Instalar modelo de Ollama";
+"ollama.library.install_title" = "Descargar & Instalar modelo local de Ollama";
 "ollama.library.enter_model_name" = "Ingresar nombre del modelo";
 "ollama.library.what_is_model_name" = "¿qué es el nombre del modelo? como llama3:70b";
 "ollama.library.click_here" = "haz clic aquí";
@@ -149,7 +153,7 @@
 "righttopbar.groq_api_key_config" = "Configuración de clave API de Groq";
 "righttopbar.ollamacloud_api_key_config" = "Configuración de clave API de Ollama Cloud";
 "righttopbar.groq_no_streaming" = "Groq no admite salida en streaming";
-"righttopbar.library" = "Mercado";
+"righttopbar.library" = "Descargar";
 "righttopbar.no_models_found" = "No se encontraron modelos";
 "righttopbar.notice" = "Aviso";
 "righttopbar.ollama_http_host_config" = "Configuración del host HTTP de Ollama";

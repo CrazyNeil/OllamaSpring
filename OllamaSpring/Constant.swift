@@ -62,7 +62,3 @@ let noModelFound = "No model found"
 /// ollama api default params
 let ollamaApiDefaultBaseUrl = "localhost"
 let ollamaApiDefaultPort = "11434"
-/// models json url
-struct OllamaSpringModelsApiURL {
-    static let ollamaModels = "https://www.ollamaspring.com/ollama-models.json"
-}

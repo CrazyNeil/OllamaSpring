@@ -203,8 +203,6 @@ struct MainPanelView: View {
             Task {
                 /// fetch groq models from api
                 await commonViewModel.fetchGroqModels()
-                /// fetch ollama models from api
-                await commonViewModel.fetchOllamaModels()
                 //// fetch deepseek models from api
                 let deepSeekApiKey = commonViewModel.loadDeepSeekApiKeyFromDatabase()
                 await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)

@@ -137,48 +137,6 @@ class CommonViewModel: ObservableObject {
     
     // MARK: - Model Fetching
     
-    /// Fetch available Ollama models from remote library
-    /// Updates remote model list and sets default selected model
-    func fetchOllamaModels() async {
-        do {
-            let apiModels = try await ollamaSpringModelsApi.fetchOllamaModels()
-            let customModels = apiModels.map { apiModel in
-                return OllamaModel(
-                    modelName: apiModel.modelName,
-                    name: apiModel.name,
-                    size: apiModel.size,
-                    parameterSize: apiModel.parameterSize,
-                    isDefault: apiModel.isDefault
-                )
-            }
-            
-            DispatchQueue.main.async {
-                self.ollamaRemoteModelList = customModels
-                if self.ollamaRemoteModelList.isEmpty {
-                    self.selectedOllamaModel = "Ollama Models"
-                } else {
-                    /// Setup default selected model from local or remote list
-                    if let defaultModel = self.ollamaLocalModelList.first(where: { $0.isDefault }) {
-                        self.selectedOllamaModel = defaultModel.name
-                    } else {
-                        
-                        if self.ollamaLocalModelList.isEmpty {
-                            self.selectedOllamaModel = "No model Installed"
-                        } else {
-                            self.loadSelectedOllamaModelFromDatabase()
-                            if self.selectedOllamaModel == "" {
-                                self.selectedOllamaModel = self.ollamaLocalModelList.first?.name ?? "Ollama Models"
-                            }
-                        }
-                    }
-                }
-            }
-            
-        } catch {
-            NSLog("Failed to fetch Ollama models: \(error)")
-        }
-    }
-    
     /// Fetch available Groq models from Groq API
     /// Uses OpenAI-compatible endpoint to retrieve model list
     /// Sets default model based on availability (llama3-70b or mixtral-8x7b preferred)
@@ -410,6 +368,38 @@ class CommonViewModel: ObservableObject {
         self.groqApiKey = loadPreference(forKey: "groqApiKey", defaultValue: defaultGroqApiKey)
         
         return self.groqApiKey
+    }
+    
+    /// Verify Groq API key by attempting to fetch models
+    /// - Parameter key: Groq API key to verify
+    /// - Returns: True if API key is valid and can fetch models, false otherwise
+    func verifyGroqApiKey(key: String) async -> Bool {
+        let httpProxy = loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = loadHttpProxyAuthFromDatabase()
+        let groqApi = GroqApi(
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: key,
+            isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase(),
+            login: httpProxyAuth.login,
+            password: httpProxyAuth.password
+        )
+        
+        do {
+            let response = try await groqApi.models()
+            // Check if response contains error
+            if let errorResponse = response as? [String: Any],
+               let _ = errorResponse["error"] as? [String: Any] {
+                return false
+            } else if let modelResponse = response as? [String: Any],
+                      let modelsData = modelResponse["data"] as? [[String: Any]] {
+                return !modelsData.isEmpty
+            }
+            return false
+        } catch {
+            return false
+        }
     }
     
     /// Load DeepSeek API key from database

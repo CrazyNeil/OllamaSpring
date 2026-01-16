@@ -238,63 +238,42 @@ struct ChatListPanelView: View {
             // ollama models management
             ZStack(alignment: .bottom) {
                 if openDownloadPanel {
-                    VStack{
+                    VStack{                        
                         ScrollView(showsIndicators: false) {
                             VStack(spacing:0) {
-                                ForEach(commonViewModel.ollamaRemoteModelList.indices, id: \.self) { index in
+                                // Only show installed models
+                                ForEach(commonViewModel.ollamaLocalModelList.indices, id: \.self) { index in
                                     HStack {
                                         OllamaLocalModelListRowView(
-                                            ollamaLocalModel: commonViewModel.ollamaRemoteModelList[index]
+                                            ollamaLocalModel: commonViewModel.ollamaLocalModelList[index]
                                         )
-                                        // download & delete model button
-                                        let modelExists = commonViewModel.ollamaLocalModelList.contains { $0.name ==  commonViewModel.ollamaRemoteModelList[index].name}
-                                        if modelExists {
-                                            Text(NSLocalizedString("chatlist.installed", comment: ""))
-                                                .font(.subheadline)
-                                                .foregroundColor(.green)
-                                                .padding(.trailing, 10)
-                                            
-                                            Image(systemName: "trash.circle")
-                                                .font(.subheadline)
-                                                .imageScale(.large)
-                                                .foregroundColor(.gray)
-                                                .padding(.trailing, 10)
-                                                .onTapGesture {
-                                                    deleteModelConfirm = true
-                                                    modelToBeDeleted = commonViewModel.ollamaRemoteModelList[index].name
-                                                }
-                                        } else {
-                                            Text(NSLocalizedString("chatlist.download", comment: ""))
-                                                .font(.subheadline)
-                                                .foregroundColor(.gray)
-                                                .padding(.trailing, 10)
-                                                .onTapGesture {
-                                                    // update api service status
-                                                    commonViewModel.ollamaApiServiceStatusCheck()
-                                                    // api service available
-                                                    if commonViewModel.isOllamaApiServiceAvailable {
-                                                        // no downloading jobs
-                                                        if downloadViewModel.downloadOnProcessing == false {
-                                                            downloadModelConfirm = true
-                                                            modelToBeDownloaded = commonViewModel.ollamaRemoteModelList[index].name
-                                                        }
-                                                    }
-                                                }
-                                            
-                                            Image(systemName: "arrow.down.circle")
-                                                .font(.subheadline)
-                                                .imageScale(.large)
-                                                .foregroundColor(.gray)
-                                                .padding(.trailing, 10)
-                                                .onTapGesture {
-                                                    if downloadViewModel.downloadOnProcessing == false {
-                                                        downloadModelConfirm = true
-                                                        modelToBeDownloaded = commonViewModel.ollamaRemoteModelList[index].name
-                                                    }
-                                                    
-                                                }
-                                        }
+                                        // Delete model button
+                                        Text(NSLocalizedString("chatlist.installed", comment: ""))
+                                            .font(.subheadline)
+                                            .foregroundColor(.green)
+                                            .padding(.trailing, 10)
                                         
+                                        Image(systemName: "trash.circle")
+                                            .font(.subheadline)
+                                            .imageScale(.large)
+                                            .foregroundColor(.gray)
+                                            .padding(.trailing, 10)
+                                            .onTapGesture {
+                                                deleteModelConfirm = true
+                                                modelToBeDeleted = commonViewModel.ollamaLocalModelList[index].name
+                                            }
+                                    }
+                                }
+                                
+                                // Show message if no models installed
+                                if commonViewModel.ollamaLocalModelList.isEmpty {
+                                    HStack {
+                                        Spacer()
+                                        Text(NSLocalizedString("chatlist.no_model_installed", comment: ""))
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                            .padding(.top, 20)
+                                        Spacer()
                                     }
                                 }
                             }
@@ -546,6 +525,35 @@ struct ChatListPanelView: View {
                     }
                 }
                 
+                // delete model confirm modal
+                ConfirmModalView(
+                    isPresented: $deleteModelConfirm,
+                    title: NSLocalizedString("chatlist.warning", comment: ""),
+                    content: String(format: NSLocalizedString("chatlist.delete_confirm", comment: ""), modelToBeDeleted ?? ""),
+                    confirmAction: {
+                        lockDownloadPanel.toggle() // lock download panel
+                        Task {
+                            if await commonViewModel.isLocalModelExist(name: modelToBeDeleted!) {
+                                let success = await commonViewModel.removeOllamaLocalModel(name: modelToBeDeleted!)
+                                if success {
+                                    deleteModelSuccess = true
+                                    DispatchQueue.main.async {
+                                        lockDownloadPanel.toggle() // unlock download panel
+                                    }
+                                }
+                            } else {
+                                modelNotExistAlert = true // Display alert when model does not exist
+                                lockDownloadPanel.toggle()
+                            }
+                        }
+                    },
+                    cancelAction: {
+                    }
+                )
+                .frame(maxHeight: 150)
+                .padding(.top, 120)
+                .cornerRadius(0)
+                
                 // download process handler
                 if downloadProcessPanel{
                     VStack(spacing: 0) {
@@ -631,35 +639,6 @@ struct ChatListPanelView: View {
                         downloadViewModel.startDownload(modelName:modelToBeDownloaded ?? "")
                     }
                 }
-                
-                // delete model confirm modal
-                ConfirmModalView(
-                    isPresented: $deleteModelConfirm,
-                    title: NSLocalizedString("chatlist.warning", comment: ""),
-                    content: String(format: NSLocalizedString("chatlist.delete_confirm", comment: ""), modelToBeDeleted ?? ""),
-                    confirmAction: {
-                        lockDownloadPanel.toggle() // lock download panel
-                        Task {
-                            if await commonViewModel.isLocalModelExist(name: modelToBeDeleted!) {
-                                let success = await commonViewModel.removeOllamaLocalModel(name: modelToBeDeleted!)
-                                if success {
-                                    deleteModelSuccess = true
-                                    DispatchQueue.main.async {
-                                        lockDownloadPanel.toggle() // unlock download panel
-                                    }
-                                }
-                            } else {
-                                modelNotExistAlert = true // Display alert when model does not exist
-                                lockDownloadPanel.toggle()
-                            }
-                        }
-                    },
-                    cancelAction: {
-                    }
-                )
-                .frame(maxHeight: 150)
-                .padding(.top, 120)
-                .cornerRadius(0)
                 
                 // download confirm modal
                 ConfirmModalView(

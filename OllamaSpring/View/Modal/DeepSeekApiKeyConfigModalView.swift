@@ -80,17 +80,28 @@ struct DeepSeekApiKeyConfigModalView: View {
                     .cornerRadius(4)
                     .onTapGesture {
                         Task {
-                            if await commonViewModel.verifyDeepSeekApiKey(key: deepSeekApiKeyText) {
-                                commonViewModel.updateDeepSeekApiKey(key: deepSeekApiKeyText)
+                            // Allow saving empty key (deletion) without verification
+                            let trimmedKey = deepSeekApiKeyText.trimmingCharacters(in: .whitespaces)
+                            if trimmedKey.isEmpty {
+                                // Save empty key (delete) and close modal
+                                commonViewModel.updateDeepSeekApiKey(key: "")
                                 self.openDeepSeekApiKeyConfigModal = false
-                                await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKeyText)
+                                // Clear model list when key is deleted
+                                await commonViewModel.fetchDeepSeekModels(apiKey: "")
                             } else {
-                                let alert = NSAlert()
-                                alert.messageText = NSLocalizedString("deepseek.connection_failed", comment: "")
-                                alert.informativeText = NSLocalizedString("deepseek.connection_failed_desc", comment: "")
-                                alert.alertStyle = .warning
-                                alert.addButton(withTitle: NSLocalizedString("deepseek.ok", comment: ""))
-                                alert.runModal()
+                                // Verify non-empty key before saving
+                                if await commonViewModel.verifyDeepSeekApiKey(key: deepSeekApiKeyText) {
+                                    commonViewModel.updateDeepSeekApiKey(key: deepSeekApiKeyText)
+                                    self.openDeepSeekApiKeyConfigModal = false
+                                    await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKeyText)
+                                } else {
+                                    let alert = NSAlert()
+                                    alert.messageText = NSLocalizedString("deepseek.connection_failed", comment: "")
+                                    alert.informativeText = NSLocalizedString("deepseek.connection_failed_desc", comment: "")
+                                    alert.alertStyle = .warning
+                                    alert.addButton(withTitle: NSLocalizedString("deepseek.ok", comment: ""))
+                                    alert.runModal()
+                                }
                             }
                         }
                     }

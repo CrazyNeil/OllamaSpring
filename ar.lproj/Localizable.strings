@@ -35,7 +35,8 @@
 "chatlist.model" = "النموذج";
 "chatlist.download_first" = "يجب عليك أولاً تحميل نموذج واختيار نموذج مفضل قبل إنشاء محادثة جديدة";
 "chatlist.remove" = "إزالة";
-"chatlist.downloads" = "التحميلات";
+"chatlist.downloads" = "النماذج المحلية";
+"chatlist.no_model_installed" = "لا توجد نماذج مثبتة";
 "chatlist.reset_all" = "إعادة تعيين الكل";
 "chatlist.temperature" = "درجة الحرارة";
 "chatlist.temperature_desc" = "درجة حرارة النموذج. زيادة درجة الحرارة ستجعل إجابات النموذج أكثر إبداعاً. (افتراضي: 0.8)";
@@ -91,6 +92,9 @@
 "groq.enter_secret_key" = "أدخل المفتاح السري";
 "groq.how_to_apply" = "كيفية التقدم بطلب للحصول على مفتاح API Groq؟";
 "groq.click_here" = "انقر هنا";
+"groq.connection_failed" = "فشل الاتصال";
+"groq.connection_failed_desc" = "فشل الاتصال بخادم Groq. يرجى التحقق من apiKey أو تكوين وكيل HTTP.";
+"groq.ok" = "موافق";
 "groq.description" = "Groq هو استدلال ذكاء اصطناعي سريع، مدعوم بتقنية الاستدلال LPU™ التي توفر ذكاء اصطناعي سريع وميسور التكلفة وفعال من حيث الطاقة.";
 
 // Ollama Host Config
@@ -123,7 +127,7 @@
 "menu.check_for_updates" = "البحث عن التحديثات…";
 
 // Ollama Library
-"ollama.library.install_title" = "تثبيت نموذج Ollama";
+"ollama.library.install_title" = "تحميل & تثبيت النموذج المحلي Ollama";
 "ollama.library.enter_model_name" = "أدخل اسم النموذج";
 "ollama.library.what_is_model_name" = "ما هو اسم النموذج؟ مثل llama3:70b";
 "ollama.library.click_here" = "انقر هنا";
@@ -149,7 +153,7 @@
 "righttopbar.groq_api_key_config" = "تكوين مفتاح API Groq";
 "righttopbar.ollamacloud_api_key_config" = "تكوين مفتاح API Ollama Cloud";
 "righttopbar.groq_no_streaming" = "Groq لا يدعم الإخراج المتدفق";
-"righttopbar.library" = "السوق";
+"righttopbar.library" = "تحميل";
 "righttopbar.no_models_found" = "لم يتم العثور على نماذج";
 "righttopbar.notice" = "إشعار";
 "righttopbar.ollama_http_host_config" = "تكوين خادم HTTP Ollama";

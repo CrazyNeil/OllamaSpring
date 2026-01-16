@@ -50,6 +50,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // MARK: - Application Lifecycle
     
+    /// Called before application finishes launching
+    /// Set app language based on system language before UI loads
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Set app language based on macOS system language
+        // This must be done before UI loads to ensure correct localization
+        let systemLanguages = Locale.preferredLanguages
+        let supportedLanguages = ["en", "zh-Hans", "de", "ja", "ko", "fr", "es", "ar"]
+        
+        // Find first system language that matches supported languages
+        var appLanguage = "en" // Default fallback
+        for systemLang in systemLanguages {
+            // Check exact match or prefix match (e.g., "zh-Hans" matches "zh-Hans-CN")
+            for supportedLang in supportedLanguages {
+                if systemLang == supportedLang || systemLang.hasPrefix(supportedLang + "-") {
+                    appLanguage = supportedLang
+                    break
+                }
+            }
+            if appLanguage != "en" {
+                break
+            }
+        }
+        
+        // Force set app language to match system language
+        UserDefaults.standard.set([appLanguage], forKey: "AppleLanguages")
+        UserDefaults.standard.synchronize()
+        NSLog("AppDelegate: Set app language to \(appLanguage) based on system language: \(systemLanguages.first ?? "unknown")")
+    }
+    
     /// Called when application finishes launching
     /// Sets up status bar icon, menu, windows, and global hotkey
     /// - Parameter notification: Launch notification

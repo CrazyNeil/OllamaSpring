@@ -15,25 +15,6 @@ class OllamaSpringModelsApi {
     
     private init() {}
     
-    /// Fetch Ollama model list from remote JSON endpoint
-    /// Uses cache-busting query parameter to ensure fresh data
-    /// - Returns: Array of OllamaModel objects
-    /// - Throws: URLError if request fails, returns empty array on decode failure
-    func fetchOllamaModels() async throws -> [OllamaModel] {
-        guard let url = URL(string: "\(OllamaSpringModelsApiURL.ollamaModels)?_=\(Date().timeIntervalSince1970)") else {
-            throw URLError(.badURL)
-        }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let decoder = JSONDecoder()
-            let response = try decoder.decode(OllamaModelResponse.self, from: data)
-            return response.models
-        } catch {
-            return []
-        }
-    }
-    
     /// Fetch DeepSeek model list from DeepSeek API
     /// - Parameters:
     ///   - apiKey: DeepSeek API key for authentication
@@ -74,11 +55,4 @@ class OllamaSpringModelsApi {
             return []
         }
     }
-}
-
-// MARK: - Response Structures
-
-/// Response structure for Ollama model list API
-struct OllamaModelResponse: Codable {
-    let models: [OllamaModel]
 }

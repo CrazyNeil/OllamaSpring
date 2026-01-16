@@ -34,7 +34,8 @@
 "chatlist.conversation" = "Conversation";
 "chatlist.download_first" = "You should download a model first and select a preffered one before creating a new chat";
 "chatlist.remove" = "Remove";
-"chatlist.downloads" = "Downloads";
+"chatlist.downloads" = "Local Models";
+"chatlist.no_model_installed" = "No models installed";
 "chatlist.reset_all" = "Reset All";
 "chatlist.temperature" = "Temperature";
 "chatlist.temperature_desc" = "The temperature of the model. Increasing the temperature will make the model answer more creatively. (Default: 0.8)";
@@ -91,6 +92,9 @@
 "groq.enter_secret_key" = "ENTER SECRET KEY";
 "groq.how_to_apply" = "How to apply a Groq API key?";
 "groq.click_here" = "click here";
+"groq.connection_failed" = "Connection Failed";
+"groq.connection_failed_desc" = "Failed to connect to Groq host. Please verify your apiKey or HTTP Proxy Config.";
+"groq.ok" = "OK";
 "groq.description" = "Groq is a fast AI inference, powered by LPU™ AI inference technology which delivers fast, affordable, and energy efficient AI.";
 
 // Ollama Host Config
@@ -111,7 +115,7 @@
 "ollamacloud.description" = "Ollama Cloud provides managed hosting for Ollama models, offering scalable and reliable AI inference services in the cloud.";
 
 // Ollama Library
-"ollama.library.install_title" = "Install Ollama Model";
+"ollama.library.install_title" = "Download & Install Ollama Local Model";
 "ollama.library.enter_model_name" = "Enter Model Name";
 "ollama.library.what_is_model_name" = "what is model name? like llama3:70b";
 "ollama.library.click_here" = "click here";
@@ -121,7 +125,7 @@
 "menu.check_for_updates" = "Check for Updates…";
 
 // Right Top Bar
-"righttopbar.library" = "Market";
+"righttopbar.library" = "Download";
 "righttopbar.response_language" = "Response Language";
 "righttopbar.api_host" = "API Host";
 "righttopbar.streaming" = "Streaming";

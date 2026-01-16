@@ -17,11 +17,82 @@ class RealmConfiguration {
 
     private init() {}
 
+    /// Migrate database from old default location to new explicit location
+    /// This ensures data persistence when upgrading from versions that used default Realm path
+    private func migrateDatabaseIfNeeded() {
+        let fileManager = FileManager.default
+        let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.neil.dev.studio.OllamaSpring"
+        let newDatabasePath = appSupportURL.appendingPathComponent(bundleID, isDirectory: true).appendingPathComponent("default.realm")
+        
+        // Check if new database already exists
+        if fileManager.fileExists(atPath: newDatabasePath.path) {
+            return // Already migrated or using new path
+        }
+        
+        // Try to find database in old default location
+        let oldDefaultConfig = Realm.Configuration.defaultConfiguration
+        if let oldDatabaseURL = oldDefaultConfig.fileURL, oldDatabaseURL != newDatabasePath {
+            let oldDatabasePath = oldDatabaseURL.path
+            
+            // Check if old database exists
+            if fileManager.fileExists(atPath: oldDatabasePath) {
+                NSLog("Found database in old location, migrating to new location...")
+                
+                // Create new directory
+                try? fileManager.createDirectory(at: newDatabasePath.deletingLastPathComponent(), withIntermediateDirectories: true, attributes: nil)
+                
+                // Copy database file and related files
+                let relatedFiles = [
+                    oldDatabasePath,
+                    oldDatabasePath + ".lock",
+                    oldDatabasePath + ".note",
+                    oldDatabasePath + ".management"
+                ]
+                
+                for oldFile in relatedFiles {
+                    if fileManager.fileExists(atPath: oldFile) {
+                        let fileName = (oldFile as NSString).lastPathComponent
+                        let newFile = newDatabasePath.deletingLastPathComponent().appendingPathComponent(fileName)
+                        
+                        do {
+                            try fileManager.copyItem(atPath: oldFile, toPath: newFile.path)
+                            NSLog("Migrated database file: \(fileName)")
+                        } catch {
+                            NSLog("Failed to migrate database file \(fileName): \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /// Lazy-initialized Realm configuration with migration support
     /// - Note: Schema version should be incremented when updating the data model
-    /// - Warning: `deleteRealmIfMigrationNeeded` is set to true for development convenience
+    /// - Important: `deleteRealmIfMigrationNeeded` is set to false to prevent data loss during app updates
+    ///   In production, we should never delete user data. Always implement proper migration logic instead.
     lazy var config: Realm.Configuration = {
+        // Migrate database from old location if needed (before creating config)
+        migrateDatabaseIfNeeded()
+        
+        // Get the application support directory for storing Realm database
+        // This ensures the database persists across app updates
+        let fileManager = FileManager.default
+        let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        // Use bundle identifier if available, otherwise fall back to app name from Info.plist
+        let bundleID = Bundle.main.bundleIdentifier ?? 
+            (Bundle.main.infoDictionary?["CFBundleName"] as? String) ?? 
+            "OllamaSpring"
+        let appSupportSubdirectory = appSupportURL.appendingPathComponent(bundleID, isDirectory: true)
+        
+        // Create directory if it doesn't exist
+        try? fileManager.createDirectory(at: appSupportSubdirectory, withIntermediateDirectories: true, attributes: nil)
+        
+        // Set explicit database file path to ensure data persistence across updates
+        let databaseURL = appSupportSubdirectory.appendingPathComponent("default.realm")
+        
         var config = Realm.Configuration(
+            fileURL: databaseURL, // Explicit file path to ensure data persistence
             schemaVersion: 0, // Increment this value when you update the schema
             migrationBlock: { migration, oldSchemaVersion in
                 /// Migrate from schema version < 2 to version 2
@@ -32,10 +103,24 @@ class RealmConfiguration {
                         newObject?["preferenceValue"] = oldObject?["value"]
                     }
                 }
-            },deleteRealmIfMigrationNeeded: true
+            },
+            deleteRealmIfMigrationNeeded: false // Changed to false to prevent data loss during Sparkle updates
         )
         return config
     }()
+    
+    /// Safely create a Realm instance with error handling
+    /// - Returns: Realm instance if successful, nil if error occurs
+    /// - Note: Logs errors to console for debugging
+    func createRealm() -> Realm? {
+        do {
+            return try Realm(configuration: config)
+        } catch {
+            NSLog("Failed to open Realm database: \(error.localizedDescription)")
+            NSLog("Error details: \(error)")
+            return nil
+        }
+    }
 }
 
 // MARK: - Realm Models

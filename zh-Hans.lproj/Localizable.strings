@@ -35,7 +35,8 @@
 "chatlist.model" = "模型";
 "chatlist.download_first" = "请先下载一个模型并选择您喜欢的模型，然后再创建新对话";
 "chatlist.remove" = "删除";
-"chatlist.downloads" = "下载";
+"chatlist.downloads" = "本地模型";
+"chatlist.no_model_installed" = "未安装任何模型";
 "chatlist.reset_all" = "重置全部";
 "chatlist.temperature" = "温度";
 "chatlist.temperature_desc" = "模型的温度参数。增加温度会使模型的回答更具创造性。（默认值：0.8）";
@@ -91,6 +92,9 @@
 "groq.enter_secret_key" = "输入密钥";
 "groq.how_to_apply" = "如何申请 Groq API 密钥？";
 "groq.click_here" = "点击这里";
+"groq.connection_failed" = "连接失败";
+"groq.connection_failed_desc" = "无法连接到 Groq 主机。请验证您的 apiKey 或 HTTP 代理配置。";
+"groq.ok" = "确定";
 "groq.description" = "Groq 是一个快速的 AI 推理平台，由 LPU™ AI 推理技术驱动，提供快速、经济且节能的 AI 服务。";
 
 // Ollama Host Config
@@ -111,7 +115,7 @@
 "ollamacloud.description" = "Ollama Cloud 为 Ollama 模型提供托管服务，在云端提供可扩展且可靠的 AI 推理服务。";
 
 // Ollama Library
-"ollama.library.install_title" = "安装 Ollama 模型";
+"ollama.library.install_title" = "下载安装 Ollama 本地模型";
 "ollama.library.enter_model_name" = "输入模型名称";
 "ollama.library.what_is_model_name" = "什么是模型名称？例如 llama3:70b";
 "ollama.library.click_here" = "点击这里";
@@ -121,7 +125,7 @@
 "menu.check_for_updates" = "检查更新…";
 
 // Right Top Bar
-"righttopbar.library" = "模型市场";
+"righttopbar.library" = "下载";
 "righttopbar.response_language" = "响应语言";
 "righttopbar.api_host" = "API 主机";
 "righttopbar.streaming" = "流式输出";

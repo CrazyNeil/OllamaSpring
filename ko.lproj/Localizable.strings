@@ -35,7 +35,8 @@
 "chatlist.model" = "모델";
 "chatlist.download_first" = "새 채팅을 만들기 전에 먼저 모델을 다운로드하고 선호하는 모델을 선택해야 합니다";
 "chatlist.remove" = "제거";
-"chatlist.downloads" = "다운로드";
+"chatlist.downloads" = "로컬 모델";
+"chatlist.no_model_installed" = "설치된 모델이 없습니다";
 "chatlist.reset_all" = "모두 재설정";
 "chatlist.temperature" = "온도";
 "chatlist.temperature_desc" = "모델의 온도. 온도를 높이면 모델의 답변이 더 창의적이 됩니다. (기본값: 0.8)";
@@ -91,6 +92,9 @@
 "groq.enter_secret_key" = "시크릿 키 입력";
 "groq.how_to_apply" = "Groq API 키를 신청하는 방법은?";
 "groq.click_here" = "여기를 클릭";
+"groq.connection_failed" = "연결 실패";
+"groq.connection_failed_desc" = "Groq 호스트에 연결할 수 없습니다. apiKey 또는 HTTP 프록시 구성을 확인하세요.";
+"groq.ok" = "확인";
 "groq.description" = "Groq는 LPU™ AI 추론 기술로 구동되는 빠른 AI 추론으로, 빠르고 저렴하며 에너지 효율적인 AI를 제공합니다.";
 
 // Ollama Host Config
@@ -123,7 +127,7 @@
 "menu.check_for_updates" = "업데이트 확인…";
 
 // Ollama Library
-"ollama.library.install_title" = "Ollama 모델 설치";
+"ollama.library.install_title" = "Ollama 로컬 모델 다운로드 & 설치";
 "ollama.library.enter_model_name" = "모델 이름 입력";
 "ollama.library.what_is_model_name" = "모델 이름이란? 예: llama3:70b";
 "ollama.library.click_here" = "여기를 클릭";
@@ -149,7 +153,7 @@
 "righttopbar.groq_api_key_config" = "Groq API 키 구성";
 "righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API 키 구성";
 "righttopbar.groq_no_streaming" = "Groq는 스트리밍 출력을 지원하지 않습니다";
-"righttopbar.library" = "마켓";
+"righttopbar.library" = "다운로드";
 "righttopbar.no_models_found" = "모델을 찾을 수 없습니다";
 "righttopbar.notice" = "알림";
 "righttopbar.ollama_http_host_config" = "Ollama HTTP 호스트 구성";

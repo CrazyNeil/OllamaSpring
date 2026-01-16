@@ -20,11 +20,11 @@ struct RightTopBarView: View {
             globeImage
             responseLanguageMenu
             chevronDownImage
-            libraryIcon
-            library
             apiHostIcon
             apiHostMenu
             chevronDownImage
+            libraryIcon
+            library
             Spacer()
             streamingText
             streamingButton
@@ -218,7 +218,7 @@ struct RightTopBarView: View {
     }
     
     private var libraryIcon: some View {
-        Image(systemName: "book")
+        Image(systemName: "arrow.down.circle")
             .font(.subheadline)
             .imageScale(.medium)
             .foregroundColor(.gray)
