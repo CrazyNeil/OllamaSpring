@@ -268,6 +268,7 @@ struct SendMsgPanelView: View {
             let isGroqFastAI = (selectedApiHost == ApiHostList[1].name)
             let isDeepSeek = (selectedApiHost == ApiHostList[2].name)
             let isOllamaCloud = (selectedApiHost == ApiHostList[3].name)
+            let isOpenRouter = (selectedApiHost == ApiHostList[4].name)
 
             // msg params
             let chatId = chatListViewModel.selectedChat!
@@ -311,6 +312,18 @@ struct SendMsgPanelView: View {
                         messageFileType: msgFileType,
                         messageFileText: msgFileText
                     )
+                } else if isOpenRouter {
+                    messagesViewModel.openRouterSendMsgWithStreamingOn(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedOpenRouterModel,
+                        responseLang: responseLang,
+                        content: content,
+                        historyMessages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
+                    )
                 } else {
                     messagesViewModel.sendMsgWithStreamingOn(
                         chatId: chatId,
@@ -345,6 +358,18 @@ struct SendMsgPanelView: View {
                     messagesViewModel.ollamaCloudSendMsg(
                         chatId: chatId,
                         modelName: commonViewModel.selectedOllamaCloudModel,
+                        responseLang: responseLang,
+                        content: content,
+                        historyMessages: messagesViewModel.messages,
+                        image: imageToSend ?? [],
+                        messageFileName: msgFileName,
+                        messageFileType: msgFileType,
+                        messageFileText: msgFileText
+                    )
+                } else if isOpenRouter {
+                    messagesViewModel.openRouterSendMsg(
+                        chatId: chatId,
+                        modelName: commonViewModel.selectedOpenRouterModel,
                         responseLang: responseLang,
                         content: content,
                         historyMessages: messagesViewModel.messages,

@@ -126,8 +126,8 @@ struct OllamaLibraryModalView: View {
                                 return
                             }
 
-                            // update api service status
-                            commonViewModel.ollamaApiServiceStatusCheck()
+                            // update api service status (force refresh to get latest status)
+                            commonViewModel.forceRefreshLocalModels()
                             // api service available
                             if commonViewModel.isOllamaApiServiceAvailable {
                                 if downloadViewModel.downloadOnProcessing == false {

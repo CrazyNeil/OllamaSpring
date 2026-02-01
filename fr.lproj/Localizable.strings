@@ -86,6 +86,11 @@
 "deepseek.connection_failed_desc" = "Impossible de se connecter à l'hôte DeepSeek. Veuillez vérifier votre clé API ou la configuration du proxy HTTP.";
 "deepseek.ok" = "OK";
 "deepseek.description" = "DeepSeek réalise une percée significative dans la vitesse d'inférence par rapport aux modèles précédents. Il se classe en tête du classement parmi les modèles open-source et rivalise avec les modèles closed-source les plus avancés au monde.";
+"deepseek.loading_balance" = "Chargement du solde...";
+"deepseek.api_key_invalid" = "Clé API invalide";
+"deepseek.account_balance" = "Solde du compte";
+"deepseek.granted" = "Accordé:";
+"deepseek.topped_up" = "Rechargé:";
 
 // Groq API Config
 "groq.api_title" = "API Groq Fast";
@@ -112,6 +117,20 @@
 "ollamacloud.connection_failed_desc" = "Impossible de se connecter à Ollama Cloud. Veuillez vérifier votre clé API ou la configuration du proxy HTTP.";
 "ollamacloud.ok" = "OK";
 "ollamacloud.description" = "Ollama Cloud fournit un hébergement géré pour les modèles Ollama, offrant des services d'inférence IA évolutifs et fiables dans le cloud.";
+
+// Open Router API Config
+"openrouter.api_title" = "API Open Router";
+"openrouter.enter_secret_key" = "ENTREZ LA CLÉ SECRÈTE";
+"openrouter.how_to_apply" = "Comment obtenir une clé API Open Router ?";
+"openrouter.click_here" = "cliquez ici";
+"openrouter.connection_failed" = "Échec de la connexion";
+"openrouter.connection_failed_desc" = "Impossible de se connecter à Open Router. Veuillez vérifier votre clé API ou la configuration du proxy HTTP.";
+"openrouter.ok" = "OK";
+"openrouter.description" = "Open Router fournit un accès unifié à plusieurs modèles d'IA, notamment GPT-4, Claude, Llama et bien d'autres, via une seule API.";
+"openrouter.loading_credits" = "Chargement des crédits...";
+"openrouter.api_key_invalid" = "Clé API invalide";
+"openrouter.credits_usage" = "Utilisation des crédits";
+"openrouter.remaining_credits" = "Restant: $%.2f";
 
 // StatusBar
 "statusbar.option_1" = "Option 1";
@@ -152,6 +171,7 @@
 "righttopbar.deepseek_api_key_config" = "Configuration de la clé API DeepSeek";
 "righttopbar.groq_api_key_config" = "Configuration de la clé API Groq";
 "righttopbar.ollamacloud_api_key_config" = "Configuration de la clé API Ollama Cloud";
+"righttopbar.openrouter_api_key_config" = "Configuration de la clé API Open Router";
 "righttopbar.groq_no_streaming" = "Groq ne prend pas en charge la sortie en streaming";
 "righttopbar.library" = "Télécharger";
 "righttopbar.no_models_found" = "Aucun modèle trouvé";

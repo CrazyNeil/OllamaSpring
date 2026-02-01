@@ -93,6 +93,9 @@
 		FBEFBE512C9D077600B93648 /* HttpProxyConfigPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */; };
 		FBF304822C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */; };
 		FBF304842C8EAB9A00C91CB4 /* GroqModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */; };
+		FBOPENRT42EAF416700E48A16 /* OpenRouterApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBOPENRT12EAF416700E48A16 /* OpenRouterApi.swift */; };
+		FBOPENRT52EAF416700E48A16 /* OpenRouterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBOPENRT22EAF416700E48A16 /* OpenRouterModel.swift */; };
+		FBOPENRT62EAF416700E48A16 /* OpenRouterApiKeyConfigModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBOPENRT32EAF416700E48A16 /* OpenRouterApiKeyConfigModalView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,6 +197,9 @@
 		FBEFBE502C9D077600B93648 /* HttpProxyConfigPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpProxyConfigPanelView.swift; sourceTree = "<group>"; };
 		FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqApiKeyConfigModalView.swift; sourceTree = "<group>"; };
 		FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroqModel.swift; sourceTree = "<group>"; };
+		FBOPENRT12EAF416700E48A16 /* OpenRouterApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterApi.swift; sourceTree = "<group>"; };
+		FBOPENRT22EAF416700E48A16 /* OpenRouterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterModel.swift; sourceTree = "<group>"; };
+		FBOPENRT32EAF416700E48A16 /* OpenRouterApiKeyConfigModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterApiKeyConfigModalView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -328,6 +334,7 @@
 				FBDF8C522C0775DC00BED237 /* OllamaLibraryModalView.swift */,
 				FBF304812C8C1C5100C91CB4 /* GroqApiKeyConfigModalView.swift */,
 				FB9ED4792D4705BC00D59411 /* OllamaCloudApiKeyConfigModalView.swift */,
+				FBOPENRT32EAF416700E48A16 /* OpenRouterApiKeyConfigModalView.swift */,
 			);
 			path = Modal;
 			sourceTree = "<group>";
@@ -344,6 +351,7 @@
 				FB9871682C198F3F000A4808 /* OptionsModel.swift */,
 				FBD459442C855FBD000BE5C1 /* ApiHostModel.swift */,
 				FBF304832C8EAB9A00C91CB4 /* GroqModel.swift */,
+				FBOPENRT22EAF416700E48A16 /* OpenRouterModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -380,6 +388,7 @@
 				FB68CEB42D32035A00C5A495 /* OllamaSpringModelsApi.swift */,
 				FBA45BD52BF20B48007E0935 /* OllamaApi.swift */,
 				FBD459462C86B680000BE5C1 /* GroqApi.swift */,
+				FBOPENRT12EAF416700E48A16 /* OpenRouterApi.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -721,6 +730,9 @@
 				FBA45BC72BF19115007E0935 /* ChatModel.swift in Sources */,
 				FB8ED47E2D4A44EA00D59410 /* DeepSeekModel.swift in Sources */,
 				FB9ED47B2D4705BC00D59412 /* OllamaCloudModel.swift in Sources */,
+				FBOPENRT42EAF416700E48A16 /* OpenRouterApi.swift in Sources */,
+				FBOPENRT52EAF416700E48A16 /* OpenRouterModel.swift in Sources */,
+				FBOPENRT62EAF416700E48A16 /* OpenRouterApiKeyConfigModalView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

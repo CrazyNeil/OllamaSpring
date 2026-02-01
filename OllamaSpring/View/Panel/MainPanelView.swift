@@ -11,6 +11,7 @@ struct MainPanelView: View {
     @State private var openOllamaHostConfigModal = false
     @State private var openDeepSeekApiKeyConfigModal = false
     @State private var openOllamaCloudApiKeyConfigModal = false
+    @State private var openOpenRouterApiKeyConfigModal = false
     
     @State private var isLeftPanelVisible: Bool = true
     @State private var leftPanelWidth: CGFloat = 280
@@ -33,8 +34,9 @@ struct MainPanelView: View {
                         openOllamaLibraryModal: $openOllamaLibraryModal,
                         openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
                         openOllamaHostConfigModal: $openOllamaHostConfigModal,
-                    openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal,
-                    openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal
+                        openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal,
+                        openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal,
+                        openOpenRouterApiKeyConfigModal: $openOpenRouterApiKeyConfigModal
                     )
                 .frame(
                     minWidth: isLeftPanelVisible ? 240 : 0,
@@ -64,7 +66,8 @@ struct MainPanelView: View {
                             openGroqApiKeyConfigModal: $openGroqApiKeyConfigModal,
                             openDeepSeekApiKeyConfigModal: $openDeepSeekApiKeyConfigModal,
                             openOllamaHostConfigModal: $openOllamaHostConfigModal,
-                            openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal
+                            openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal,
+                            openOpenRouterApiKeyConfigModal: $openOpenRouterApiKeyConfigModal
                         )
                     }
                     .padding(.horizontal, 8)
@@ -99,11 +102,6 @@ struct MainPanelView: View {
             .frame(minWidth: 1000)
             .frame(maxHeight: .infinity)
             .frame(minHeight: 600)
-            .onAppear(){
-                commonViewModel.loadAvailableLocalModels()
-            }
-            
-            
             // ollama api service not available
             if commonViewModel.isOllamaApiServiceAvailable == false  {
                 Color.clear
@@ -175,7 +173,7 @@ struct MainPanelView: View {
                                     .stroke(Color.gray, lineWidth: 1)
                             )
                             .onTapGesture {
-                                commonViewModel.ollamaApiServiceStatusCheck()
+                                commonViewModel.forceRefreshLocalModels()
                             }
                         
                         Text(NSLocalizedString("main.enter_ollama_host", comment: ""))
@@ -198,12 +196,12 @@ struct MainPanelView: View {
             
         }
         .onAppear(){
-            commonViewModel.ollamaApiServiceStatusCheck()
-            commonViewModel.localModelInstalledCheck()
+            /// Check Ollama service and load local models (single API call)
+            commonViewModel.checkOllamaServiceAndLoadModels()
             Task {
                 /// fetch groq models from api
                 await commonViewModel.fetchGroqModels()
-                //// fetch deepseek models from api
+                /// fetch deepseek models from api
                 let deepSeekApiKey = commonViewModel.loadDeepSeekApiKeyFromDatabase()
                 await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKey)
             }

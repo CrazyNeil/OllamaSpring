@@ -9,6 +9,7 @@ struct RightTopBarView: View {
     @Binding var openDeepSeekApiKeyConfigModal:Bool
     @Binding var openOllamaHostConfigModal:Bool
     @Binding var openOllamaCloudApiKeyConfigModal:Bool
+    @Binding var openOpenRouterApiKeyConfigModal:Bool
     
     @State private var streamingOutputToggleAlert = false
     
@@ -36,7 +37,18 @@ struct RightTopBarView: View {
             
             /// Initialize models based on selected API host
             let selectedApiHost = commonViewModel.selectedApiHost
-            if selectedApiHost == ApiHostList[3].name {
+            if selectedApiHost == ApiHostList[4].name {
+                // Open Router
+                commonViewModel.loadSelectedOpenRouterModelFromDatabase()
+                // Set default value if empty
+                if commonViewModel.selectedOpenRouterModel.isEmpty {
+                    commonViewModel.selectedOpenRouterModel = "Open Router"
+                }
+                Task {
+                    await commonViewModel.fetchOpenRouterModels()
+                }
+                messagesViewModel.streamingOutput = true
+            } else if selectedApiHost == ApiHostList[3].name {
                 // Ollama Cloud
                 commonViewModel.loadSelectedOllamaCloudModelFromDatabase()
                 // Set default value if empty
@@ -66,7 +78,7 @@ struct RightTopBarView: View {
             } else if selectedApiHost == ApiHostList[0].name {
                 // Ollama
                 commonViewModel.loadSelectedOllamaModelFromDatabase()
-                commonViewModel.loadAvailableLocalModels()
+                commonViewModel.checkOllamaServiceAndLoadModels()
                 messagesViewModel.streamingOutput = true
             }
         }
@@ -96,6 +108,8 @@ struct RightTopBarView: View {
             return commonViewModel.selectedDeepSeekModel
         case ApiHostList[3].name:
             return commonViewModel.selectedOllamaCloudModel
+        case ApiHostList[4].name:
+            return commonViewModel.selectedOpenRouterModel
         default:
             return NSLocalizedString("righttopbar.unknown_model", comment: "")
         }
@@ -169,6 +183,19 @@ struct RightTopBarView: View {
                             name: model.modelName,
                             isSelected: commonViewModel.selectedOllamaCloudModel == model.name,
                             action: { commonViewModel.updateSelectedOllamaCloudModel(name: model.name) }
+                        )
+                    }
+                }
+                
+            case ApiHostList[4].name:
+                if commonViewModel.openRouterModelList.isEmpty {
+                    emptyModelListText()
+                } else {
+                    ForEach(commonViewModel.openRouterModelList) { model in
+                        modelMenuItem(
+                            name: model.modelName,
+                            isSelected: commonViewModel.selectedOpenRouterModel == model.name,
+                            action: { commonViewModel.updateSelectedOpenRouterModel(name: model.name) }
                         )
                     }
                 }
@@ -286,10 +313,18 @@ struct RightTopBarView: View {
                         messagesViewModel.streamingOutput = true
                     }
                     
+                    /// init open router api service
+                    if host.name == ApiHostList[4].name {
+                        commonViewModel.loadSelectedOpenRouterModelFromDatabase()
+                        Task {
+                            await commonViewModel.fetchOpenRouterModels()
+                        }
+                        messagesViewModel.streamingOutput = true
+                    }
+                    
                     /// init ollama api service
                     if host.name == ApiHostList[0].name {
-                        commonViewModel.loadAvailableLocalModels()
-                        commonViewModel.ollamaApiServiceStatusCheck()
+                        commonViewModel.forceRefreshLocalModels()
                         messagesViewModel.streamingOutput = true
                     }
                 }) {
@@ -332,6 +367,15 @@ struct RightTopBarView: View {
             }) {
                 HStack {
                     Text(NSLocalizedString("righttopbar.ollamacloud_api_key_config", comment: ""))
+                        .font(.subheadline)
+                }
+            }
+            /// open router api key config
+            Button(role: .destructive, action: {
+                self.openOpenRouterApiKeyConfigModal.toggle()
+            }) {
+                HStack {
+                    Text(NSLocalizedString("righttopbar.openrouter_api_key_config", comment: ""))
                         .font(.subheadline)
                 }
             }

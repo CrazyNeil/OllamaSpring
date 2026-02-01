@@ -330,5 +330,102 @@ func filterRedactedReasoningTagsForTitle(_ content: String) -> String {
 /// - Returns: Filtered content with reasoning tags removed
 /// - Note: This function is maintained for backward compatibility with existing code
 func filterRedactedReasoningTags(_ content: String) -> String {
-    return filterRedactedReasoningTagsForDisplay(content)
+    var filtered = filterRedactedReasoningTagsForDisplay(content)
+    filtered = convertLatexToReadable(filtered)
+    return filtered
+}
+
+// MARK: - LaTeX Conversion Utilities
+
+/// Convert common LaTeX math notation to readable text format
+/// MarkdownUI does not support LaTeX rendering, so we convert to plain text or Unicode
+/// - Parameter content: Content string that may contain LaTeX notation
+/// - Returns: Content with LaTeX notation converted to readable format
+func convertLatexToReadable(_ content: String) -> String {
+    var result = content
+    
+    /// Convert \boxed{content} to 【content】
+    if let boxedRegex = try? NSRegularExpression(pattern: "\\\\boxed\\{([^}]*)\\}", options: []) {
+        let range = NSRange(result.startIndex..<result.endIndex, in: result)
+        result = boxedRegex.stringByReplacingMatches(in: result, options: [], range: range, withTemplate: "【$1】")
+    }
+    
+    /// Convert \frac{a}{b} to a/b
+    if let fracRegex = try? NSRegularExpression(pattern: "\\\\frac\\{([^}]*)\\}\\{([^}]*)\\}", options: []) {
+        let range = NSRange(result.startIndex..<result.endIndex, in: result)
+        result = fracRegex.stringByReplacingMatches(in: result, options: [], range: range, withTemplate: "($1/$2)")
+    }
+    
+    /// Convert \sqrt{x} to √x
+    if let sqrtRegex = try? NSRegularExpression(pattern: "\\\\sqrt\\{([^}]*)\\}", options: []) {
+        let range = NSRange(result.startIndex..<result.endIndex, in: result)
+        result = sqrtRegex.stringByReplacingMatches(in: result, options: [], range: range, withTemplate: "√($1)")
+    }
+    
+    /// Convert \times to ×
+    result = result.replacingOccurrences(of: "\\times", with: "×")
+    
+    /// Convert \div to ÷
+    result = result.replacingOccurrences(of: "\\div", with: "÷")
+    
+    /// Convert \pm to ±
+    result = result.replacingOccurrences(of: "\\pm", with: "±")
+    
+    /// Convert \leq to ≤
+    result = result.replacingOccurrences(of: "\\leq", with: "≤")
+    
+    /// Convert \geq to ≥
+    result = result.replacingOccurrences(of: "\\geq", with: "≥")
+    
+    /// Convert \neq to ≠
+    result = result.replacingOccurrences(of: "\\neq", with: "≠")
+    
+    /// Convert \infty to ∞
+    result = result.replacingOccurrences(of: "\\infty", with: "∞")
+    
+    /// Convert \sum to Σ
+    result = result.replacingOccurrences(of: "\\sum", with: "Σ")
+    
+    /// Convert \prod to Π
+    result = result.replacingOccurrences(of: "\\prod", with: "Π")
+    
+    /// Convert \alpha, \beta, \gamma etc. to Greek letters
+    let greekLetters: [String: String] = [
+        "\\alpha": "α", "\\beta": "β", "\\gamma": "γ", "\\delta": "δ",
+        "\\epsilon": "ε", "\\zeta": "ζ", "\\eta": "η", "\\theta": "θ",
+        "\\iota": "ι", "\\kappa": "κ", "\\lambda": "λ", "\\mu": "μ",
+        "\\nu": "ν", "\\xi": "ξ", "\\pi": "π", "\\rho": "ρ",
+        "\\sigma": "σ", "\\tau": "τ", "\\upsilon": "υ", "\\phi": "φ",
+        "\\chi": "χ", "\\psi": "ψ", "\\omega": "ω",
+        "\\Alpha": "Α", "\\Beta": "Β", "\\Gamma": "Γ", "\\Delta": "Δ",
+        "\\Theta": "Θ", "\\Lambda": "Λ", "\\Pi": "Π", "\\Sigma": "Σ",
+        "\\Phi": "Φ", "\\Psi": "Ψ", "\\Omega": "Ω"
+    ]
+    
+    for (latex, unicode) in greekLetters {
+        result = result.replacingOccurrences(of: latex, with: unicode)
+    }
+    
+    /// Convert \cdot to ·
+    result = result.replacingOccurrences(of: "\\cdot", with: "·")
+    
+    /// Convert \rightarrow to →
+    result = result.replacingOccurrences(of: "\\rightarrow", with: "→")
+    
+    /// Convert \leftarrow to ←
+    result = result.replacingOccurrences(of: "\\leftarrow", with: "←")
+    
+    /// Convert \Rightarrow to ⇒
+    result = result.replacingOccurrences(of: "\\Rightarrow", with: "⇒")
+    
+    /// Convert \Leftarrow to ⇐
+    result = result.replacingOccurrences(of: "\\Leftarrow", with: "⇐")
+    
+    /// Remove remaining \text{} wrappers
+    if let textRegex = try? NSRegularExpression(pattern: "\\\\text\\{([^}]*)\\}", options: []) {
+        let range = NSRange(result.startIndex..<result.endIndex, in: result)
+        result = textRegex.stringByReplacingMatches(in: result, options: [], range: range, withTemplate: "$1")
+    }
+    
+    return result
 }

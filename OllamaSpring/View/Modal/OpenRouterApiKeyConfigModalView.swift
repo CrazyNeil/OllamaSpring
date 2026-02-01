@@ -1,25 +1,23 @@
 //
-//  DeepSeekApiKeyConfigModalView.swift
+//  OpenRouterApiKeyConfigModalView.swift
 //  OllamaSpring
 //
-//  Created by NeilStudio on 2025/1/27.
+//  Created by NeilStudio on 2025/1/30.
 //
 
 import SwiftUI
 
-struct DeepSeekApiKeyConfigModalView: View {
+struct OpenRouterApiKeyConfigModalView: View {
     @ObservedObject var commonViewModel: CommonViewModel
     
-    @Binding var openDeepSeekApiKeyConfigModal:Bool
+    @Binding var openOpenRouterApiKeyConfigModal:Bool
     
-    @State private var deepSeekApiKeyText = ""
+    @State private var openRouterApiKeyText = ""
     
-    /// Balance display states
-    @State private var isLoadingBalance = false
-    @State private var totalBalance: String = "0.00"
-    @State private var grantedBalance: String = "0.00"
-    @State private var toppedUpBalance: String = "0.00"
-    @State private var currency: String = "CNY"
+    /// Credits display states
+    @State private var isLoadingCredits = false
+    @State private var totalCredits: Double = 0
+    @State private var totalUsage: Double = 0
     @State private var hasValidApiKey = false
     @State private var apiKeyInvalid = false
     
@@ -28,7 +26,7 @@ struct DeepSeekApiKeyConfigModalView: View {
         VStack(spacing:0) {
             
             HStack {
-                Text(NSLocalizedString("deepseek.api_title", comment: ""))
+                Text(NSLocalizedString("openrouter.api_title", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
@@ -36,17 +34,17 @@ struct DeepSeekApiKeyConfigModalView: View {
             }
             .padding(.leading, 45)
             .onAppear(){
-                self.deepSeekApiKeyText = commonViewModel.loadDeepSeekApiKeyFromDatabase()
-                /// Load balance if API key exists
-                if !deepSeekApiKeyText.isEmpty {
+                self.openRouterApiKeyText = commonViewModel.loadOpenRouterApiKeyFromDatabase()
+                /// Load credits if API key exists
+                if !openRouterApiKeyText.isEmpty {
                     Task {
-                        await loadBalance()
+                        await loadCredits()
                     }
                 }
             }
             
             HStack {
-                TextField(self.deepSeekApiKeyText == "" ? NSLocalizedString("deepseek.enter_secret_key", comment: "") : self.deepSeekApiKeyText, text: $deepSeekApiKeyText)
+                TextField(self.openRouterApiKeyText == "" ? NSLocalizedString("openrouter.enter_secret_key", comment: "") : self.openRouterApiKeyText, text: $openRouterApiKeyText)
                     .textFieldStyle(PlainTextFieldStyle())
                     .frame(width: 300, height: 25)
                     .padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 12))
@@ -58,13 +56,13 @@ struct DeepSeekApiKeyConfigModalView: View {
             }
             .padding(.top, 0)
             
-            /// Balance display section
-            if !deepSeekApiKeyText.isEmpty {
-                if isLoadingBalance {
+            /// Credits progress bar section
+            if !openRouterApiKeyText.isEmpty {
+                if isLoadingCredits {
                     HStack {
                         ProgressView()
                             .scaleEffect(0.7)
-                        Text(NSLocalizedString("deepseek.loading_balance", comment: ""))
+                        Text(NSLocalizedString("openrouter.loading_credits", comment: ""))
                             .font(.caption)
                             .foregroundColor(.gray)
                         Spacer()
@@ -76,7 +74,7 @@ struct DeepSeekApiKeyConfigModalView: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(.red)
                             .font(.caption)
-                        Text(NSLocalizedString("deepseek.api_key_invalid", comment: ""))
+                        Text(NSLocalizedString("openrouter.api_key_invalid", comment: ""))
                             .font(.caption)
                             .foregroundColor(.red)
                         Spacer()
@@ -86,35 +84,35 @@ struct DeepSeekApiKeyConfigModalView: View {
                 } else if hasValidApiKey {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text(NSLocalizedString("deepseek.account_balance", comment: ""))
+                            Text(NSLocalizedString("openrouter.credits_usage", comment: ""))
                                 .font(.caption)
                                 .foregroundColor(.gray)
                             Spacer()
-                            Text("\(currency) \(totalBalance)")
+                            Text(String(format: "$%.2f / $%.2f", totalUsage, totalCredits))
                                 .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(.green)
+                                .foregroundColor(.gray)
                         }
                         
-                        HStack(spacing: 15) {
-                            HStack(spacing: 3) {
-                                Text(NSLocalizedString("deepseek.granted", comment: ""))
-                                    .font(.caption2)
-                                    .foregroundColor(.gray.opacity(0.8))
-                                Text("\(currency) \(grantedBalance)")
-                                    .font(.caption2)
-                                    .foregroundColor(.orange)
+                        /// Progress bar
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                /// Background
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 8)
+                                
+                                /// Usage progress
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(usageProgressColor)
+                                    .frame(width: max(0, min(geometry.size.width * usagePercentage, geometry.size.width)), height: 8)
                             }
-                            
-                            HStack(spacing: 3) {
-                                Text(NSLocalizedString("deepseek.topped_up", comment: ""))
-                                    .font(.caption2)
-                                    .foregroundColor(.gray.opacity(0.8))
-                                Text("\(currency) \(toppedUpBalance)")
-                                    .font(.caption2)
-                                    .foregroundColor(.blue)
-                            }
-                            
+                        }
+                        .frame(height: 8)
+                        
+                        HStack {
+                            Text(String(format: NSLocalizedString("openrouter.remaining_credits", comment: ""), max(0, totalCredits - totalUsage)))
+                                .font(.caption2)
+                                .foregroundColor(remainingCreditsColor)
                             Spacer()
                         }
                     }
@@ -129,18 +127,18 @@ struct DeepSeekApiKeyConfigModalView: View {
                     .imageScale(.medium)
                     .foregroundColor(.gray)
                 
-                Text(NSLocalizedString("deepseek.how_to_apply", comment: ""))
+                Text(NSLocalizedString("openrouter.how_to_apply", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .opacity(0.6)
                     .padding(.leading, 5)
                 
-                Text(NSLocalizedString("deepseek.click_here", comment: ""))
+                Text(NSLocalizedString("openrouter.click_here", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.orange)
                     .padding(.leading, 15)
                     .onTapGesture {
-                        openURL(deepSeekWebUrl)
+                        openURL(openRouterWebUrl)
                     }
                 
                 Spacer()
@@ -162,31 +160,31 @@ struct DeepSeekApiKeyConfigModalView: View {
                     .onTapGesture {
                         Task {
                             // Allow saving empty key (deletion) without verification
-                            let trimmedKey = deepSeekApiKeyText.trimmingCharacters(in: .whitespaces)
+                            let trimmedKey = openRouterApiKeyText.trimmingCharacters(in: .whitespaces)
                             if trimmedKey.isEmpty {
                                 // Save empty key (delete) and close modal
-                                commonViewModel.updateDeepSeekApiKey(key: "")
-                                self.openDeepSeekApiKeyConfigModal = false
+                                commonViewModel.updateOpenRouterApiKey(key: "")
+                                self.openOpenRouterApiKeyConfigModal = false
                                 // Clear model list when key is deleted
-                                await commonViewModel.fetchDeepSeekModels(apiKey: "")
+                                await commonViewModel.fetchOpenRouterModels()
                             } else {
                                 // Verify non-empty key before saving
-                                if await commonViewModel.verifyDeepSeekApiKey(key: deepSeekApiKeyText) {
-                                    commonViewModel.updateDeepSeekApiKey(key: deepSeekApiKeyText)
-                                    self.openDeepSeekApiKeyConfigModal = false
-                                    await commonViewModel.fetchDeepSeekModels(apiKey: deepSeekApiKeyText)
+                                if await commonViewModel.verifyOpenRouterApiKey(key: openRouterApiKeyText) {
+                                    commonViewModel.updateOpenRouterApiKey(key: openRouterApiKeyText)
+                                    self.openOpenRouterApiKeyConfigModal = false
+                                    await commonViewModel.fetchOpenRouterModels()
                                 } else {
                                     let alert = NSAlert()
-                                    alert.messageText = NSLocalizedString("deepseek.connection_failed", comment: "")
-                                    alert.informativeText = NSLocalizedString("deepseek.connection_failed_desc", comment: "")
+                                    alert.messageText = NSLocalizedString("openrouter.connection_failed", comment: "")
+                                    alert.informativeText = NSLocalizedString("openrouter.connection_failed_desc", comment: "")
                                     alert.alertStyle = .warning
-                                    alert.addButton(withTitle: NSLocalizedString("deepseek.ok", comment: ""))
+                                    alert.addButton(withTitle: NSLocalizedString("openrouter.ok", comment: ""))
                                     alert.runModal()
                                 }
                             }
                         }
                     }
-                
+
                 Text(NSLocalizedString("modal.cancel", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.black)
@@ -196,18 +194,18 @@ struct DeepSeekApiKeyConfigModalView: View {
                     .background(Color.white)
                     .cornerRadius(4)
                     .onTapGesture {
-                        self.openDeepSeekApiKeyConfigModal.toggle()
+                        self.openOpenRouterApiKeyConfigModal.toggle()
                     }
             }
             .padding(.trailing, 40)
             .padding(.leading, 75)
             .padding(.top, 10)
-            
+
             HStack(spacing:0) {
-                Text(NSLocalizedString("deepseek.description", comment: ""))
+                Text(NSLocalizedString("openrouter.description", comment: ""))
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                    .lineLimit(4)
+                    .lineLimit(3)
                     .opacity(0.9)
                     .padding(8)
                     .overlay(
@@ -224,19 +222,48 @@ struct DeepSeekApiKeyConfigModalView: View {
         .frame(width: 400, height: 280)
     }
     
-    /// Load balance from DeepSeek API
-    private func loadBalance() async {
-        isLoadingBalance = true
+    /// Calculate usage percentage for progress bar
+    private var usagePercentage: Double {
+        guard totalCredits > 0 else { return 0 }
+        return totalUsage / totalCredits
+    }
+    
+    /// Determine progress bar color based on usage
+    private var usageProgressColor: Color {
+        if usagePercentage >= 0.9 {
+            return .red
+        } else if usagePercentage >= 0.7 {
+            return .orange
+        } else {
+            return .green
+        }
+    }
+    
+    /// Determine remaining credits text color
+    private var remainingCreditsColor: Color {
+        let remaining = totalCredits - totalUsage
+        if remaining <= 0 {
+            return .red
+        } else if remaining < totalCredits * 0.1 {
+            return .orange
+        } else {
+            return .gray
+        }
+    }
+    
+    /// Load credits from OpenRouter API
+    private func loadCredits() async {
+        isLoadingCredits = true
         apiKeyInvalid = false
         hasValidApiKey = false
         
         let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
         let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
         
-        let api = DeepSeekApi(
+        let api = OpenRouterApi(
             proxyUrl: httpProxy.name,
             proxyPort: Int(httpProxy.port) ?? 0,
-            authorizationToken: deepSeekApiKeyText,
+            authorizationToken: openRouterApiKeyText,
             isHttpProxyEnabled: commonViewModel.loadHttpProxyStatusFromDatabase(),
             isHttpProxyAuthEnabled: commonViewModel.loadHttpProxyAuthStatusFromDatabase(),
             login: httpProxyAuth.login,
@@ -244,40 +271,37 @@ struct DeepSeekApiKeyConfigModalView: View {
         )
         
         do {
-            let response = try await api.balance()
+            let response = try await api.credits()
             
             DispatchQueue.main.async {
-                self.isLoadingBalance = false
+                self.isLoadingCredits = false
                 
                 /// Check for error response
                 if let errorResponse = response as? [String: Any],
-                   let _ = errorResponse["msg"] {
+                   let _ = errorResponse["error"] {
                     self.apiKeyInvalid = true
                     return
                 }
                 
-                /// Parse balance data
-                if let balanceResponse = response as? [String: Any],
-                   let isAvailable = balanceResponse["is_available"] as? Bool,
-                   isAvailable,
-                   let balanceInfos = balanceResponse["balance_infos"] as? [[String: Any]],
-                   let firstBalance = balanceInfos.first {
-                    self.currency = firstBalance["currency"] as? String ?? "CNY"
-                    self.totalBalance = firstBalance["total_balance"] as? String ?? "0.00"
-                    self.grantedBalance = firstBalance["granted_balance"] as? String ?? "0.00"
-                    self.toppedUpBalance = firstBalance["topped_up_balance"] as? String ?? "0.00"
+                /// Parse credits data
+                if let creditsResponse = response as? [String: Any],
+                   let data = creditsResponse["data"] as? [String: Any],
+                   let totalCredits = data["total_credits"] as? Double,
+                   let totalUsage = data["total_usage"] as? Double {
+                    self.totalCredits = totalCredits
+                    self.totalUsage = totalUsage
                     self.hasValidApiKey = true
                 } else {
-                    /// Invalid response format or account not available
+                    /// Invalid response format, might be invalid API key
                     self.apiKeyInvalid = true
                 }
             }
         } catch {
             DispatchQueue.main.async {
-                self.isLoadingBalance = false
+                self.isLoadingCredits = false
                 self.apiKeyInvalid = true
             }
-            NSLog("DeepSeek Balance API error: \(error)")
+            NSLog("OpenRouter Credits API error: \(error)")
         }
     }
 }

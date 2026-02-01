@@ -86,6 +86,11 @@
 "deepseek.connection_failed_desc" = "无法连接到 DeepSeek 服务器。请验证您的 API 密钥或 HTTP 代理配置。";
 "deepseek.ok" = "确定";
 "deepseek.description" = "DeepSeek 在推理速度方面取得了重大突破。它在开源模型中位居榜首，并与全球最先进的闭源模型相媲美。";
+"deepseek.loading_balance" = "正在加载余额...";
+"deepseek.api_key_invalid" = "API Key 无效";
+"deepseek.account_balance" = "账户余额";
+"deepseek.granted" = "赠送:";
+"deepseek.topped_up" = "充值:";
 
 // Groq API Config
 "groq.api_title" = "Groq 快速 API";
@@ -114,6 +119,20 @@
 "ollamacloud.ok" = "确定";
 "ollamacloud.description" = "Ollama Cloud 为 Ollama 模型提供托管服务，在云端提供可扩展且可靠的 AI 推理服务。";
 
+// Open Router API Config
+"openrouter.api_title" = "Open Router API 配置";
+"openrouter.enter_secret_key" = "输入密钥";
+"openrouter.how_to_apply" = "如何申请 Open Router API 密钥？";
+"openrouter.click_here" = "点击这里";
+"openrouter.connection_failed" = "连接失败";
+"openrouter.connection_failed_desc" = "无法连接到 Open Router 服务器。请验证您的 API 密钥或 HTTP 代理配置。";
+"openrouter.ok" = "确定";
+"openrouter.description" = "Open Router 通过单一 API 提供对多种 AI 模型的统一访问，包括 GPT-4、Claude、Llama 等。";
+"openrouter.loading_credits" = "正在加载余额...";
+"openrouter.api_key_invalid" = "API Key 无效";
+"openrouter.credits_usage" = "额度使用";
+"openrouter.remaining_credits" = "剩余: $%.2f";
+
 // Ollama Library
 "ollama.library.install_title" = "下载安装 Ollama 本地模型";
 "ollama.library.enter_model_name" = "输入模型名称";
@@ -135,6 +154,7 @@
 "righttopbar.ollama_http_host_config" = "Ollama HTTP 主机配置";
 "righttopbar.deepseek_api_key_config" = "DeepSeek API 密钥配置";
 "righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API 密钥配置";
+"righttopbar.openrouter_api_key_config" = "Open Router API 密钥配置";
 "righttopbar.notice" = "提示";
 "righttopbar.groq_no_streaming" = "Groq 不支持流式输出";
 "righttopbar.confirm" = "确认";

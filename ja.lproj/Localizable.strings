@@ -86,6 +86,11 @@
 "deepseek.connection_failed_desc" = "DeepSeekホストへの接続に失敗しました。APIキーまたはHTTPプロキシ設定を確認してください。";
 "deepseek.ok" = "OK";
 "deepseek.description" = "DeepSeekは、以前のモデルと比較して推論速度において重要なブレークスルーを達成しました。オープンソースモデルの中でリーダーボードのトップに立ち、世界で最も先進的なクローズドソースモデルと競合しています。";
+"deepseek.loading_balance" = "残高を読み込み中...";
+"deepseek.api_key_invalid" = "APIキーが無効です";
+"deepseek.account_balance" = "アカウント残高";
+"deepseek.granted" = "付与:";
+"deepseek.topped_up" = "チャージ:";
 
 // Groq API Config
 "groq.api_title" = "Groq Fast API";
@@ -112,6 +117,20 @@
 "ollamacloud.connection_failed_desc" = "Ollama Cloudへの接続に失敗しました。APIキーまたはHTTPプロキシ設定を確認してください。";
 "ollamacloud.ok" = "OK";
 "ollamacloud.description" = "Ollama CloudはOllamaモデルの管理ホスティングを提供し、クラウドでスケーラブルで信頼性の高いAI推論サービスを提供します。";
+
+// Open Router API Config
+"openrouter.api_title" = "Open Router API";
+"openrouter.enter_secret_key" = "シークレットキーを入力";
+"openrouter.how_to_apply" = "Open Router APIキーの取得方法は？";
+"openrouter.click_here" = "こちらをクリック";
+"openrouter.connection_failed" = "接続失敗";
+"openrouter.connection_failed_desc" = "Open Routerへの接続に失敗しました。APIキーまたはHTTPプロキシ設定を確認してください。";
+"openrouter.ok" = "OK";
+"openrouter.description" = "Open Routerは、GPT-4、Claude、Llamaなど複数のAIモデルへの統一されたアクセスを単一のAPIで提供します。";
+"openrouter.loading_credits" = "クレジットを読み込み中...";
+"openrouter.api_key_invalid" = "APIキーが無効です";
+"openrouter.credits_usage" = "クレジット使用量";
+"openrouter.remaining_credits" = "残り: $%.2f";
 
 // StatusBar
 "statusbar.option_1" = "オプション1";
@@ -152,6 +171,7 @@
 "righttopbar.deepseek_api_key_config" = "DeepSeek APIキー設定";
 "righttopbar.groq_api_key_config" = "Groq APIキー設定";
 "righttopbar.ollamacloud_api_key_config" = "Ollama Cloud APIキー設定";
+"righttopbar.openrouter_api_key_config" = "Open Router APIキー設定";
 "righttopbar.groq_no_streaming" = "Groqはストリーミング出力をサポートしていません";
 "righttopbar.library" = "ダウンロード";
 "righttopbar.no_models_found" = "モデルが見つかりません";

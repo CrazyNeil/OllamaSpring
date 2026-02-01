@@ -37,6 +37,7 @@ struct ChatListPanelView: View {
     @Binding var openOllamaHostConfigModal:Bool
     @Binding var openDeepSeekApiKeyConfigModal:Bool
     @Binding var openOllamaCloudApiKeyConfigModal:Bool
+    @Binding var openOpenRouterApiKeyConfigModal:Bool
     
     @State private var isShowingTemperatureDesc = false
     @State private var isShowingSeedDesc = false
@@ -222,6 +223,12 @@ struct ChatListPanelView: View {
                     OllamaCloudApiKeyConfigModalView(
                         commonViewModel: commonViewModel,
                         openOllamaCloudApiKeyConfigModal: $openOllamaCloudApiKeyConfigModal
+                    )
+                }
+                .sheet(isPresented:$openOpenRouterApiKeyConfigModal) {
+                    OpenRouterApiKeyConfigModalView(
+                        commonViewModel: commonViewModel,
+                        openOpenRouterApiKeyConfigModal: $openOpenRouterApiKeyConfigModal
                     )
                 }
             }
@@ -521,7 +528,7 @@ struct ChatListPanelView: View {
                     .cornerRadius(0)
                     .padding(.top, 120)
                     .onAppear(){
-                        commonViewModel.loadAvailableLocalModels()
+                        commonViewModel.checkOllamaServiceAndLoadModels()
                     }
                 }
                 
@@ -625,7 +632,7 @@ struct ChatListPanelView: View {
                             .padding(.top, 15)
                             .onAppear(){
                                 commonViewModel.selectedOllamaModel = modelToBeDownloaded!
-                                commonViewModel.loadAvailableLocalModels()
+                                commonViewModel.forceRefreshLocalModels()
                             }
                         }
                     }

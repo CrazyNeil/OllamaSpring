@@ -41,6 +41,8 @@ class CommonViewModel: ObservableObject {
     @Published var deepSeekApiKey:String = defaultDeepSeekApiKey
     /// Ollama Cloud API key for authentication
     @Published var ollamaCloudApiKey:String = defaultOllamaCloudApiKey
+    /// Open Router API key for authentication
+    @Published var openRouterApiKey:String = defaultOpenRouterApiKey
     
     // MARK: Service Status
     /// Whether local Ollama API service is available and reachable
@@ -57,6 +59,8 @@ class CommonViewModel: ObservableObject {
     @Published var selectedDeepSeekModel:String = ""
     /// Currently selected Ollama Cloud model name
     @Published var selectedOllamaCloudModel:String = ""
+    /// Currently selected Open Router model name
+    @Published var selectedOpenRouterModel:String = ""
     
     // MARK: Model Lists
     /// List of locally installed Ollama models
@@ -69,6 +73,8 @@ class CommonViewModel: ObservableObject {
     @Published var groqModelList:[GroqModel] = []
     /// List of available Ollama Cloud models
     @Published var ollamaCloudModelList:[OllamaCloudModel] = []
+    /// List of available Open Router models
+    @Published var openRouterModelList:[OpenRouterModel] = []
     /// Loading state indicator for Ollama Cloud models fetch operation
     @Published var isLoadingOllamaCloudModels: Bool = false
     
@@ -257,6 +263,101 @@ class CommonViewModel: ObservableObject {
         }
     }
     
+    /// Fetch available Open Router models from OpenRouter API
+    /// Uses the /api/v1/models endpoint to retrieve model list
+    func fetchOpenRouterModels() async {
+        /// First, try to fetch models from OpenRouter API directly
+        let openRouterApiKey = loadOpenRouterApiKeyFromDatabase()
+        if !openRouterApiKey.isEmpty {
+            let httpProxy = loadHttpProxyHostFromDatabase()
+            let httpProxyAuth = loadHttpProxyAuthFromDatabase()
+            let openRouterApi = OpenRouterApi(
+                proxyUrl: httpProxy.name,
+                proxyPort: Int(httpProxy.port) ?? 0,
+                authorizationToken: openRouterApiKey,
+                isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+                isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase(),
+                login: httpProxyAuth.login,
+                password: httpProxyAuth.password
+            )
+            
+            do {
+                NSLog("OpenRouter API - Attempting to fetch models from OpenRouter API endpoint: api/v1/models")
+                let response = try await openRouterApi.models()
+                
+                /// Check if response contains error
+                if let errorResponse = response as? [String: Any],
+                   let error = errorResponse["error"] as? [String: Any],
+                   let errorMessage = error["message"] as? String {
+                    NSLog("OpenRouter API - Error response: \(errorMessage)")
+                    DispatchQueue.main.async {
+                        self.openRouterModelList = []
+                        self.selectedOpenRouterModel = "Open Router"
+                    }
+                    return
+                } else if let modelResponse = response as? [String: Any],
+                          let modelsData = modelResponse["data"] as? [[String: Any]] {
+                    NSLog("OpenRouter API - Successfully fetched \(modelsData.count) models from OpenRouter API")
+                    
+                    let customModels = modelsData.map { modelData in
+                        let modelId = modelData["id"] as? String ?? ""
+                        let modelName = modelData["name"] as? String ?? modelId
+                        return OpenRouterModel(
+                            modelName: modelName,
+                            name: modelId,
+                            isDefault: modelId.contains("gpt-4") || modelId.contains("claude-3")
+                        )
+                    }
+
+                    DispatchQueue.main.async {
+                        self.openRouterModelList = customModels
+                        if self.openRouterModelList.isEmpty {
+                            self.selectedOpenRouterModel = "Open Router"
+                        } else {
+                            /// First, try to load saved model preference
+                            let savedModel = self.loadPreference(forKey: "selectedOpenRouterModelName", defaultValue: "")
+                            
+                            /// Check if saved model exists in the fetched list
+                            let savedModelExists = customModels.contains { $0.name == savedModel }
+                            
+                            if !savedModel.isEmpty && savedModelExists {
+                                /// Use the saved model if it exists in the list
+                                self.selectedOpenRouterModel = savedModel
+                            } else {
+                                /// Set default model only if no valid saved preference
+                                if let defaultModel = self.openRouterModelList.first(where: { $0.isDefault }) {
+                                    self.selectedOpenRouterModel = defaultModel.name
+                                } else {
+                                    self.selectedOpenRouterModel = self.openRouterModelList.first?.name ?? "Open Router Model"
+                                }
+                                self.updateSelectedOpenRouterModel(name: self.selectedOpenRouterModel)
+                            }
+                        }
+                    }
+                    return /// Successfully fetched from OpenRouter API, exit early
+                } else {
+                    NSLog("OpenRouter API - Response format is not as expected")
+                    DispatchQueue.main.async {
+                        self.openRouterModelList = []
+                        self.selectedOpenRouterModel = "Open Router"
+                    }
+                }
+            } catch {
+                NSLog("OpenRouter API - Failed to fetch models from OpenRouter API: \(error)")
+                DispatchQueue.main.async {
+                    self.openRouterModelList = []
+                    self.selectedOpenRouterModel = "Open Router"
+                }
+            }
+        } else {
+            NSLog("OpenRouter API - No API key configured")
+            DispatchQueue.main.async {
+                self.openRouterModelList = []
+                self.selectedOpenRouterModel = "Open Router"
+            }
+        }
+    }
+    
     // MARK: - Preference Management
     
     /// Load preference value from database with default value fallback
@@ -353,6 +454,18 @@ class CommonViewModel: ObservableObject {
         self.selectedOllamaCloudModel = loadPreference(forKey: "selectedOllamaCloudModelName", defaultValue: selectedOllamaCloudModel)
     }
     
+    /// Update selected Open Router model preference
+    /// - Parameter name: Open Router model name to select
+    func updateSelectedOpenRouterModel(name:String) {
+        preference.updatePreference(preferenceKey: "selectedOpenRouterModelName", preferenceValue: name)
+        self.selectedOpenRouterModel = name
+    }
+    
+    /// Load selected Open Router model from database
+    func loadSelectedOpenRouterModelFromDatabase() {
+        self.selectedOpenRouterModel = loadPreference(forKey: "selectedOpenRouterModelName", defaultValue: selectedOpenRouterModel)
+    }
+    
     // MARK: - API Key Configuration
     
     /// Update Groq API key in both database and memory
@@ -434,6 +547,53 @@ class CommonViewModel: ObservableObject {
             let response = try await deepSeekApi.models()
             if let modelResponse = response as? [String: Any],
                let modelsData = modelResponse["data"] as? [[String: Any]] {
+                return !modelsData.isEmpty
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
+    
+    /// Load Open Router API key from database
+    /// - Returns: Open Router API key string
+    func loadOpenRouterApiKeyFromDatabase() -> String {
+        self.openRouterApiKey = loadPreference(forKey: "openRouterApiKey", defaultValue: defaultOpenRouterApiKey)
+        
+        return self.openRouterApiKey
+    }
+    
+    /// Update Open Router API key in both database and memory
+    /// - Parameter key: Open Router API key string
+    func updateOpenRouterApiKey(key: String) {
+        preference.updatePreference(preferenceKey: "openRouterApiKey", preferenceValue: key)
+        self.openRouterApiKey = key
+    }
+    
+    /// Verify Open Router API key by attempting to fetch models
+    /// - Parameter key: Open Router API key to verify
+    /// - Returns: True if API key is valid and can fetch models, false otherwise
+    func verifyOpenRouterApiKey(key: String) async -> Bool {
+        let httpProxy = loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = loadHttpProxyAuthFromDatabase()
+        let openRouterApi = OpenRouterApi(
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: key,
+            isHttpProxyEnabled: loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: loadHttpProxyAuthStatusFromDatabase(),
+            login: httpProxyAuth.login,
+            password: httpProxyAuth.password
+        )
+        
+        do {
+            let response = try await openRouterApi.models()
+            // Check if response contains error
+            if let errorResponse = response as? [String: Any],
+               let _ = errorResponse["error"] as? [String: Any] {
+                return false
+            } else if let modelResponse = response as? [String: Any],
+                      let modelsData = modelResponse["data"] as? [[String: Any]] {
                 return !modelsData.isEmpty
             }
             return false
@@ -701,54 +861,102 @@ class CommonViewModel: ObservableObject {
     
     // MARK: - Ollama Service Status
     
-    /// Check if local Ollama API service is available
-    /// Updates service availability status and loads available local models
-    func ollamaApiServiceStatusCheck() {
+    /// Flag to track if Ollama check has already been performed this session
+    private var hasCheckedOllamaService = false
+    
+    /// Unified function to check Ollama service status and load models in a single API call
+    /// This consolidates ollamaApiServiceStatusCheck, localModelInstalledCheck, and loadAvailableLocalModels
+    /// to avoid redundant network requests
+    func checkOllamaServiceAndLoadModels() {
+        /// Skip if already checked this session and service was unavailable
+        if hasCheckedOllamaService && !isOllamaApiServiceAvailable {
+            return
+        }
+        
         Task {
             let ollama = OllamaApi()
             
             do {
                 let response = try await ollama.tags()
-                self.loadAvailableLocalModels()
-                DispatchQueue.main.async {
-                    if response["models"] is [[String: Any]] {
+                hasCheckedOllamaService = true
+                
+                if let models = response["models"] as? [[String: Any]] {
+                    DispatchQueue.main.async {
                         self.isOllamaApiServiceAvailable = true
-                    } else {
+                        self.hasLocalModelInstalled = !models.isEmpty
+                        
+                        /// Clear and rebuild the local model list
+                        self.ollamaLocalModelList.removeAll()
+                        
+                        for model in models {
+                            let details = model["details"] as? [String: Any]
+                            let parameterSize = details?["parameter_size"] as? String ?? ""
+                            
+                            let sizeInGB: Double
+                            if let sizeInBytes = model["size"] as? Int {
+                                sizeInGB = Double(sizeInBytes) / (1024.0 * 1024.0 * 1024.0)
+                            } else {
+                                sizeInGB = 0.0
+                            }
+                            
+                            self.ollamaLocalModelList.append(OllamaModel(
+                                modelName: (model["name"] as? String ?? "Not Available"),
+                                name: (model["name"] as? String ?? "Not Available"),
+                                size: String(format: "%.2fGB", sizeInGB),
+                                parameterSize: parameterSize,
+                                isDefault: false
+                            ))
+                            
+                            /// Append model to remote list if not already present
+                            if self.findLocalModel(byName: model["name"] as! String, in: self.ollamaRemoteModelList) == nil {
+                                self.ollamaRemoteModelList.append(OllamaModel(
+                                    modelName: (model["name"] as? String ?? "Not Available"),
+                                    name: (model["name"] as? String ?? "Not Available"),
+                                    size: String(format: "%.2fGB", sizeInGB),
+                                    parameterSize: parameterSize,
+                                    isDefault: false
+                                ))
+                            }
+                        }
+                        
+                        /// Setup default selected model
+                        if self.ollamaLocalModelList.count > 0 {
+                            self.selectedOllamaModel = self.ollamaLocalModelList[0].name
+                        } else {
+                            self.selectedOllamaModel = noModelFound
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
                         self.isOllamaApiServiceAvailable = false
+                        self.hasLocalModelInstalled = false
+                        self.selectedOllamaModel = noModelFound
                     }
                 }
             } catch {
+                hasCheckedOllamaService = true
                 DispatchQueue.main.async {
                     self.isOllamaApiServiceAvailable = false
+                    self.hasLocalModelInstalled = false
+                    self.selectedOllamaModel = noModelFound
                 }
-                NSLog("Error during Ollama API service status check: \(error)")
+                /// Only log once to avoid log spam
+                NSLog("Ollama local service not available: \(error.localizedDescription)")
             }
         }
+    }
+    
+    /// Check if local Ollama API service is available
+    /// Updates service availability status and loads available local models
+    func ollamaApiServiceStatusCheck() {
+        checkOllamaServiceAndLoadModels()
     }
     
     /// Check if at least one local Ollama model is installed
     /// Updates hasLocalModelInstalled status and loads available local models
     func localModelInstalledCheck() {
-        Task {
-            let ollama = OllamaApi()
-            
-            do {
-                let response = try await ollama.tags()
-                self.loadAvailableLocalModels()
-                DispatchQueue.main.async {
-                    if let models = response["models"] as? [[String: Any]], !models.isEmpty {
-                        self.hasLocalModelInstalled = true
-                    } else {
-                        self.hasLocalModelInstalled = false
-                    }
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.hasLocalModelInstalled = false
-                }
-                NSLog("Error during Ollama API service status check: \(error)")
-            }
-        }
+        /// This is now handled by checkOllamaServiceAndLoadModels
+        /// No additional API call needed
     }
     
     // MARK: - Local Model Management
@@ -763,66 +971,17 @@ class CommonViewModel: ObservableObject {
     }
     
     /// Load and update list of available local Ollama models
-    /// Fetches models from local Ollama instance and calculates model sizes
-    /// Also appends models to remote list if they're not already present
+    /// Uses the unified check function to avoid redundant API calls
     func loadAvailableLocalModels() {
-        
-        Task {
-            let ollama = OllamaApi()
-            let response = try await ollama.tags()
-            if let models = response["models"] as? [[String: Any]] {
-                DispatchQueue.main.async {
-                    self.ollamaLocalModelList.removeAll()
-                }
-                
-                for model in models {
-                    
-                    let details = model["details"] as? [String: Any]
-                    let parameterSize = details?["parameter_size"] as? String ?? ""
-                    
-                    let sizeInGB: Double
-                    if let sizeInBytes = model["size"] as? Int {
-                        sizeInGB = Double(sizeInBytes) / (1024.0 * 1024.0 * 1024.0)
-                    } else {
-                        sizeInGB = 0.0
-                    }
-                    
-                    /// Initialize available local model list
-                    DispatchQueue.main.async {
-                        self.ollamaLocalModelList.append(OllamaModel(
-                            modelName: (model["name"] as? String ?? "Not Available"),
-                            name: (model["name"] as? String ?? "Not Available"),
-                            size: String(format: "%.2fGB", sizeInGB),
-                            parameterSize: parameterSize,
-                            isDefault: false
-                        ))
-                        
-                        /// Append model to remote list if not already present (installed by library)
-                        if self.findLocalModel(byName: model["name"] as! String, in: self.ollamaRemoteModelList) == nil {
-                            self.ollamaRemoteModelList.append(OllamaModel(
-                                modelName: (model["name"] as? String ?? "Not Available"),
-                                name: (model["name"] as? String ?? "Not Available"),
-                                size: String(format: "%.2fGB", sizeInGB),
-                                parameterSize: parameterSize,
-                                isDefault: false
-                            ))
-                        }
-                        
-
-                    }
-                }
-                
-                /// Setup default selected model
-                DispatchQueue.main.async {
-                    if self.ollamaLocalModelList.count > 0 {
-                        self.selectedOllamaModel = self.ollamaLocalModelList[0].name
-                    } else {
-                        self.selectedOllamaModel = noModelFound
-                    }
-                }
-                
-            }
-        }
+        /// Use the unified check function instead of making another API call
+        checkOllamaServiceAndLoadModels()
+    }
+    
+    /// Force refresh local models (bypasses cache)
+    /// Use this when user explicitly requests a refresh
+    func forceRefreshLocalModels() {
+        hasCheckedOllamaService = false
+        checkOllamaServiceAndLoadModels()
     }
     
     /// Remove a local Ollama model by name

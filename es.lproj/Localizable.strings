@@ -86,6 +86,11 @@
 "deepseek.connection_failed_desc" = "No se pudo conectar al host de DeepSeek. Por favor verifica tu clave API o la configuración del proxy HTTP.";
 "deepseek.ok" = "OK";
 "deepseek.description" = "DeepSeek logra un avance significativo en la velocidad de inferencia sobre modelos anteriores. Encabeza la tabla de clasificación entre modelos de código abierto y compite con los modelos de código cerrado más avanzados del mundo.";
+"deepseek.loading_balance" = "Cargando saldo...";
+"deepseek.api_key_invalid" = "Clave API inválida";
+"deepseek.account_balance" = "Saldo de cuenta";
+"deepseek.granted" = "Otorgado:";
+"deepseek.topped_up" = "Recargado:";
 
 // Groq API Config
 "groq.api_title" = "API Groq Fast";
@@ -112,6 +117,20 @@
 "ollamacloud.connection_failed_desc" = "No se pudo conectar a Ollama Cloud. Por favor verifica tu clave API o la configuración del proxy HTTP.";
 "ollamacloud.ok" = "OK";
 "ollamacloud.description" = "Ollama Cloud proporciona alojamiento gestionado para modelos Ollama, ofreciendo servicios de inferencia de IA escalables y confiables en la nube.";
+
+// Open Router API Config
+"openrouter.api_title" = "API de Open Router";
+"openrouter.enter_secret_key" = "INGRESE CLAVE SECRETA";
+"openrouter.how_to_apply" = "¿Cómo solicitar una clave de API de Open Router?";
+"openrouter.click_here" = "haga clic aquí";
+"openrouter.connection_failed" = "Conexión fallida";
+"openrouter.connection_failed_desc" = "No se pudo conectar a Open Router. Por favor verifica tu clave API o la configuración del proxy HTTP.";
+"openrouter.ok" = "OK";
+"openrouter.description" = "Open Router proporciona acceso unificado a múltiples modelos de IA incluyendo GPT-4, Claude, Llama y muchos más a través de una sola API.";
+"openrouter.loading_credits" = "Cargando créditos...";
+"openrouter.api_key_invalid" = "Clave API inválida";
+"openrouter.credits_usage" = "Uso de créditos";
+"openrouter.remaining_credits" = "Restante: $%.2f";
 
 // StatusBar
 "statusbar.option_1" = "Opción 1";
@@ -152,6 +171,7 @@
 "righttopbar.deepseek_api_key_config" = "Configuración de clave API de DeepSeek";
 "righttopbar.groq_api_key_config" = "Configuración de clave API de Groq";
 "righttopbar.ollamacloud_api_key_config" = "Configuración de clave API de Ollama Cloud";
+"righttopbar.openrouter_api_key_config" = "Configuración de clave API de Open Router";
 "righttopbar.groq_no_streaming" = "Groq no admite salida en streaming";
 "righttopbar.library" = "Descargar";
 "righttopbar.no_models_found" = "No se encontraron modelos";

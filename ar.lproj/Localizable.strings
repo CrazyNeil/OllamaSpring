@@ -86,6 +86,11 @@
 "deepseek.connection_failed_desc" = "فشل الاتصال بخادم DeepSeek. يرجى التحقق من مفتاح API أو إعدادات الوكيل HTTP.";
 "deepseek.ok" = "موافق";
 "deepseek.description" = "يحقق DeepSeek اختراقاً كبيراً في سرعة الاستدلال مقارنة بالنماذج السابقة. يتصدر قائمة التصنيف بين النماذج مفتوحة المصدر ويتنافس مع أكثر النماذج المغلقة المصدر تقدماً في العالم.";
+"deepseek.loading_balance" = "جاري تحميل الرصيد...";
+"deepseek.api_key_invalid" = "مفتاح API غير صالح";
+"deepseek.account_balance" = "رصيد الحساب";
+"deepseek.granted" = "ممنوح:";
+"deepseek.topped_up" = "مشحون:";
 
 // Groq API Config
 "groq.api_title" = "API Groq السريع";
@@ -112,6 +117,20 @@
 "ollamacloud.connection_failed_desc" = "فشل الاتصال بـ Ollama Cloud. يرجى التحقق من مفتاح API أو تكوين وكيل HTTP.";
 "ollamacloud.ok" = "موافق";
 "ollamacloud.description" = "يوفر Ollama Cloud استضافة مدارة لنماذج Ollama، مما يوفر خدمات استدلال الذكاء الاصطناعي القابلة للتطوير والموثوقة في السحابة.";
+
+// Open Router API Config
+"openrouter.api_title" = "واجهة Open Router";
+"openrouter.enter_secret_key" = "أدخل المفتاح السري";
+"openrouter.how_to_apply" = "كيفية الحصول على مفتاح Open Router API؟";
+"openrouter.click_here" = "انقر هنا";
+"openrouter.connection_failed" = "فشل الاتصال";
+"openrouter.connection_failed_desc" = "فشل الاتصال بـ Open Router. يرجى التحقق من مفتاح API أو تكوين وكيل HTTP.";
+"openrouter.ok" = "موافق";
+"openrouter.description" = "يوفر Open Router وصولاً موحداً إلى نماذج AI متعددة بما في ذلك GPT-4 و Claude و Llama والمزيد من خلال واجهة برمجة واحدة.";
+"openrouter.loading_credits" = "جاري تحميل الرصيد...";
+"openrouter.api_key_invalid" = "مفتاح API غير صالح";
+"openrouter.credits_usage" = "استخدام الرصيد";
+"openrouter.remaining_credits" = "المتبقي: $%.2f";
 
 // StatusBar
 "statusbar.option_1" = "الخيار 1";
@@ -152,6 +171,7 @@
 "righttopbar.deepseek_api_key_config" = "تكوين مفتاح API DeepSeek";
 "righttopbar.groq_api_key_config" = "تكوين مفتاح API Groq";
 "righttopbar.ollamacloud_api_key_config" = "تكوين مفتاح API Ollama Cloud";
+"righttopbar.openrouter_api_key_config" = "تكوين مفتاح API Open Router";
 "righttopbar.groq_no_streaming" = "Groq لا يدعم الإخراج المتدفق";
 "righttopbar.library" = "تحميل";
 "righttopbar.no_models_found" = "لم يتم العثور على نماذج";

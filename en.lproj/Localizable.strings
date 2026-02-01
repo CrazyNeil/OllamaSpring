@@ -86,6 +86,11 @@
 "deepseek.connection_failed_desc" = "Failed to connect to DeepSeek host. Please verify your apiKey or HTTP Proxy Config.";
 "deepseek.ok" = "OK";
 "deepseek.description" = "DeepSeek achieves a significant breakthrough in inference speed over previous models. It tops the leaderboard among open-source models and rivals the most advanced closed-source models globally.";
+"deepseek.loading_balance" = "Loading balance...";
+"deepseek.api_key_invalid" = "API Key is invalid";
+"deepseek.account_balance" = "Account Balance";
+"deepseek.granted" = "Granted:";
+"deepseek.topped_up" = "Topped Up:";
 
 // Groq API Config
 "groq.api_title" = "Groq Fast API";
@@ -114,6 +119,20 @@
 "ollamacloud.ok" = "OK";
 "ollamacloud.description" = "Ollama Cloud provides managed hosting for Ollama models, offering scalable and reliable AI inference services in the cloud.";
 
+// Open Router API Config
+"openrouter.api_title" = "Open Router API";
+"openrouter.enter_secret_key" = "ENTER SECRET KEY";
+"openrouter.how_to_apply" = "How to apply an Open Router API key?";
+"openrouter.click_here" = "click here";
+"openrouter.connection_failed" = "Connection Failed";
+"openrouter.connection_failed_desc" = "Failed to connect to Open Router. Please verify your apiKey or HTTP Proxy Config.";
+"openrouter.ok" = "OK";
+"openrouter.description" = "Open Router provides unified access to multiple AI models including GPT-4, Claude, Llama, and many more through a single API.";
+"openrouter.loading_credits" = "Loading credits...";
+"openrouter.api_key_invalid" = "API Key is invalid";
+"openrouter.credits_usage" = "Credits Usage";
+"openrouter.remaining_credits" = "Remaining: $%.2f";
+
 // Ollama Library
 "ollama.library.install_title" = "Download & Install Ollama Local Model";
 "ollama.library.enter_model_name" = "Enter Model Name";
@@ -135,6 +154,7 @@
 "righttopbar.ollama_http_host_config" = "Ollama HTTP Host Config";
 "righttopbar.deepseek_api_key_config" = "DeepSeek API Key Config";
 "righttopbar.ollamacloud_api_key_config" = "Ollama Cloud API Key Config";
+"righttopbar.openrouter_api_key_config" = "Open Router API Key Config";
 "righttopbar.notice" = "Notice";
 "righttopbar.groq_no_streaming" = "Groq not support Streaming Output";
 "righttopbar.confirm" = "Confirm";

@@ -57,6 +57,13 @@ class DeepSeekApi {
         return try await makeRequest(method: "GET", endpoint: "models")
     }
     
+    /// Fetch user balance from DeepSeek API
+    /// - Returns: API response containing balance information
+    /// - Throws: Error if request fails
+    public func balance() async throws -> AnyObject {
+        return try await makeRequest(method: "GET", endpoint: "user/balance")
+    }
+    
     /// Send chat completion request to DeepSeek API
     /// - Parameters:
     ///   - modelName: Name of the DeepSeek model to use

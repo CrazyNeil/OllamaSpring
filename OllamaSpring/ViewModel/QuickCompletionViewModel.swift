@@ -244,6 +244,175 @@ class QuickCompletionGroqStreamDelegate: NSObject, URLSessionDataDelegate {
     }
 }
 
+/// URLSession delegate for handling Open Router API streaming responses
+/// Processes Server-Sent Events (SSE) format responses line by line
+class QuickCompletionOpenRouterStreamDelegate: NSObject, URLSessionDataDelegate {
+    /// Accumulated received data (currently unused but kept for compatibility)
+    private var receivedData = Data()
+    /// Reference to parent ViewModel for updating UI state
+    private var quickCompletionViewModel: QuickCompletionViewModel
+    /// Buffer for accumulating incomplete lines from streaming data
+    private var buffer = ""
+    /// Flag to track if we've already handled an error
+    private var hasHandledError = false
+    
+    /// Initialize delegate with ViewModel reference
+    /// - Parameter quickCompletionViewModel: Parent ViewModel instance
+    init(quickCompletionViewModel: QuickCompletionViewModel) {
+        self.quickCompletionViewModel = quickCompletionViewModel
+    }
+    
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        NSLog("Open Router Quick Completion - Received data: \(data.count) bytes")
+        
+        /// Check HTTP response status code
+        if let response = dataTask.response as? HTTPURLResponse {
+            NSLog("Open Router Quick Completion - Status code: \(response.statusCode)")
+            if response.statusCode != 200 {
+                let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+                NSLog("Open Router Quick Completion - HTTP error \(response.statusCode): \(responseBody)")
+                
+                /// Parse error message for user-friendly display
+                var userFriendlyError = "Open Router API Error (\(response.statusCode))"
+                if let jsonData = responseBody.data(using: .utf8),
+                   let errorDict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+                   let error = errorDict["error"] as? [String: Any],
+                   let errorMessage = error["message"] as? String {
+                    userFriendlyError = "Open Router: \(errorMessage)"
+                }
+                
+                handleError(userFriendlyError)
+                return
+            }
+        }
+        
+        guard let text = String(data: data, encoding: .utf8) else {
+            NSLog("Open Router Quick Completion - Failed to convert data to string")
+            return
+        }
+        buffer += text
+        
+        /// Process complete lines (ending with newline) from buffer
+        while let newlineIndex = buffer.firstIndex(of: "\n") {
+            let line = String(buffer[..<newlineIndex])
+            buffer = String(buffer[buffer.index(after: newlineIndex)...])
+            
+            /// Process each complete line
+            processLine(line)
+        }
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        NSLog("Open Router Quick Completion - Task completed, error: \(error?.localizedDescription ?? "none")")
+        
+        if let error = error as NSError? {
+            var errorMessage = "Connection Error"
+            
+            // Handle proxy-related errors
+            if error.domain == NSURLErrorDomain || error.domain == "kCFErrorDomainCFNetwork" {
+                switch error.code {
+                case NSURLErrorTimedOut:
+                    errorMessage = "Request timed out. Please check your network connection."
+                case NSURLErrorCannotConnectToHost:
+                    errorMessage = "Could not connect to server. Please try again later."
+                case NSURLErrorNotConnectedToInternet:
+                    errorMessage = "No internet connection. Please check your network settings."
+                case 310:
+                    errorMessage = "Proxy connection failed. Please check your proxy settings or try disabling the proxy."
+                default:
+                    if (error.userInfo["_kCFStreamErrorDomainKey"] as? Int == 4 &&
+                        error.userInfo["_kCFStreamErrorCodeKey"] as? Int == -2096) {
+                        errorMessage = "Failed to connect to proxy server. Please verify your proxy configuration or try disabling it."
+                    } else {
+                        errorMessage = "Network error: \(error.localizedDescription)"
+                    }
+                }
+            }
+            
+            NSLog("Open Router Quick Completion - Connection error: \(error)")
+            handleError(errorMessage)
+        }
+    }
+    
+    private func processLine(_ line: String) {
+        /// Skip empty lines
+        guard !line.isEmpty else { return }
+        
+        /// Skip lines that don't start with "data: " (SSE format requirement)
+        guard line.hasPrefix("data: ") else {
+            NSLog("Open Router Quick Completion - Line doesn't start with 'data: ', skipping: \(line.prefix(50))...")
+            return
+        }
+        
+        /// Extract JSON content after "data: "
+        let cleanedLine = String(line.dropFirst(6))
+        
+        /// Handle [DONE] marker
+        if cleanedLine == "[DONE]" {
+            NSLog("Open Router Quick Completion - Stream complete [DONE]")
+            DispatchQueue.main.async {
+                self.quickCompletionViewModel.waitingModelResponse = false
+            }
+            return
+        }
+        
+        guard let jsonData = cleanedLine.data(using: .utf8) else {
+            NSLog("Open Router Quick Completion - Failed to convert line to data")
+            return
+        }
+        
+        do {
+            /// First try to parse error response
+            if let errorDict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+               let error = errorDict["error"] as? [String: Any],
+               let errorMessage = error["message"] as? String {
+                handleError("Open Router: \(errorMessage)")
+                return
+            }
+            
+            /// Try to parse normal response
+            guard let jsonObject = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+                NSLog("Open Router Quick Completion - Failed to parse JSON object")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                if let choices = jsonObject["choices"] as? [[String: Any]],
+                   let firstChoice = choices.first,
+                   let delta = firstChoice["delta"] as? [String: Any],
+                   let content = delta["content"] as? String {
+                    self.quickCompletionViewModel.tmpResponse = (self.quickCompletionViewModel.tmpResponse) + content
+                }
+                
+                if let choices = jsonObject["choices"] as? [[String: Any]],
+                   let firstChoice = choices.first,
+                   let finishReason = firstChoice["finish_reason"] as? String,
+                   finishReason == "stop" {
+                    self.quickCompletionViewModel.waitingModelResponse = false
+                }
+            }
+        } catch {
+            NSLog("Open Router Quick Completion - JSON parsing error: \(error), line: \(cleanedLine.prefix(100))...")
+            /// Ignore JSON parsing errors for non-JSON lines
+        }
+    }
+    
+    private func handleError(_ errorMessage: String) {
+        /// Prevent duplicate error handling
+        guard !hasHandledError else { return }
+        hasHandledError = true
+        
+        NSLog("Open Router Quick Completion - Error: \(errorMessage)")
+        DispatchQueue.main.async {
+            /// Display error message in the response panel instead of closing it
+            self.quickCompletionViewModel.tmpResponse = errorMessage
+            self.quickCompletionViewModel.waitingModelResponse = false
+            /// Keep panel open to show error message
+            /// self.quickCompletionViewModel.showOpenRouterResponsePanel = false  // Don't close!
+        }
+    }
+}
+
 // MARK: - Quick Completion ViewModel
 
 /// ViewModel for managing quick completion feature
@@ -277,6 +446,8 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
     @Published var showDeepSeekResponsePanel = false
     /// Whether to show Ollama Cloud response panel
     @Published var showOllamaCloudResponsePanel = false
+    /// Whether to show Open Router response panel
+    @Published var showOpenRouterResponsePanel = false
     /// Whether to show message panel
     @Published var showMsgPanel = false
     
@@ -631,6 +802,109 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
         self.showOllamaCloudResponsePanel = true
     }
     
+    /// Send streaming request to Open Router API
+    /// Uses Server-Sent Events (SSE) format for real-time response streaming
+    /// - Parameters:
+    ///   - modelName: Open Router model name to use
+    ///   - content: User prompt content
+    ///   - responseLang: Preferred response language
+    @MainActor func openRouterSendMsgWithStreamingOn(
+        modelName: String,
+        content: String,
+        responseLang: String
+    ) {
+        self.tmpModelName = modelName
+        
+        /// Construct the full URL for Open Router API
+        guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else {
+            return
+        }
+        
+        /// Initialize HTTP request
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Bearer \(commonViewModel.loadOpenRouterApiKeyFromDatabase())", forHTTPHeaderField: "Authorization")
+        
+        /// Setup proxy configuration with timeouts
+        let configuration = URLSessionConfiguration.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 300
+        
+        /// Setup proxy if enabled
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let isHttpProxyEnabled = commonViewModel.loadHttpProxyStatusFromDatabase()
+        let isHttpProxyAuthEnabled = commonViewModel.loadHttpProxyAuthStatusFromDatabase()
+        
+        if isHttpProxyEnabled {
+            let proxyHost = httpProxy.name.replacingOccurrences(of: "@", with: "")
+            let proxyPort = Int(httpProxy.port) ?? 0
+            
+            configuration.connectionProxyDictionary = [
+                kCFNetworkProxiesHTTPEnable: true,
+                kCFNetworkProxiesHTTPProxy: proxyHost,
+                kCFNetworkProxiesHTTPPort: proxyPort,
+                kCFProxyTypeHTTP: true,
+                
+                kCFNetworkProxiesHTTPSEnable: true,
+                kCFNetworkProxiesHTTPSProxy: proxyHost,
+                kCFNetworkProxiesHTTPSPort: proxyPort,
+                kCFProxyTypeHTTPS: true
+            ]
+            
+            if isHttpProxyAuthEnabled {
+                let authString = "\(httpProxyAuth.login):\(httpProxyAuth.password)"
+                if let authData = authString.data(using: .utf8) {
+                    let base64AuthString = authData.base64EncodedString()
+                    request.addValue("Basic \(base64AuthString)", forHTTPHeaderField: "Proxy-Authorization")
+                }
+            }
+        }
+        
+        /// Prepare messages array with system role for language preference
+        var mutableMessages = [
+            ["role": "user", "content": content] as [String: String]
+        ]
+        
+        // Add system role for language preference
+        if responseLang != "Auto" {
+            let sysRolePrompt = [
+                "role": "system",
+                "content": "you are a help assistant and answer the question in \(responseLang)"
+            ] as [String: String]
+            mutableMessages.insert(sysRolePrompt, at: 0)
+        }
+        
+        let params: [String: Any] = [
+            "model": modelName,
+            "messages": mutableMessages,
+            "stream": true
+        ]
+        
+        // send request
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: params, options: [])
+            request.httpBody = jsonData
+            
+        } catch {
+            NSLog("Error serializing JSON: \(error)")
+            return
+        }
+        
+        /// Start a session data task with the OpenRouterStreamDelegate for streaming response
+        let openRouterDelegate = QuickCompletionOpenRouterStreamDelegate(quickCompletionViewModel: self)
+        let session = URLSession(configuration: configuration, delegate: openRouterDelegate, delegateQueue: nil)
+        let task = session.dataTask(with: request)
+        task.resume()
+        
+        /// Update view state for streaming response
+        self.waitingModelResponse = true
+        self.tmpResponse = ""
+        self.showOpenRouterResponsePanel = true
+    }
+    
     /// Send streaming request to local Ollama API
     /// Uses Server-Sent Events (SSE) format for real-time response streaming
     /// - Parameters:
@@ -764,6 +1038,71 @@ class QuickCompletionViewModel: NSObject, ObservableObject, URLSessionDataDelega
                 let jsonResponse = JSON(response)
                 
                 /// Parse Groq message content or error message
+                let errorMessage = jsonResponse["msg"].string
+                
+                let content: String
+                if let errorMessage = errorMessage {
+                    content = errorMessage
+                } else {
+                    content = jsonResponse["choices"].array?.first?["message"]["content"].string ?? ""
+                }
+                
+                let finalContent = (content.isEmpty || content == "\n") ? "No Response from \(modelName)" : content
+                DispatchQueue.main.async {
+                    self.tmpResponse = finalContent
+                }
+                
+            } catch {
+                print("Error: \(error)")
+            }
+        }
+    }
+    
+    /// Send non-streaming request to Open Router API
+    /// Returns complete response after generation finishes
+    /// - Parameters:
+    ///   - modelName: Open Router model name to use
+    ///   - responseLang: Preferred response language
+    ///   - content: User prompt content
+    @MainActor func openRouterSendMsg(
+        modelName: String,
+        responseLang: String,
+        content: String
+    ){
+        let openRouterAuthKey = commonViewModel.loadOpenRouterApiKeyFromDatabase()
+        let httpProxy = commonViewModel.loadHttpProxyHostFromDatabase()
+        let httpProxyAuth = commonViewModel.loadHttpProxyAuthFromDatabase()
+        let openRouter = OpenRouterApi(
+            proxyUrl: httpProxy.name,
+            proxyPort: Int(httpProxy.port) ?? 0,
+            authorizationToken: openRouterAuthKey,
+            isHttpProxyEnabled: commonViewModel.loadHttpProxyStatusFromDatabase(),
+            isHttpProxyAuthEnabled: commonViewModel.loadHttpProxyAuthStatusFromDatabase(),
+            login: httpProxyAuth.login,
+            password: httpProxyAuth.password
+        )
+        
+        Task {
+            do {
+                /// Prepare user prompt messages
+                let messages = [
+                    ["role": "user", "content": content]
+                ]
+                
+                /// Send request to Open Router API and get response
+                let response = try await openRouter.chat(
+                    modelName: modelName,
+                    responseLang: responseLang,
+                    messages: messages,
+                    historyMessages: [],
+                    seed: Int(self.modelOptions.seed),
+                    temperature: self.modelOptions.temperature,
+                    top_p: self.modelOptions.topP
+                )
+                
+                let jsonResponse = JSON(response)
+                
+                /// Parse Open Router message content or error message
                 let errorMessage = jsonResponse["msg"].string
                 
                 let content: String

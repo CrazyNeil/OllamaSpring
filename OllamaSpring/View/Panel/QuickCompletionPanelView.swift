@@ -33,6 +33,8 @@ struct QuickCompletionPanelView: View {
             sendDeepSeekPrompt()
         } else if commonViewModel.selectedApiHost == ApiHostList[3].name {
             sendOllamaCloudPrompt()
+        } else if commonViewModel.selectedApiHost == ApiHostList[4].name {
+            sendOpenRouterPrompt()
         }
     }
 
@@ -116,6 +118,21 @@ struct QuickCompletionPanelView: View {
         quickCompletionViewModel.showOllamaCloudResponsePanel = true
     }
     
+    private func sendOpenRouterPrompt() {
+        commonViewModel.loadSelectedOpenRouterModelFromDatabase()
+        quickCompletionViewModel.openRouterSendMsgWithStreamingOn(
+            modelName: commonViewModel.selectedOpenRouterModel,
+            content: inputText,
+            responseLang: commonViewModel.selectedResponseLang
+        )
+        quickCompletionViewModel.showResponsePanel = false
+        quickCompletionViewModel.showMsgPanel = false
+        quickCompletionViewModel.showGroqResponsePanel = false
+        quickCompletionViewModel.showDeepSeekResponsePanel = false
+        quickCompletionViewModel.showOllamaCloudResponsePanel = false
+        quickCompletionViewModel.showOpenRouterResponsePanel = true
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             TextField(NSLocalizedString("quick.prompt", comment: ""), text: $inputText)
@@ -154,10 +171,8 @@ struct QuickCompletionPanelView: View {
         .opacity(0.95)
         .cornerRadius(8)
         .onAppear {
-            /// load installed models
-            commonViewModel.loadAvailableLocalModels()
-            /// update ollama api service status
-            commonViewModel.ollamaApiServiceStatusCheck()
+            /// Check Ollama service and load local models (single API call)
+            commonViewModel.checkOllamaServiceAndLoadModels()
             /// init status value
             quickCompletionViewModel.showResponsePanel = false
             quickCompletionViewModel.showMsgPanel = false
@@ -198,7 +213,7 @@ struct QuickCompletionPanelView: View {
         }
         
         /// show groq/deepseek/ollamacloud response after user input
-        if quickCompletionViewModel.showGroqResponsePanel || quickCompletionViewModel.showDeepSeekResponsePanel || quickCompletionViewModel.showOllamaCloudResponsePanel {
+        if quickCompletionViewModel.showGroqResponsePanel || quickCompletionViewModel.showDeepSeekResponsePanel || quickCompletionViewModel.showOllamaCloudResponsePanel || quickCompletionViewModel.showOpenRouterResponsePanel {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -206,7 +221,11 @@ struct QuickCompletionPanelView: View {
                             /// response bar - fixed at top
                             HStack {
                                 /// display model name
-                                if commonViewModel.selectedApiHost == ApiHostList[3].name {
+                                if commonViewModel.selectedApiHost == ApiHostList[4].name {
+                                    Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedOpenRouterModel)
+                                        .font(.body)
+                                        .foregroundColor(.orange)
+                                } else if commonViewModel.selectedApiHost == ApiHostList[3].name {
                                     Text(commonViewModel.selectedApiHost + ": " + commonViewModel.selectedOllamaCloudModel)
                                         .font(.body)
                                         .foregroundColor(.orange)

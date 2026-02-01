@@ -32,6 +32,7 @@ let ApiHostList = [
     ApiHost(baseUrl: "https://api.groq.com", port: 443, name: "Groq Fast AI"),
     ApiHost(baseUrl: "https://api.deepseek.com", port: 443, name: "DeepSeek"),
     ApiHost(baseUrl: "https://ollama.com", port: 443, name: "Ollama Cloud"),
+    ApiHost(baseUrl: "https://openrouter.ai", port: 443, name: "Open Router"),
 ]
 let defaultApiHost = ApiHostList[0].name
 /// Groq
@@ -45,6 +46,10 @@ let deepSeekApiBaseUrl = ApiHostList[2].baseUrl + ":" + String(ApiHostList[2].po
 /// Ollama Cloud
 let defaultOllamaCloudApiKey = ""
 let ollamaCloudWebUrl = "https://ollama.com/cloud"
+/// Open Router
+let defaultOpenRouterApiKey = ""
+let openRouterWebUrl = "https://openrouter.ai"
+let openRouterApiBaseUrl = ApiHostList[4].baseUrl + ":" + String(ApiHostList[4].port)
 /// Http Proxy
 let defaultHttpProxyHostName = "127.0.0.1"
 let defaultHttpProxyHostPort = "6152"
