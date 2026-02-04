@@ -3034,8 +3034,8 @@ class MessagesViewModel:NSObject, ObservableObject, URLSessionDataDelegate {
                      temperature: 0.5,
                      top_p: self.modelOptions.topP
                  )
-                 /// Parse Open Router response and extract title content
-                 let jsonResponse = JSON(response)
+                /// Parse Open Router response and extract title content
+                let jsonResponse = JSON(response as Any)
                  if let titleContent = jsonResponse["choices"].array?.first?["message"]["content"].string {
                      generatedTitle = cleanGeneratedTitle(titleContent)
                  } else if let errorMsg = jsonResponse["msg"].string {
